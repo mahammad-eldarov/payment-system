@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.dto.response;
 
+import az.bank.paymentsystem.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class TransactionResponse {
     private String customerName;
     private BigDecimal amount;
     private Currency currency;
+    private TransactionType transactionType;
     private TransactionStatus status;
     private String paidBy;    // pan və ya accountNumber
     private String enrollTo;  // pan və ya accountNumber

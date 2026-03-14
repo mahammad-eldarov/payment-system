@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.payment;
 
+import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,6 +36,10 @@ public class PaymentSourceResolver {
         }
         if (!card.getCustomer().getId().equals(customerId)) {
             errors.add(new ExceptionResponse(403, "Source card does not belong to this customer", LocalDateTime.now()));
+            return;
+        }
+        if (card.getStatus() == CardStatus.EXPIRED) {
+            errors.add(new ExceptionResponse(400, "Card is expired", LocalDateTime.now()));
             return;
         }
 
@@ -123,6 +128,10 @@ public class PaymentSourceResolver {
         CardEntity card = cardRepository.findByPanAndIsVisibleTrue(toPan).orElse(null);
         if (card == null) {
             errors.add(new ExceptionResponse(404, "Destination card not found", LocalDateTime.now()));
+            return;
+        }
+        if (card.getStatus() == CardStatus.EXPIRED) {
+            errors.add(new ExceptionResponse(400, "Destination card is expired", LocalDateTime.now()));
             return;
         }
         payment.setToCard(card);

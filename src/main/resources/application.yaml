@@ -64,7 +64,7 @@ bank:
 
 scheduler:
   payment:
-    cron: "50 03 22 * * *"
+    cron: "40 24 19 * * *"
   card:
     cron: "0 0 0 * * *"
   currentAccount:

@@ -34,9 +34,12 @@ public class TransactionEntity extends  BaseEntity {
 //    @Column(name = "created_at", nullable = false)
 //    private Instant createdAt;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "payment_id", nullable = false)
+//    @NotNull
+//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+//    @JoinColumn(name = "payment_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "payment_id", nullable = true)
     private PaymentEntity payment;
 
     @NotNull

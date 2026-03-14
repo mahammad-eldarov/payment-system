@@ -1,5 +1,8 @@
 package az.bank.paymentsystem.util.shared;
 
+import az.bank.paymentsystem.entity.CardEntity;
+import az.bank.paymentsystem.entity.CurrentAccountEntity;
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.PaymentEntity;
@@ -16,20 +19,63 @@ public class TransactionCreator {
     private final TransactionRepository transactionRepository;
 
     public void create(PaymentEntity payment, TransactionStatus status) {
+        transactionRepository.save(buildTransaction(payment, status, TransactionType.CREDIT));
+        transactionRepository.save(buildTransaction(payment, status, TransactionType.DEBIT));
+    }
+
+    private TransactionEntity buildTransaction(PaymentEntity payment, TransactionStatus status, TransactionType type) {
         TransactionEntity transaction = new TransactionEntity();
         transaction.setPayment(payment);
         transaction.setCustomer(payment.getCustomer());
         transaction.setAmount(payment.getAmount());
         transaction.setCurrency(payment.getCurrency());
         transaction.setStatus(status);
-        transaction.setFromCard(payment.getFromCard());
-        transaction.setFromAccount(payment.getFromAccount());
-        transaction.setToCard(payment.getToCard());
-        transaction.setToAccount(payment.getToAccount());
-        transaction.setTransactionType(TransactionType.DEBIT);
-        transaction.setDescription(String.format("Transfer of %s %s from %s to %s",
-                payment.getAmount(), payment.getCurrency(),
-                payment.getFromType(), payment.getToType()));
+        transaction.setTransactionType(type);
+        transaction.setDescription(buildDescription(payment));
+
+        if (type == TransactionType.CREDIT) {
+            transaction.setFromCard(payment.getFromCard());
+            transaction.setFromAccount(payment.getFromAccount());
+        } else {
+            transaction.setToCard(payment.getToCard());
+            transaction.setToAccount(payment.getToAccount());
+        }
+
+        transaction.setCreatedAt(Instant.now());
+        return transaction;
+    }
+
+    private String buildDescription(PaymentEntity payment) {
+        return "Transfer of " + payment.getAmount() + " " + payment.getCurrency() +
+                " from " + payment.getFromType() + " to " + payment.getToType();
+    }
+
+    public void createBalanceTransfer(CardEntity fromCard, CardEntity toCard,
+                                      BigDecimal amount, String description) {
+        TransactionEntity transaction = new TransactionEntity();
+        transaction.setFromCard(fromCard);
+        transaction.setToCard(toCard);
+        transaction.setAmount(amount);
+        transaction.setCurrency(fromCard.getCurrency());
+        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setTransactionType(TransactionType.CREDIT);
+        transaction.setDescription(description);
+        transaction.setCustomer(fromCard.getCustomer());
+        transaction.setCreatedAt(Instant.now());
+        transactionRepository.save(transaction);
+    }
+
+    public void createBalanceTransfer(CardEntity fromCard, CurrentAccountEntity toAccount,
+                                      BigDecimal amount, String description) {
+        TransactionEntity transaction = new TransactionEntity();
+        transaction.setFromCard(fromCard);
+        transaction.setToAccount(toAccount);
+        transaction.setAmount(amount);
+        transaction.setCurrency(fromCard.getCurrency());
+        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setTransactionType(TransactionType.CREDIT);
+        transaction.setDescription(description);
+        transaction.setCustomer(fromCard.getCustomer());
         transaction.setCreatedAt(Instant.now());
         transactionRepository.save(transaction);
     }

@@ -44,4 +44,5 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
     @Query("SELECT c FROM CardEntity c WHERE c.customer.id = :customerId AND c.isVisible = true AND c.balance >= :amount ORDER BY c.balance ASC LIMIT 1")
     Optional<CardEntity> findSufficientCard(@Param("customerId") Integer customerId, @Param("amount") BigDecimal amount);
 
+    Optional<CardEntity> findFirstByCustomerIdAndIsVisibleTrueAndIdNot(Integer customerId, Integer cardId);
 }

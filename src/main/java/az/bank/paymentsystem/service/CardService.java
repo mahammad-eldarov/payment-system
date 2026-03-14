@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.util.shared.CardBalanceTransfer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -31,6 +32,7 @@ public class CardService {
     private final CardValidator cardValidator;
     private final CardCreator cardCreator;
     private final CardMapper cardMapper;
+    private final CardBalanceTransfer cardBalanceTransfer;
 
 
     // CREATE
@@ -49,24 +51,50 @@ public class CardService {
     }
 
     // DELETE
+//    public MessageResponse deleteCard(Integer cardId) {
+//        CardEntity card = findActiveCard(cardId);
+//        cardValidator.validateCardDeletion(card);
+//        card.setStatus(CardStatus.CLOSED);
+//        card.setIsVisible(false);
+//        card.setUpdatedAt(Instant.now());
+//        cardRepository.save(card);
+//        return new MessageResponse("Card was successfully deleted.");
+//    }
     public MessageResponse deleteCard(Integer cardId) {
         CardEntity card = findActiveCard(cardId);
         cardValidator.validateCardDeletion(card);
+
         card.setStatus(CardStatus.CLOSED);
         card.setIsVisible(false);
         card.setUpdatedAt(Instant.now());
+
+        String message = cardBalanceTransfer.transfer(card);
         cardRepository.save(card);
-        return new MessageResponse("Card was successfully deleted.");
+        return new MessageResponse(message);
     }
 
     // UPDATE
+//    public void updateExpiredCards() {
+//        List<CardEntity> expiredCards = cardRepository
+//                .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
+//        expiredCards.forEach(card -> {
+//            card.setStatus(CardStatus.EXPIRED);
+//            card.setUpdatedAt(Instant.now());
+//        });
+//        cardRepository.saveAll(expiredCards);
+//    }
+
     public void updateExpiredCards() {
         List<CardEntity> expiredCards = cardRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
+
         expiredCards.forEach(card -> {
             card.setStatus(CardStatus.EXPIRED);
+//            card.setIsVisible(false); //why?
             card.setUpdatedAt(Instant.now());
+            cardBalanceTransfer.transfer(card);
         });
+
         cardRepository.saveAll(expiredCards);
     }
 
