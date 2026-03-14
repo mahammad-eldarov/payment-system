@@ -31,7 +31,7 @@ public class CardBalanceTransfer {
         }
 
         card.setBalance(BigDecimal.ZERO);
-        return "Your remaining balance of " + balance + " AZN can be collected by visiting your nearest branch.";
+        return "Your remaining balance of " + balance + card.getCurrency() +" can be collected by visiting your nearest branch.";
     }
 
 //    private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance) {

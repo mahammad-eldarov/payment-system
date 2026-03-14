@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.util.shared.CurrentAccountBalanceTransfer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +31,7 @@ public class CurrentAccountService {
     private final CurrentAccountMapper currentAccountMapper;
     private final CurrentAccountCreator currentAccountCreator;
     private final CurrentAccountValidator currentAccountValidator;
+    private final CurrentAccountBalanceTransfer currentAccountBalanceTransfer;
 
 
     // CREATE
@@ -81,16 +83,30 @@ public class CurrentAccountService {
         return new MessageResponse("Current account status updated successfully");
     }
 
-    public void updateExpiredCurrentAccounts() {
+//    public void updateExpiredCurrentAccounts() {
+//
+//        List<CurrentAccountEntity> expiredCurrentAccounts = currentAccountRepository
+//                .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CurrentAccountStatus.EXPIRED);
+//
+//        expiredCurrentAccounts.forEach(currentAccount -> {
+//            currentAccount.setStatus(CurrentAccountStatus.EXPIRED);
+//            currentAccount.setUpdatedAt(Instant.now());
+//        });
+//        currentAccountRepository.saveAll(expiredCurrentAccounts);
+//    }
 
-        List<CurrentAccountEntity> expiredCurrentAccounts = currentAccountRepository
+
+    public void updateExpiredCurrentAccounts() {
+        List<CurrentAccountEntity> expiredAccounts = currentAccountRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CurrentAccountStatus.EXPIRED);
 
-        expiredCurrentAccounts.forEach(currentAccount -> {
-            currentAccount.setStatus(CurrentAccountStatus.EXPIRED);
-            currentAccount.setUpdatedAt(Instant.now());
+        expiredAccounts.forEach(account -> {
+            account.setStatus(CurrentAccountStatus.EXPIRED);
+            account.setUpdatedAt(Instant.now());
+            currentAccountBalanceTransfer.transfer(account);
         });
-        currentAccountRepository.saveAll(expiredCurrentAccounts);
+
+        currentAccountRepository.saveAll(expiredAccounts);
     }
 
     // DELETE
