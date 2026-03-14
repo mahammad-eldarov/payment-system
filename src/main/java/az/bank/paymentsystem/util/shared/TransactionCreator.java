@@ -4,6 +4,7 @@ import az.bank.paymentsystem.entity.CardEntity;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.PaymentEntity;
 import az.bank.paymentsystem.entity.TransactionEntity;
@@ -50,33 +51,61 @@ public class TransactionCreator {
                 " from " + payment.getFromType() + " to " + payment.getToType();
     }
 
+
     public void createBalanceTransfer(CardEntity fromCard, CardEntity toCard,
-                                      BigDecimal amount, String description) {
-        TransactionEntity transaction = new TransactionEntity();
-        transaction.setFromCard(fromCard);
-        transaction.setToCard(toCard);
-        transaction.setAmount(amount);
-        transaction.setCurrency(fromCard.getCurrency());
-        transaction.setStatus(TransactionStatus.SUCCESS);
-        transaction.setTransactionType(TransactionType.CREDIT);
-        transaction.setDescription(description);
-        transaction.setCustomer(fromCard.getCustomer());
-        transaction.setCreatedAt(Instant.now());
-        transactionRepository.save(transaction);
+                                      BigDecimal amount, String debitDescription, String creditDescription) {
+        // Expired/closed kartdan pul çıxdı — müştəri üçün CREDIT (balans azaldı)
+        TransactionEntity credit = new TransactionEntity();
+        credit.setFromCard(fromCard);
+        credit.setAmount(amount);
+        credit.setCurrency(fromCard.getCurrency());
+        credit.setStatus(TransactionStatus.SUCCESS);
+        credit.setTransactionType(TransactionType.CREDIT);
+        credit.setDescription(creditDescription);
+        credit.setCustomer(fromCard.getCustomer());
+        credit.setCreatedAt(Instant.now());
+
+        // Digər karta pul gəldi — müştəri üçün DEBIT (balans artdı)
+        TransactionEntity debit = new TransactionEntity();
+        debit.setToCard(toCard);
+        debit.setAmount(amount);
+        debit.setCurrency(fromCard.getCurrency());
+        debit.setStatus(TransactionStatus.SUCCESS);
+        debit.setTransactionType(TransactionType.DEBIT);
+        debit.setDescription(debitDescription);
+        debit.setCustomer(fromCard.getCustomer());
+        debit.setCreatedAt(Instant.now());
+
+        transactionRepository.saveAll(List.of(debit, credit));
     }
 
-    public void createBalanceTransfer(CardEntity fromCard, CurrentAccountEntity toAccount,
-                                      BigDecimal amount, String description) {
-        TransactionEntity transaction = new TransactionEntity();
-        transaction.setFromCard(fromCard);
-        transaction.setToAccount(toAccount);
-        transaction.setAmount(amount);
-        transaction.setCurrency(fromCard.getCurrency());
-        transaction.setStatus(TransactionStatus.SUCCESS);
-        transaction.setTransactionType(TransactionType.CREDIT);
-        transaction.setDescription(description);
-        transaction.setCustomer(fromCard.getCustomer());
-        transaction.setCreatedAt(Instant.now());
-        transactionRepository.save(transaction);
-    }
+//    public void createBalanceTransfer(CardEntity fromCard, CardEntity toCard,
+//                                      BigDecimal amount, String description) {
+//        TransactionEntity transaction = new TransactionEntity();
+//        transaction.setFromCard(fromCard);
+//        transaction.setToCard(toCard);
+//        transaction.setAmount(amount);
+//        transaction.setCurrency(fromCard.getCurrency());
+//        transaction.setStatus(TransactionStatus.SUCCESS);
+//        transaction.setTransactionType(TransactionType.CREDIT);
+//        transaction.setDescription(description);
+//        transaction.setCustomer(fromCard.getCustomer());
+//        transaction.setCreatedAt(Instant.now());
+//        transactionRepository.save(transaction);
+//    }
+
+//    public void createBalanceTransfer(CardEntity fromCard, CurrentAccountEntity toAccount,
+//                                      BigDecimal amount, String description) {
+//        TransactionEntity transaction = new TransactionEntity();
+//        transaction.setFromCard(fromCard);
+//        transaction.setToAccount(toAccount);
+//        transaction.setAmount(amount);
+//        transaction.setCurrency(fromCard.getCurrency());
+//        transaction.setStatus(TransactionStatus.SUCCESS);
+//        transaction.setTransactionType(TransactionType.CREDIT);
+//        transaction.setDescription(description);
+//        transaction.setCustomer(fromCard.getCustomer());
+//        transaction.setCreatedAt(Instant.now());
+//        transactionRepository.save(transaction);
+//    }
 }

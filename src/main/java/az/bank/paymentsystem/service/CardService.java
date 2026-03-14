@@ -22,6 +22,7 @@ import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.card.CardCreator;
 import az.bank.paymentsystem.util.card.CardValidator;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +85,7 @@ public class CardService {
 //        cardRepository.saveAll(expiredCards);
 //    }
 
+    @Transactional
     public void updateExpiredCards() {
         List<CardEntity> expiredCards = cardRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);

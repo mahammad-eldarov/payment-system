@@ -26,38 +26,48 @@ public class SuspiciousTransactionChecker {
     private final BankConfig bankConfig;
 
     public void check(PaymentEntity payment) {
-        String suspiciousCurrency = bankConfig.getTransaction().getSuspiciousCurrency();
-        BigDecimal threshold = bankConfig.getTransaction().getSuspiciousThreshold();
+        if (isUnderThreshold(payment)) return;
 
-        if (payment.getCurrency().name().equals(suspiciousCurrency)
-                && payment.getAmount().compareTo(threshold) >= 0) {
+        CustomerEntity customer = payment.getCustomer();
+        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) return;
 
-            markCustomerSuspicious(payment.getCustomer());
-
-            if (payment.getFromCard() != null) {
-                markCardSuspicious(payment.getFromCard());
-            }
-            if (payment.getFromAccount() != null) {
-                markAccountSuspicious(payment.getFromAccount());
-            }
+        if (isAlreadySuspicious(customer.getId())) {
+            markCustomerSuspicious(payment);
+        } else {
+            markSourceSuspicious(payment);
         }
     }
 
-    private void markCustomerSuspicious(CustomerEntity customer) {
+    private boolean isUnderThreshold(PaymentEntity payment) {
+        return payment.getAmount().compareTo(bankConfig.getTransaction().getSuspiciousThreshold()) < 0;
+    }
+
+    private boolean isAlreadySuspicious(Integer customerId) {
+        return cardRepository.existsByCustomerIdAndStatus(customerId, CardStatus.SUSPICIOUS)
+                || currentAccountRepository.existsByCustomerIdAndStatus(customerId, CurrentAccountStatus.SUSPICIOUS);
+    }
+
+    private void markSourceSuspicious(PaymentEntity payment) {
+        if (payment.getFromCard() != null) {
+            payment.getFromCard().setStatus(CardStatus.SUSPICIOUS);
+            cardRepository.save(payment.getFromCard());
+        } else if (payment.getFromAccount() != null) {
+            payment.getFromAccount().setStatus(CurrentAccountStatus.SUSPICIOUS);
+            currentAccountRepository.save(payment.getFromAccount());
+        }
+    }
+
+    private void markCustomerSuspicious(PaymentEntity payment) {
+        CustomerEntity customer = payment.getCustomer();
         customer.setStatus(CustomerStatus.SUSPICIOUS);
-        customer.setUpdatedAt(Instant.now());
         customerRepository.save(customer);
-    }
 
-    private void markCardSuspicious(CardEntity card) {
-        card.setStatus(CardStatus.SUSPICIOUS);
-        card.setUpdatedAt(Instant.now());
-        cardRepository.save(card);
-    }
-
-    private void markAccountSuspicious(CurrentAccountEntity account) {
-        account.setStatus(CurrentAccountStatus.SUSPICIOUS);
-        account.setUpdatedAt(Instant.now());
-        currentAccountRepository.save(account);
+        if (payment.getFromCard() != null) {
+            payment.getFromCard().setStatus(CardStatus.SUSPICIOUS);
+            cardRepository.save(payment.getFromCard());
+        } else if (payment.getFromAccount() != null) {
+            payment.getFromAccount().setStatus(CurrentAccountStatus.SUSPICIOUS);
+            currentAccountRepository.save(payment.getFromAccount());
+        }
     }
 }

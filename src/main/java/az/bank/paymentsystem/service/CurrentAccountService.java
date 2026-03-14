@@ -37,7 +37,7 @@ public class CurrentAccountService {
                                                       OrderCurrentAccountRequest request) {
         CustomerEntity customer = findActiveCustomerById(customerId);
 
-        currentAccountValidator.validateAccountOrder(
+        currentAccountValidator.validateAccountOrder(customerId,
                 currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customerId));
 
         CurrentAccountEntity account = currentAccountCreator.createAccount(request, customer);

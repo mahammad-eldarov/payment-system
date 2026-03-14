@@ -1,5 +1,10 @@
 package az.bank.paymentsystem.util.card;
 
+import az.bank.paymentsystem.entity.CustomerEntity;
+import az.bank.paymentsystem.enums.CustomerStatus;
+import az.bank.paymentsystem.exception.CustomerNotFoundException;
+import az.bank.paymentsystem.exception.CustomerSuspiciousException;
+import az.bank.paymentsystem.repository.CustomerRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.CardEntity;
@@ -14,8 +19,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CardValidator {
     private final CardRepository cardRepository;
+    private final CustomerRepository customerRepository;
 
     public void validateCardOrder(Integer customerId) {
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+
+        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+            throw new CustomerSuspiciousException("Your account is suspended due to suspicious activity.");
+        }
 
         boolean hasSuspiciousCard = cardRepository.existsByCustomerIdAndStatusIn(
                 customerId, List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN));

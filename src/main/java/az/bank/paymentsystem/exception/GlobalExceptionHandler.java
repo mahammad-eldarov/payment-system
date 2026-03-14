@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.exception;
 
+import az.bank.paymentsystem.exception.base.ForbiddenException;
 import java.util.List;
 import az.bank.paymentsystem.exception.base.BadRequestException;
 import az.bank.paymentsystem.exception.base.ConflictException;
@@ -27,6 +28,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleBadRequest(BadRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ExceptionResponse(400, ex.getMessage(), LocalDateTime.now()));
+    }
+
+    // Exception 403
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ExceptionResponse> handleBadRequest(ForbiddenException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ExceptionResponse(403, ex.getMessage(), LocalDateTime.now()));
     }
 
     // Exception 404

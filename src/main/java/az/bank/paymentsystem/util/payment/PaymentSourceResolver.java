@@ -1,6 +1,8 @@
 package az.bank.paymentsystem.util.payment;
 
 import az.bank.paymentsystem.enums.CardStatus;
+import az.bank.paymentsystem.enums.CurrentAccountStatus;
+import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -38,8 +40,16 @@ public class PaymentSourceResolver {
             errors.add(new ExceptionResponse(403, "Source card does not belong to this customer", LocalDateTime.now()));
             return;
         }
+        if (card.getStatus() == CardStatus.SUSPICIOUS) {
+            errors.add(new ExceptionResponse(403, "Your card is suspended due to suspicious activity.", LocalDateTime.now()));
+            return;
+        }
         if (card.getStatus() == CardStatus.EXPIRED) {
             errors.add(new ExceptionResponse(400, "Card is expired", LocalDateTime.now()));
+            return;
+        }
+        if (payment.getCustomer().getStatus() == CustomerStatus.SUSPICIOUS) {
+            errors.add(new ExceptionResponse(403, "Your account is suspended due to suspicious activity.", LocalDateTime.now()));
             return;
         }
 
@@ -64,6 +74,14 @@ public class PaymentSourceResolver {
         }
         if (!account.getCustomer().getId().equals(customerId)) {
             errors.add(new ExceptionResponse(403, "Source current account does not belong to this customer", LocalDateTime.now()));
+            return;
+        }
+        if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
+            errors.add(new ExceptionResponse(403, "Your current account is suspended due to suspicious activity.", LocalDateTime.now()));
+            return;
+        }
+        if (payment.getCustomer().getStatus() == CustomerStatus.SUSPICIOUS) {
+            errors.add(new ExceptionResponse(403, "Your account is suspended due to suspicious activity.", LocalDateTime.now()));
             return;
         }
 

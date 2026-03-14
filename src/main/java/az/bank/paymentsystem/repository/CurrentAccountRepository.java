@@ -54,4 +54,5 @@ public interface CurrentAccountRepository extends JpaRepository<CurrentAccountEn
     @Query("SELECT a FROM CurrentAccountEntity a WHERE a.customer.id = :customerId AND a.isVisible = true AND a.balance >= :amount ORDER BY a.balance DESC LIMIT 1")
     Optional<CurrentAccountEntity> findSufficientAccount(@Param("customerId") Integer customerId, @Param("amount") BigDecimal amount);
 
+    Boolean existsByCustomerIdAndStatus(Integer customerId, CurrentAccountStatus status);
 }

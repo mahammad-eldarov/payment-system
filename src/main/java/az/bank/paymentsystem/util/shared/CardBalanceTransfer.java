@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class CardBalanceTransfer {
 
     private final CardRepository cardRepository;
-    private final CurrentAccountRepository currentAccountRepository;
     private final TransactionCreator transactionCreator;
 
     public String transfer(CardEntity card) {
@@ -31,36 +30,41 @@ public class CardBalanceTransfer {
             return transferToCard(card, otherCard, balance);
         }
 
-        CurrentAccountEntity account = currentAccountRepository
-                .findFirstByCustomerIdAndIsVisibleTrue(customerId).orElse(null);
-        if (account != null) {
-            return transferToAccount(card, account, balance);
-        }
-
+        card.setBalance(BigDecimal.ZERO);
         return "Your remaining balance of " + balance + " AZN can be collected by visiting your nearest branch.";
     }
 
+//    private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance) {
+//        otherCard.setBalance(otherCard.getBalance().add(balance));
+//        card.setBalance(BigDecimal.ZERO);
+//        cardRepository.save(otherCard);
+//        // transaction yarat
+//        transactionCreator.createBalanceTransfer(card, otherCard, balance,
+//                "Balance transferred from expired/closed card ending in "
+//                        + card.getPan().substring(card.getPan().length() - 4));
+//        return "Your remaining balance of " + balance + " AZN has been transferred to your card ending in "
+//                + otherCard.getPan().substring(otherCard.getPan().length() - 4) + ".";
+//    }
     private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance) {
         otherCard.setBalance(otherCard.getBalance().add(balance));
         card.setBalance(BigDecimal.ZERO);
         cardRepository.save(otherCard);
-        // transaction yarat
-        transactionCreator.createBalanceTransfer(card, otherCard, balance,
-                "Balance transferred from expired/closed card ending in "
-                        + card.getPan().substring(card.getPan().length() - 4));
+
+        String debitDescription = "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
+                + " was expired or closed. Balance of " + balance + " AZN has been transferred to your card ending in "
+                + otherCard.getPan().substring(otherCard.getPan().length() - 4) + ".";
+
+        String creditDescription = "Balance transferred from card ending in " + card.getPan().substring(card.getPan().length() - 4)
+                + " to card ending in " + otherCard.getPan().substring(otherCard.getPan().length() - 4);
+
+//                "Balance of " + balance + " AZN transferred from your expired/closed card ending in "
+//                + card.getPan().substring(card.getPan().length() - 4) + ".";
+
+        transactionCreator.createBalanceTransfer(card, otherCard, balance, debitDescription, creditDescription);
+
+
         return "Your remaining balance of " + balance + " AZN has been transferred to your card ending in "
                 + otherCard.getPan().substring(otherCard.getPan().length() - 4) + ".";
-    }
-
-    private String transferToAccount(CardEntity card, CurrentAccountEntity account, BigDecimal balance) {
-        account.setBalance(account.getBalance().add(balance));
-        card.setBalance(BigDecimal.ZERO);
-        currentAccountRepository.save(account);
-        transactionCreator.createBalanceTransfer(card, account, balance,
-                "Balance transferred from expired/closed card ending in "
-                        + card.getPan().substring(card.getPan().length() - 4));
-        return "Your remaining balance of " + balance + " AZN has been transferred to your account "
-                + account.getAccountNumber() + ".";
     }
 
 }

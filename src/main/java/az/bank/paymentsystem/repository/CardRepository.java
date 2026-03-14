@@ -45,4 +45,6 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
     Optional<CardEntity> findSufficientCard(@Param("customerId") Integer customerId, @Param("amount") BigDecimal amount);
 
     Optional<CardEntity> findFirstByCustomerIdAndIsVisibleTrueAndIdNot(Integer customerId, Integer cardId);
+
+    Boolean existsByCustomerIdAndStatus(Integer customerId, CardStatus status);
 }

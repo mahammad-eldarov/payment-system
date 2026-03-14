@@ -38,8 +38,8 @@ public class TransactionEntity extends  BaseEntity {
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "payment_id", nullable = false)
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "payment_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
     private PaymentEntity payment;
 
     @NotNull
