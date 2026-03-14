@@ -51,7 +51,7 @@ public class CardBalanceTransfer {
         cardRepository.save(otherCard);
 
         String debitDescription = "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
-                + " was expired or closed. Balance of " + balance + " AZN has been transferred to your card ending in "
+                + " was expired or closed. Balance of " + balance + card.getCurrency() + " has been transferred to your card ending in "
                 + otherCard.getPan().substring(otherCard.getPan().length() - 4) + ".";
 
         String creditDescription = "Balance transferred from card ending in " + card.getPan().substring(card.getPan().length() - 4)
@@ -63,7 +63,7 @@ public class CardBalanceTransfer {
         transactionCreator.createBalanceTransfer(card, otherCard, balance, debitDescription, creditDescription);
 
 
-        return "Your remaining balance of " + balance + " AZN has been transferred to your card ending in "
+        return "Your remaining balance of " + balance + card.getCurrency() + " has been transferred to your card ending in "
                 + otherCard.getPan().substring(otherCard.getPan().length() - 4) + ".";
     }
 
