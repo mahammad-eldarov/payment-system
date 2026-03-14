@@ -36,7 +36,15 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             Pageable pageable
     );
 
+    @EntityGraph(attributePaths = {
+            "customer",
+            "fromCard", "toCard",
+            "fromAccount", "toAccount",
+            "payment"
+    })
     Page<TransactionEntity> findAllByPaymentId(Integer paymentId, Pageable pageable);
+
+//    Page<TransactionEntity> findAllByPaymentId(Integer paymentId, Pageable pageable);
 
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM TransactionEntity t " +
             "WHERE t.customer.id = :customerId " +

@@ -9,10 +9,20 @@ import org.mapstruct.Mapping;
 public interface TransactionMapper {
 
     @Mapping(target = "paymentId", source = "payment.id")
-    @Mapping(target = "customerId", source = "customer.id")
-    @Mapping(target = "fromCardId", source = "fromCard.id")
-    @Mapping(target = "fromAccountId", source = "fromAccount.id")
-    @Mapping(target = "toCardId", source = "toCard.id")
-    @Mapping(target = "toAccountId", source = "toAccount.id")
-    TransactionResponse toResponse(TransactionEntity transaction);
+    @Mapping(target = "paidBy", expression = "java(getPaidBy(t))")
+    @Mapping(target = "enrollTo", expression = "java(getEnrollTo(t))")
+    @Mapping(target = "customerName", expression = "java(t.getCustomer().getName() + \" \" + t.getCustomer().getSurname())")
+    TransactionResponse toResponse(TransactionEntity t);
+
+    default String getPaidBy(TransactionEntity t) {
+        if (t.getFromCard() != null) return t.getFromCard().getPan();
+        if (t.getFromAccount() != null) return t.getFromAccount().getAccountNumber();
+        return null;
+    }
+
+    default String getEnrollTo(TransactionEntity t) {
+        if (t.getToCard() != null) return t.getToCard().getPan();
+        if (t.getToAccount() != null) return t.getToAccount().getAccountNumber();
+        return null;
+    }
 }

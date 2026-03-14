@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.TransactionStatus;
-import az.bank.paymentsystem.enums.TransactionType;
 
 @Getter
 @Setter
@@ -17,18 +16,26 @@ import az.bank.paymentsystem.enums.TransactionType;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionResponse {
 
+//    private Integer paymentId;
+//    private Integer customerId;
+//    private BigDecimal amount;
+//    private Currency currency;
+//    private TransactionType transactionType;
+//    private TransactionStatus status;
+////    private PaymentSourceType fromType;
+//    private Integer fromCardId;
+//    private Integer fromAccountId;
+////    private PaymentSourceType toType;
+//    private Integer toCardId;
+//    private Integer toAccountId;
+//    private String description;
     private Integer paymentId;
-    private Integer customerId;
+    private String customerName;
     private BigDecimal amount;
     private Currency currency;
-    private TransactionType transactionType;
     private TransactionStatus status;
-//    private PaymentSourceType fromType;
-    private Integer fromCardId;
-    private Integer fromAccountId;
-//    private PaymentSourceType toType;
-    private Integer toCardId;
-    private Integer toAccountId;
+    private String paidBy;    // pan və ya accountNumber
+    private String enrollTo;  // pan və ya accountNumber
     private String description;
 
 }
