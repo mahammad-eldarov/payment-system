@@ -1,0 +1,81 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: ${DB_PASSWORD}
+
+  application:
+    name:
+      payment-system
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+
+#  liquibase:
+#    default-schema: test_schema
+#    liquibase-schema: test_schema
+#    change-log: classpath:db.changelog/db.changelog-master.yaml
+#    enabled: true
+
+#bank:
+#  bin: "9988"
+#  card:
+#    min-balance: 10
+#    min-balance-currency: AZN
+#  account:
+#    min-balance: 5
+#    min-balance-currency: USD
+#  transaction:
+#    suspicious-threshold: 100
+#    suspicious-currency: AZN
+#
+#account:
+#  number:
+#    prefix: "2211"
+#    total-length: 18
+
+
+bank:
+  card:
+    min-balance: 10
+    min-balance-currency: AZN
+    number:
+      prefix: "9988"
+      total-length: 16
+  account:
+    min-balance: 5
+    min-balance-currency: USD
+    number:
+      prefix: "2211"
+      total-length: 18
+  transaction:
+    suspicious-threshold: 100
+    suspicious-currency: AZN
+
+scheduler:
+  payment:
+    cron: "50 03 22 * * *"
+  card:
+    cron: "0 0 0 * * *"
+  currentAccount:
+    cron: "0 0 0 * * *"
+
+
+#  cron: "0 33 23 4 3 *"
+
+#spring:
+#  jackson:
+#    default-property-inclusion: non_null
+
+
+
