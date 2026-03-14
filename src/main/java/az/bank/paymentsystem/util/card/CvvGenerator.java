@@ -1,4 +1,4 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.card;
 
 import java.security.SecureRandom;
 import org.springframework.stereotype.Component;

@@ -1,5 +1,8 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.payment;
 
+import az.bank.paymentsystem.util.shared.BalanceUpdater;
+import az.bank.paymentsystem.util.shared.SuspiciousTransactionChecker;
+import az.bank.paymentsystem.util.shared.TransactionCreator;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

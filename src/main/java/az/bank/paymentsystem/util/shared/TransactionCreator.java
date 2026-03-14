@@ -1,4 +1,4 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.shared;
 
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;

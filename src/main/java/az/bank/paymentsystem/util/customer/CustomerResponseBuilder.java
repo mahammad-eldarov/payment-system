@@ -1,4 +1,4 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.customer;
 
 import java.util.List;
 import java.util.stream.Collectors;

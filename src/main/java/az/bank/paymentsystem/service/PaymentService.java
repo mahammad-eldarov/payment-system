@@ -16,10 +16,10 @@ import az.bank.paymentsystem.exception.MultiValidationException;
 import az.bank.paymentsystem.exception.PaymentNotFoundException;
 import az.bank.paymentsystem.mapper.PaymentMapper;
 import az.bank.paymentsystem.repository.PaymentRepository;
-import az.bank.paymentsystem.util.PaymentCreator;
-import az.bank.paymentsystem.util.PaymentProcessor;
-import az.bank.paymentsystem.util.PaymentSourceResolver;
-import az.bank.paymentsystem.util.PaymentValidator;
+import az.bank.paymentsystem.util.payment.PaymentCreator;
+import az.bank.paymentsystem.util.payment.PaymentProcessor;
+import az.bank.paymentsystem.util.payment.PaymentSourceResolver;
+import az.bank.paymentsystem.util.payment.PaymentValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,5 +1,6 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.payment;
 
+import az.bank.paymentsystem.util.shared.CurrencyConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

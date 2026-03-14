@@ -16,8 +16,8 @@ import az.bank.paymentsystem.dto.request.UpdateCustomerRequest;
 import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.mapper.CustomerMapper;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.util.CustomerCreator;
-import az.bank.paymentsystem.util.CustomerResponseBuilder;
+import az.bank.paymentsystem.util.customer.CustomerCreator;
+import az.bank.paymentsystem.util.customer.CustomerResponseBuilder;
 import org.springframework.stereotype.Service;
 
 @Service

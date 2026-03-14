@@ -1,4 +1,4 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.payment;
 
 import java.math.BigDecimal;
 import java.time.Instant;

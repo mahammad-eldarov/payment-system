@@ -18,8 +18,8 @@ import az.bank.paymentsystem.dto.response.CardResponse;
 import az.bank.paymentsystem.mapper.CardMapper;
 import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.util.CardCreator;
-import az.bank.paymentsystem.util.CardValidator;
+import az.bank.paymentsystem.util.card.CardCreator;
+import az.bank.paymentsystem.util.card.CardValidator;
 import org.springframework.stereotype.Service;
 
 @Service

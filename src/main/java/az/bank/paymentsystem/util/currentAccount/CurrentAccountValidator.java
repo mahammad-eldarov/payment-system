@@ -1,4 +1,4 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.currentAccount;
 
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;

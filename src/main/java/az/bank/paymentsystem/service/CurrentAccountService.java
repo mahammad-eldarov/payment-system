@@ -17,8 +17,8 @@ import az.bank.paymentsystem.dto.response.CurrentAccountResponse;
 import az.bank.paymentsystem.mapper.CurrentAccountMapper;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.util.CurrentAccountCreator;
-import az.bank.paymentsystem.util.CurrentAccountValidator;
+import az.bank.paymentsystem.util.currentAccount.CurrentAccountCreator;
+import az.bank.paymentsystem.util.currentAccount.CurrentAccountValidator;
 import org.springframework.stereotype.Service;
 
 @Service

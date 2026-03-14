@@ -1,5 +1,6 @@
-package az.bank.paymentsystem.util;
+package az.bank.paymentsystem.util.card;
 
+import az.bank.paymentsystem.util.shared.LuhnPanGenerator;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
