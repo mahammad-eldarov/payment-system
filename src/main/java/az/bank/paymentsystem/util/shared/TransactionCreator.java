@@ -80,20 +80,20 @@ public class TransactionCreator {
     }
 
 
-    public void createAccountExpiredTransfer(CurrentAccountEntity account, BigDecimal amount) {
-        TransactionEntity transaction = new TransactionEntity();
-        transaction.setFromAccount(account);
-        transaction.setAmount(amount);
-        transaction.setCurrency(account.getCurrency());
-        transaction.setStatus(TransactionStatus.SUCCESS);
-        transaction.setTransactionType(TransactionType.CREDIT);
-        transaction.setDescription("Your account " + account.getAccountNumber()
-                + " was expired. Remaining balance of " + amount + " " + account.getCurrency()
-                + " can be collected by visiting your nearest branch.");
-        transaction.setCustomer(account.getCustomer());
-        transaction.setCreatedAt(Instant.now());
-        transactionRepository.save(transaction);
-    }
+//    public void createAccountExpiredTransfer(CurrentAccountEntity account, BigDecimal amount) {
+//        TransactionEntity transaction = new TransactionEntity();
+//        transaction.setFromAccount(account);
+//        transaction.setAmount(amount);
+//        transaction.setCurrency(account.getCurrency());
+//        transaction.setStatus(TransactionStatus.SUCCESS);
+//        transaction.setTransactionType(TransactionType.CREDIT);
+//        transaction.setDescription("Your account " + account.getAccountNumber()
+//                + " was expired. Remaining balance of " + amount + " " + account.getCurrency()
+//                + " can be collected by visiting your nearest branch.");
+//        transaction.setCustomer(account.getCustomer());
+//        transaction.setCreatedAt(Instant.now());
+//        transactionRepository.save(transaction);
+//    }
 
 //    public void createBalanceTransfer(CardEntity fromCard, CardEntity toCard,
 //                                      BigDecimal amount, String description) {

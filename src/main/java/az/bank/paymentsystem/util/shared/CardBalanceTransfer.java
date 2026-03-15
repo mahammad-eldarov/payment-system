@@ -35,7 +35,7 @@ public class CardBalanceTransfer {
             return transferToCard(card, otherCard, balance);
         }
 
-        card.setBalance(BigDecimal.ZERO);
+//        card.setBalance(BigDecimal.ZERO);
         return "Your remaining balance of " + balance + card.getCurrency() +" can be collected by visiting your nearest branch.";
     }
 

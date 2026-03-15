@@ -1,5 +1,7 @@
 package az.bank.paymentsystem.util.customer;
 
+import az.bank.paymentsystem.mapper.CardMapper;
+import az.bank.paymentsystem.mapper.CurrentAccountMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +21,17 @@ public class CustomerResponseBuilder {
 
     private final CardRepository cardRepository;
     private final CurrentAccountRepository currentAccountRepository;
-    private final CardService cardService;
-    private final CurrentAccountService currentAccountService;
     private final TransactionService transactionService;
+    private final CardMapper cardMapper;
+    private final CurrentAccountMapper currentAccountMapper;
 
     public void setCardsAndAccounts(CustomerResponse response, Integer customerId) {
         List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
-                .stream().map(cardService::toResponse).collect(Collectors.toList());
+                .stream().map(cardMapper::toResponse).collect(Collectors.toList());
 
         List<CurrentAccountResponse> accountResponses = currentAccountRepository
                 .findCurrentAccountByCustomerId(customerId)
-                .stream().map(currentAccountService::toResponse).collect(Collectors.toList());
+                .stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
 
         response.setCardResponse(cardResponses);
         response.setCardMessage(cardMessage(cardResponses));
@@ -40,7 +42,7 @@ public class CustomerResponseBuilder {
     public void setCardTransactions(CustomerResponse response, Integer customerId) {
         List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
                 .stream().map(card -> {
-                    CardResponse cardResponse = cardService.toResponse(card);
+                    CardResponse cardResponse = cardMapper.toResponse(card);
                     cardResponse.setTransactions(transactionService.getTransactionsByCardId(card.getId(), 1).getContent());
                     return cardResponse;
                 }).collect(Collectors.toList());
@@ -53,7 +55,7 @@ public class CustomerResponseBuilder {
         List<CurrentAccountResponse> accountResponses = currentAccountRepository
                 .findCurrentAccountByCustomerId(customerId)
                 .stream().map(account -> {
-                    CurrentAccountResponse accountResponse = currentAccountService.toResponse(account);
+                    CurrentAccountResponse accountResponse = currentAccountMapper.toResponse(account);
                     accountResponse.setTransactions(transactionService.getTransactionsByAccountId(account.getId(),1).getContent());
                     return accountResponse;
                 }).collect(Collectors.toList());
