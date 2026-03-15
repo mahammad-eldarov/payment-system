@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.util.shared.CardBalanceTransfer;
+import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +35,7 @@ public class CardService {
     private final CardCreator cardCreator;
     private final CardMapper cardMapper;
     private final CardBalanceTransfer cardBalanceTransfer;
+    private final StatusAuditLogger statusAuditLogger;
 
 
     // CREATE
@@ -44,7 +46,7 @@ public class CardService {
         CardEntity card = cardCreator.createCard(request, customer);
         cardRepository.save(card);
 
-        CardResponse response = toResponse(card);
+        CardResponse response = cardMapper.toResponse(card);
         response.setCvv(card.getCvv());
         response.setPassword(request.getPassword());
 
@@ -64,6 +66,7 @@ public class CardService {
     public MessageResponse deleteCard(Integer cardId) {
         CardEntity card = findActiveCard(cardId);
         cardValidator.validateCardDeletion(card);
+        statusAuditLogger.logCard(card, CardStatus.CLOSED.name(), "Card closed by customer");
 
         card.setStatus(CardStatus.CLOSED);
         card.setIsVisible(false);
@@ -90,9 +93,15 @@ public class CardService {
         List<CardEntity> expiredCards = cardRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
 
+//        expiredCards.forEach(card -> {
+//            card.setStatus(CardStatus.EXPIRED);
+////            card.setIsVisible(false); //why?
+//            card.setUpdatedAt(Instant.now());
+//            cardBalanceTransfer.transfer(card);
+//        });
         expiredCards.forEach(card -> {
+            statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), "Card expiry date reached");
             card.setStatus(CardStatus.EXPIRED);
-//            card.setIsVisible(false); //why?
             card.setUpdatedAt(Instant.now());
             cardBalanceTransfer.transfer(card);
         });
@@ -102,6 +111,7 @@ public class CardService {
 
     public MessageResponse updateCardStatus(Integer id, CardStatus status) {
         CardEntity card = findActiveCard(id);
+        statusAuditLogger.logCard(card, status.name(), "Status updated manually");
         card.setStatus(status);
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
@@ -123,13 +133,13 @@ public class CardService {
         if (cards.isEmpty()) {
             throw new EmptyListException("This customer does not have any cards.");
         }
-        return cards.stream().map(this::toResponse).collect(Collectors.toList());
+        return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
     }
 
     public CardResponse getCardByPan(String pan) {
         CardEntity card = cardRepository.findByPanAndIsVisibleTrue(pan)
                 .orElseThrow(() -> new CardNotFoundException("Card not found"));
-        return toResponse(card);
+        return cardMapper.toResponse(card);
     }
 
     public List<CardResponse> getCardsByStatus(CardStatus status) {
@@ -137,13 +147,13 @@ public class CardService {
         if (cards.isEmpty()) {
             throw new CardNotFoundException("No cards found with this status");
         }
-        return cards.stream().map(this::toResponse).collect(Collectors.toList());
+        return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
     }
 
     // RESPONSE
-    public CardResponse toResponse(CardEntity card) {
-        return cardMapper.toResponse(card);
-    }
+//    public CardResponse toResponse(CardEntity card) {
+//        return cardMapper.toResponse(card);
+//    }
 
     // AUXILIARY METHODS
     public CardEntity findActiveCard(Integer id) {

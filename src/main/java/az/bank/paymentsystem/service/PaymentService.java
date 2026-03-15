@@ -48,7 +48,7 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-        return toResponse(paymentRepository.save(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
     }
 
     @Transactional
@@ -65,7 +65,7 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-        return toResponse(paymentRepository.save(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
     }
 
     @Transactional
@@ -82,7 +82,7 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-        return toResponse(paymentRepository.save(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
     }
 
     @Transactional
@@ -99,7 +99,7 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-        return toResponse(paymentRepository.save(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
     }
 
     // PROCESS
@@ -112,13 +112,13 @@ public class PaymentService {
     }
     // GET
     public PaymentResponse getPaymentById(Integer paymentId) {
-        return toResponse(findPaymentById(paymentId));
+        return paymentMapper.toResponse(findPaymentById(paymentId));
     }
 
     // RESPONSE
-    public PaymentResponse toResponse(PaymentEntity payment) {
-        return paymentMapper.toResponse(payment);
-    }
+//    public PaymentResponse toResponse(PaymentEntity payment) {
+//        return paymentMapper.toResponse(payment);
+//    }
 
     public PaymentEntity findPaymentById(Integer paymentId) {
         return paymentRepository.findById(paymentId)

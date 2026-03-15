@@ -13,7 +13,7 @@ public class CardScheduler {
     private final CardService cardService;
 
     @Scheduled(cron = "${scheduler.card.cron}")
-    @SchedulerLock(name = "updateExpiredCards", lockAtLeastFor = "PT5M", lockAtMostFor = "PT1H")
+    @SchedulerLock(name = "updateExpiredCards", lockAtLeastFor = "PT20S", lockAtMostFor = "PT5M")
     public void updateExpiredCards() {
         cardService.updateExpiredCards();
     }

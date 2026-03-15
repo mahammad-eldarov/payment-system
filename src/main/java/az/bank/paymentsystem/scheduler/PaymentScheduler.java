@@ -13,8 +13,8 @@ public class PaymentScheduler {
     private final PaymentService paymentService;
 
     @Scheduled(cron = "${scheduler.payment.cron}")
-    @SchedulerLock(name = "processPendingPayments", lockAtLeastFor = "PT10S",
-            lockAtMostFor = "PT30S")
+    @SchedulerLock(name = "processPendingPayments", lockAtLeastFor = "PT20S",
+            lockAtMostFor = "PT5M")
     public void processPendingPayments() {
         paymentService.processPayments();
     }

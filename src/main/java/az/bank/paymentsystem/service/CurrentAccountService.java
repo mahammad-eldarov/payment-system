@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.util.shared.CurrentAccountBalanceTransfer;
+import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +33,7 @@ public class CurrentAccountService {
     private final CurrentAccountCreator currentAccountCreator;
     private final CurrentAccountValidator currentAccountValidator;
     private final CurrentAccountBalanceTransfer currentAccountBalanceTransfer;
+    private final StatusAuditLogger statusAuditLogger;
 
 
     // CREATE
@@ -44,7 +46,7 @@ public class CurrentAccountService {
 
         CurrentAccountEntity account = currentAccountCreator.createAccount(request, customer);
         currentAccountRepository.save(account);
-        return toResponse(account);
+        return currentAccountMapper.toResponse(account);
     }
 
     //GET
@@ -58,11 +60,11 @@ public class CurrentAccountService {
             throw new EmptyListException("This customer does not have any current accounts.");
         }
 
-        return accounts.stream().map(this::toResponse).collect(Collectors.toList());
+        return accounts.stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
     }
 
     public CurrentAccountResponse getAccountByAccountNumber(String accountNumber) {
-        return toResponse(findActiveAccountByNumber(accountNumber));
+        return currentAccountMapper.toResponse(findActiveAccountByNumber(accountNumber));
     }
 
     public List<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status) {
@@ -72,11 +74,19 @@ public class CurrentAccountService {
             throw new AccountNotFoundException("No current account found with this status");
         }
 
-        return accounts.stream().map(this::toResponse).collect(Collectors.toList());
+        return accounts.stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
     }
 
+//    public MessageResponse updateCurrentAccountStatus(Integer id, CurrentAccountStatus status) {
+//        CurrentAccountEntity account = findActiveAccountById(id);
+//        account.setStatus(status);
+//        account.setUpdatedAt(Instant.now());
+//        currentAccountRepository.save(account);
+//        return new MessageResponse("Current account status updated successfully");
+//    }
     public MessageResponse updateCurrentAccountStatus(Integer id, CurrentAccountStatus status) {
         CurrentAccountEntity account = findActiveAccountById(id);
+        statusAuditLogger.logAccount(account, status.name(), "Status updated manually");
         account.setStatus(status);
         account.setUpdatedAt(Instant.now());
         currentAccountRepository.save(account);
@@ -100,7 +110,13 @@ public class CurrentAccountService {
         List<CurrentAccountEntity> expiredAccounts = currentAccountRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CurrentAccountStatus.EXPIRED);
 
+//        expiredAccounts.forEach(account -> {
+//            account.setStatus(CurrentAccountStatus.EXPIRED);
+//            account.setUpdatedAt(Instant.now());
+//            currentAccountBalanceTransfer.transfer(account);
+//        });
         expiredAccounts.forEach(account -> {
+            statusAuditLogger.logAccount(account, CurrentAccountStatus.EXPIRED.name(), "Account expiry date reached");
             account.setStatus(CurrentAccountStatus.EXPIRED);
             account.setUpdatedAt(Instant.now());
             currentAccountBalanceTransfer.transfer(account);
@@ -110,9 +126,19 @@ public class CurrentAccountService {
     }
 
     // DELETE
-    public MessageResponse deleteCurrentAccount (Integer id) {
+//    public MessageResponse deleteCurrentAccount (Integer id) {
+//        CurrentAccountEntity account = findActiveAccountById(id);
+//        currentAccountValidator.validateDeletion(account);
+//        account.setStatus(CurrentAccountStatus.CLOSED);
+//        account.setIsVisible(false);
+//        account.setUpdatedAt(Instant.now());
+//        currentAccountRepository.save(account);
+//        return new MessageResponse("Current account was successfully deleted.");
+//    }
+    public MessageResponse deleteCurrentAccount(Integer id) {
         CurrentAccountEntity account = findActiveAccountById(id);
         currentAccountValidator.validateDeletion(account);
+        statusAuditLogger.logAccount(account, CurrentAccountStatus.CLOSED.name(), "Account closed by customer");
         account.setStatus(CurrentAccountStatus.CLOSED);
         account.setIsVisible(false);
         account.setUpdatedAt(Instant.now());
@@ -121,9 +147,9 @@ public class CurrentAccountService {
     }
 
     // RESPONSE
-    public CurrentAccountResponse toResponse(CurrentAccountEntity account) {
-        return currentAccountMapper.toResponse(account);
-    }
+//    public CurrentAccountResponse toResponse(CurrentAccountEntity account) {
+//        return currentAccountMapper.toResponse(account);
+//    }
 
     public CurrentAccountEntity findActiveAccountById(Integer id) {
         return currentAccountRepository.findByIdAndIsVisibleTrue(id)

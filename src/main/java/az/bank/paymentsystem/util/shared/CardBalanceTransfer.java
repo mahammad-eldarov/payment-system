@@ -2,6 +2,7 @@ package az.bank.paymentsystem.util.shared;
 
 import az.bank.paymentsystem.entity.CardEntity;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
+import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import java.math.BigDecimal;
@@ -20,6 +21,10 @@ public class CardBalanceTransfer {
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
             return "Card was successfully deleted.";
+        }
+        if (card.getStatus() == CardStatus.SUSPICIOUS) {
+            return "Your balance of " + balance + " " + card.getCurrency()
+                    + " has been frozen due to suspicious activity on your card.";
         }
 
         Integer customerId = card.getCustomer().getId();

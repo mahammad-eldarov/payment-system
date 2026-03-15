@@ -13,7 +13,7 @@ public class CurrentAccountScheduler {
     private final CurrentAccountService currentAccountService;
 
     @Scheduled(cron = "${scheduler.currentAccount.cron}")
-    @SchedulerLock(name = "updateExpiredCurrentAccounts", lockAtLeastFor = "PT5M", lockAtMostFor = "PT1H")
+    @SchedulerLock(name = "updateExpiredCurrentAccounts", lockAtLeastFor = "PT20S", lockAtMostFor = "PT5M")
     public void updateExpiredCards() {
         currentAccountService.updateExpiredCurrentAccounts();
 

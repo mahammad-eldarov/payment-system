@@ -34,7 +34,7 @@ public class CustomerService {
         CustomerEntity customer = customerCreator.createCustomer(request);
         customerRepository.save(customer);
 
-        CustomerResponse response = toResponse(customer);
+        CustomerResponse response = customerMapper.toResponse(customer);
         response.setPin(request.getPin());
         return response;
     }
@@ -46,7 +46,7 @@ public class CustomerService {
         Optional<CustomerEntity> activeCustomer = customerRepository.findByIdAndIsVisibleTrue(id);
 
         if (activeCustomer.isPresent()) {
-            return toResponse(activeCustomer.get());
+            return customerMapper.toResponse(activeCustomer.get());
         }
         if (customerRepository.findByIdAndIsVisibleFalse(id).isPresent()) {
             throw new CustomerDeletedException("This customer has been deleted.");
@@ -58,7 +58,7 @@ public class CustomerService {
         List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
 
         if (!activeCustomers.isEmpty()) {
-            return activeCustomers.stream().map(this::toResponse).collect(Collectors.toList());
+            return activeCustomers.stream().map(customerMapper::toResponse).collect(Collectors.toList());
         }
         if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
             throw new CustomerDeletedException("Customers with this status have been deleted.");
@@ -69,7 +69,7 @@ public class CustomerService {
     public CustomerResponse getDeletedCustomerById(Integer id) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-        CustomerResponse response = toResponse(customer);
+        CustomerResponse response = customerMapper.toResponse(customer);
         customerResponseBuilder.setCardsAndAccounts(response, id);
         return response;
     }
@@ -81,25 +81,25 @@ public class CustomerService {
             throw new EmptyListException("List is Empty.");
         }
 
-        return activeCustomer.stream().map(this::toResponse).collect(Collectors.toList());
+        return activeCustomer.stream().map(customerMapper::toResponse).collect(Collectors.toList());
     }
 
     public CustomerResponse getCustomersCardsAndAccounts(Integer id) {
-        CustomerResponse response = toResponse(findActiveCustomer(id));
+        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(id));
         customerResponseBuilder.setCardsAndAccounts(response, id);
         return response;
     }
 
     // Müştərinin kartlarını tranzaksiyalarla birlikdə gətirir
     public CustomerResponse getCustomerWithCardTransactions(Integer customerId) {
-        CustomerResponse response = toResponse(findActiveCustomer(customerId));
+        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
         customerResponseBuilder.setCardTransactions(response, customerId);
         return response;
     }
 
     // Müştərinin cari hesablarını tranzaksiyalarla birlikdə gətirir
     public CustomerResponse getCustomerWithAccountTransactions(Integer customerId) {
-        CustomerResponse response = toResponse(findActiveCustomer(customerId));
+        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
         customerResponseBuilder.setAccountTransactions(response, customerId);
         return response;
     }
@@ -148,9 +148,9 @@ public class CustomerService {
     }
 
     // RESPONSE
-    public CustomerResponse toResponse(CustomerEntity customer) {
-        return customerMapper.toResponse(customer);
-    }
+//    public CustomerResponse toResponse(CustomerEntity customer) {
+//        return customerMapper.toResponse(customer);
+//    }
 
     // Auxiliary method
     public CustomerEntity findActiveCustomer(Integer id) {
