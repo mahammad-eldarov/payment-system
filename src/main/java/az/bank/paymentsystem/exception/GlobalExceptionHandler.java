@@ -22,6 +22,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+//    // Exception 204
+//    @ExceptionHandler(EmptyListException.class)
+//    public ResponseEntity<Void> handleEmptyList(EmptyListException ex) {
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+//                .body(new ExceptionResponse(204, ex.getMessage(), LocalDateTime.now()));
+//
+//    }
+
+
     // Exception 400
 
     @ExceptionHandler(BadRequestException.class)

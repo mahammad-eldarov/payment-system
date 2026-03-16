@@ -3,10 +3,14 @@ package az.bank.paymentsystem.service;
 import az.bank.paymentsystem.dto.response.StatusAuditLogResponse;
 import az.bank.paymentsystem.entity.StatusAuditLogEntity;
 import az.bank.paymentsystem.exception.EmptyListException;
+import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.mapper.StatusAuditLogMapper;
 import az.bank.paymentsystem.repository.StatusAuditLogRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,49 +21,50 @@ public class StatusAuditLogService {
     private final StatusAuditLogMapper statusAuditLogMapper;
     private final EntityFinderService entityFinderService;
 
-    public List<StatusAuditLogResponse> getCardHistory(Integer cardId) {
+    public Page<StatusAuditLogResponse> getCardHistory(Integer cardId, int page) {
         entityFinderService.findActiveCard(cardId);
 
-        List<StatusAuditLogEntity> logs = statusAuditLogRepository
-                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CARD", cardId);
+        Pageable pageable = buildPageable(page);
+
+        Page<StatusAuditLogEntity> logs = statusAuditLogRepository
+                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CARD", cardId, pageable);
 
         if (logs.isEmpty()) throw new EmptyListException("No status changes found for this card.");
 
-        return logs.stream().map(statusAuditLogMapper::toResponse).toList();
 
-//        return statusAuditLogRepository
-//                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CARD", cardId)
-//                .stream().map(statusAuditLogMapper::toResponse).toList();
+        return logs.map(statusAuditLogMapper::toResponse);
+
     }
 
-    public List<StatusAuditLogResponse> getAccountHistory(Integer accountId) {
+    public Page<StatusAuditLogResponse> getAccountHistory(Integer accountId, int page) {
         entityFinderService.findActiveAccount(accountId);
 
-        List<StatusAuditLogEntity> logs = statusAuditLogRepository
-                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("ACCOUNT", accountId);
+        Pageable pageable = buildPageable(page);
+
+        Page<StatusAuditLogEntity> logs = statusAuditLogRepository
+                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("ACCOUNT", accountId, pageable);
 
         if (logs.isEmpty()) throw new EmptyListException("No status changes found for this current account.");
 
-        return logs.stream().map(statusAuditLogMapper::toResponse).toList();
-
-//        return statusAuditLogRepository
-//                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("ACCOUNT", accountId)
-//                .stream().map(statusAuditLogMapper::toResponse).toList();
+        return logs.map(statusAuditLogMapper::toResponse);
     }
 
-    public List<StatusAuditLogResponse> getCustomerHistory(Integer customerId) {
+    public Page<StatusAuditLogResponse> getCustomerHistory(Integer customerId, int page) {
         entityFinderService.findActiveCustomer(customerId);
 
-        List<StatusAuditLogEntity> logs = statusAuditLogRepository
-                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CUSTOMER", customerId);
+        Pageable pageable = buildPageable(page);
+
+        Page<StatusAuditLogEntity> logs = statusAuditLogRepository
+                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CUSTOMER", customerId, pageable);
 
         if (logs.isEmpty()) throw new EmptyListException("No status changes found for this customer.");
 
-        return logs.stream().map(statusAuditLogMapper::toResponse).toList();
+        return logs.map(statusAuditLogMapper::toResponse);
 
+    }
 
-//        return statusAuditLogRepository
-//                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CUSTOMER", customerId)
-//                .stream().map(statusAuditLogMapper::toResponse).toList();
+    private Pageable buildPageable(int page) {
+        if (page < 1) throw new PageRequestException("Page number must be at least 1");
+        return PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,19 +23,25 @@ public class StatusAuditLogV1Controller {
 
     @GetMapping("/card/{cardId}")
     @Operation(summary = "Get card status history", description = "Returns status change history for a specific card")
-    public ResponseEntity<List<StatusAuditLogResponse>> getCardHistory(@PathVariable Integer cardId) {
-        return ResponseEntity.ok(statusAuditLogService.getCardHistory(cardId));
+    public ResponseEntity<List<StatusAuditLogResponse>> getCardHistory(@PathVariable Integer cardId,
+                                                                       @RequestParam(required = false, defaultValue ="1")
+                                                                       int page) {
+        return ResponseEntity.ok(statusAuditLogService.getCardHistory(cardId,page).getContent());
     }
 
     @GetMapping("/account/{accountId}")
     @Operation(summary = "Get account status history", description = "Returns status change history for a specific current account")
-    public ResponseEntity<List<StatusAuditLogResponse>> getAccountHistory(@PathVariable Integer accountId) {
-        return ResponseEntity.ok(statusAuditLogService.getAccountHistory(accountId));
+    public ResponseEntity<List<StatusAuditLogResponse>> getAccountHistory(@PathVariable Integer accountId,
+                                                                          @RequestParam(required = false, defaultValue ="1")
+                                                                          int page) {
+        return ResponseEntity.ok(statusAuditLogService.getAccountHistory(accountId, page).getContent());
     }
 
     @GetMapping("/customer/{customerId}")
     @Operation(summary = "Get customer status history", description = "Returns status change history for a specific customer")
-    public ResponseEntity<List<StatusAuditLogResponse>> getCustomerHistory(@PathVariable Integer customerId) {
-        return ResponseEntity.ok(statusAuditLogService.getCustomerHistory(customerId));
+    public ResponseEntity<List<StatusAuditLogResponse>> getCustomerHistory(@PathVariable Integer customerId,
+                                                                           @RequestParam(required = false, defaultValue ="1")
+                                                                           int page) {
+        return ResponseEntity.ok(statusAuditLogService.getCustomerHistory(customerId,page).getContent());
     }
 }
