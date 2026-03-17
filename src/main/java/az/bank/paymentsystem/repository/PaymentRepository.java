@@ -33,13 +33,13 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
     })
     List<PaymentEntity> findAllByStatus(PaymentStatus status);
 
-    boolean existsByCustomerIdAndScheduledDateAndFromTypeIn(
+    Boolean existsByCustomerIdAndScheduledDateAndFromTypeIn(
             Integer customerId,
             LocalDate scheduledDate,
             List<PaymentSourceType> fromTypes
     );
 
-    boolean existsByCustomerIdAndScheduledDateAndStatus(
+    Boolean existsByCustomerIdAndScheduledDateAndStatus(
             Integer customerId,
             LocalDate scheduledDate,
             PaymentStatus status

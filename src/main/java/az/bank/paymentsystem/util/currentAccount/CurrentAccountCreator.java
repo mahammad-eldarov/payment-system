@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class CurrentAccountCreator {
 
     private final AccountNumberGenerator accountNumberGenerator;
-    private final CurrentAccountRepository currentAccountRepository;
+//    private final CurrentAccountRepository currentAccountRepository;
 
     public CurrentAccountEntity createAccount(OrderCurrentAccountRequest request,
                                               CustomerEntity customer) {

@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.currentAccount;
 
+import az.bank.paymentsystem.service.EntityFinderService;
 import jakarta.annotation.PostConstruct;
 import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,8 @@ public class AccountNumberGenerator {
 
     private int randomPartLength;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final CurrentAccountRepository currentAccountRepository;
+//    private final CurrentAccountRepository currentAccountRepository;
+    private final EntityFinderService entityFinderService;
 
     @PostConstruct
     public void init() {
@@ -30,8 +32,11 @@ public class AccountNumberGenerator {
         String accountNumber;
         do {
             accountNumber = buildAccountNumber();
-        } while (currentAccountRepository.existsByAccountNumber(accountNumber));
+        } while (entityFinderService.findExistingAccountNumber(accountNumber));
         return accountNumber;
+//        do {
+//            accountNumber = buildAccountNumber();
+//        } while (currentAccountRepository.existsByAccountNumber(accountNumber));
     }
 
     private String buildAccountNumber() {
