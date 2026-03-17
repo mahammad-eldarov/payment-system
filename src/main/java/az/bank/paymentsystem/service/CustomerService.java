@@ -15,7 +15,6 @@ import az.bank.paymentsystem.dto.request.CreateCustomerRequest;
 import az.bank.paymentsystem.dto.request.UpdateCustomerRequest;
 import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.mapper.CustomerMapper;
-import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.customer.CustomerCreator;
 import az.bank.paymentsystem.util.customer.CustomerResponseBuilder;
 import org.springframework.stereotype.Service;
@@ -46,14 +45,14 @@ public class CustomerService {
     public CustomerResponse getCustomerById(Integer id) {
 
 //        Optional<CustomerEntity> activeCustomer = customerRepository.findByIdAndIsVisibleTrue(id);
-        Optional<CustomerEntity> activeCustomer = entityFinderService.findIdVisibleTrue(id);
+        Optional<CustomerEntity> activeCustomer = entityFinderService.findCustomerIdVisibleTrue(id);
         if (activeCustomer.isPresent()) {
             return customerMapper.toResponse(activeCustomer.get());
         }
 //        if (customerRepository.findByIdAndIsVisibleFalse(id).isPresent()) {
 //            throw new CustomerDeletedException("This customer has been deleted.");
 //        }
-        if (entityFinderService.findIdVisibleFalse(id).isPresent()) {
+        if (entityFinderService.findCustomerIdVisibleFalse(id).isPresent()) {
             throw new CustomerDeletedException("This customer has been deleted.");
         }
         throw new CustomerNotFoundException("Customer not found");
@@ -62,14 +61,14 @@ public class CustomerService {
     public List<CustomerResponse> getCustomersByStatus(CustomerStatus status) {
 //        List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
 
-        List<CustomerEntity> activeCustomers = entityFinderService.findStatusVisibleTrue(status);
+        List<CustomerEntity> activeCustomers = entityFinderService.findCustomerStatusVisibleTrue(status);
         if (!activeCustomers.isEmpty()) {
             return activeCustomers.stream().map(customerMapper::toResponse).collect(Collectors.toList());
         }
 //        if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
 //            throw new CustomerDeletedException("Customers with this status have been deleted.");
 //        }
-        if (!entityFinderService.findStatusVisibleFalse(status).isEmpty()) {
+        if (!entityFinderService.findCustomerStatusVisibleFalse(status).isEmpty()) {
             throw new CustomerDeletedException("Customers with this status have been deleted.");
         }
         throw new CustomerNotFoundException("No customers found with this status");
@@ -77,7 +76,7 @@ public class CustomerService {
 
     public CustomerResponse getDeletedCustomerById(Integer id) {
 //        CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-        CustomerEntity customer = entityFinderService.findIdVisibleFalse(id).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
+        CustomerEntity customer = entityFinderService.findCustomerIdVisibleFalse(id).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
         CustomerResponse response = customerMapper.toResponse(customer);
         customerResponseBuilder.setCardsAndAccounts(response, id);
         return response;
@@ -85,7 +84,7 @@ public class CustomerService {
 
     public List<CustomerResponse> getAllCustomers() {
 //        List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
-        List<CustomerEntity> activeCustomer = entityFinderService.findAllVisibleTrue();
+        List<CustomerEntity> activeCustomer = entityFinderService.findAllCustomerVisibleTrue();
 
         if (activeCustomer.isEmpty()) {
             throw new EmptyListException("List is Empty.");

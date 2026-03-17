@@ -28,7 +28,7 @@ public class CurrentAccountValidator {
         }
     }
 
-    public void validateAccountOrder(Integer customerId, int accountCount) {
+    public void validateAccountOrder(Integer customerId, Integer accountCount) {
 
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));

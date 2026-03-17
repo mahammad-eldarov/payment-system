@@ -37,7 +37,7 @@ public class StatusAuditLogService {
     }
 
     public Page<StatusAuditLogResponse> getAccountHistory(Integer accountId, int page) {
-        entityFinderService.findActiveAccount(accountId);
+        entityFinderService.findActiveCurrentAccount(accountId);
 
         Pageable pageable = buildPageable(page);
 

@@ -29,22 +29,24 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CardService {
 
-    private final CardRepository cardRepository;
-    private final CustomerRepository customerRepository;
+//    private final CardRepository cardRepository;
+//    private final CustomerRepository customerRepository;
     private final CardValidator cardValidator;
     private final CardCreator cardCreator;
     private final CardMapper cardMapper;
     private final CardBalanceTransfer cardBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
+    private final EntityFinderService entityFinderService;
 
 
     // CREATE
     public CardResponse orderCard(Integer customerId, OrderCardRequest request) {
-        CustomerEntity customer = findActiveCustomer(customerId);
+        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
         cardValidator.validateCardOrder(customerId);
 
         CardEntity card = cardCreator.createCard(request, customer);
-        cardRepository.save(card);
+//        cardRepository.save(card);
+        entityFinderService.saveCard(card);
 
         CardResponse response = cardMapper.toResponse(card);
         response.setCvv(card.getCvv());
@@ -64,7 +66,7 @@ public class CardService {
 //        return new MessageResponse("Card was successfully deleted.");
 //    }
     public MessageResponse deleteCard(Integer cardId) {
-        CardEntity card = findActiveCard(cardId);
+        CardEntity card = entityFinderService.findActiveCard(cardId);
         cardValidator.validateCardDeletion(card);
         statusAuditLogger.logCard(card, CardStatus.CLOSED.name(), "Card closed by customer");
 
@@ -73,7 +75,8 @@ public class CardService {
         card.setUpdatedAt(Instant.now());
 
         String message = cardBalanceTransfer.transfer(card);
-        cardRepository.save(card);
+//        cardRepository.save(card);
+        entityFinderService.saveCard(card);
         return new MessageResponse(message);
     }
 
@@ -90,8 +93,10 @@ public class CardService {
 
     @Transactional
     public void updateExpiredCards() {
-        List<CardEntity> expiredCards = cardRepository
-                .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
+//        List<CardEntity> expiredCards = cardRepository
+//                .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
+
+        List<CardEntity> expiredCards = entityFinderService.findAllCardNotReachExpiryDate();
 
 //        expiredCards.forEach(card -> {
 //            card.setStatus(CardStatus.EXPIRED);
@@ -106,30 +111,34 @@ public class CardService {
             cardBalanceTransfer.transfer(card);
         });
 
-        cardRepository.saveAll(expiredCards);
+//        cardRepository.saveAll(expiredCards);
+        entityFinderService.saveAllExpiredCards(expiredCards);
     }
 
     public MessageResponse updateCardStatus(Integer id, CardStatus status) {
-        CardEntity card = findActiveCard(id);
+        CardEntity card = entityFinderService.findActiveCard(id);
         statusAuditLogger.logCard(card, status.name(), "Status updated manually");
         card.setStatus(status);
         card.setUpdatedAt(Instant.now());
-        cardRepository.save(card);
+//        cardRepository.save(card);
+        entityFinderService.saveCard(card);
         return new MessageResponse("Card status updated successfully");
     }
 
     public MessageResponse updateCardPassword(Integer id, UpdateCardPasswordRequest request) {
-        CardEntity card = findActiveCard(id);
+        CardEntity card = entityFinderService.findActiveCard(id);
         card.setPassword(request.getPassword());
         card.setUpdatedAt(Instant.now());
-        cardRepository.save(card);
+//        cardRepository.save(card);
+        entityFinderService.saveCard(card);
         return new MessageResponse("Card password updated successfully");
     }
 
     // GET
     public List<CardResponse> getCardsByCustomerId(Integer customerId) {
-        findActiveCustomer(customerId);
-        List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
+        entityFinderService.findActiveCustomer(customerId);
+//        List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
+        List<CardEntity> cards = entityFinderService.findCardsCustomerId(customerId);
         if (cards.isEmpty()) {
             throw new EmptyListException("This customer does not have any cards.");
         }
@@ -137,13 +146,14 @@ public class CardService {
     }
 
     public CardResponse getCardByPan(String pan) {
-        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(pan)
-                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+//        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(pan).orElseThrow(() -> new CardNotFoundException("Card not found"));
+        CardEntity card = entityFinderService.findCardPanVisibleTrue(pan);
         return cardMapper.toResponse(card);
     }
 
     public List<CardResponse> getCardsByStatus(CardStatus status) {
-        List<CardEntity> cards = cardRepository.findByStatusAndIsVisibleTrue(status);
+//        List<CardEntity> cards = cardRepository.findByStatusAndIsVisibleTrue(status);
+        List<CardEntity> cards = entityFinderService.findCardStatusVisibleTrue(status);
         if (cards.isEmpty()) {
             throw new CardNotFoundException("No cards found with this status");
         }
@@ -156,13 +166,15 @@ public class CardService {
 //    }
 
     // AUXILIARY METHODS
-    public CardEntity findActiveCard(Integer id) {
-        return cardRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CardNotFoundException("Card not found"));
-    }
+//    public CardEntity findActiveCard(Integer id) {
+//        return cardRepository.findByIdAndIsVisibleTrue(id)
+//                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+//    }
 
-    public CustomerEntity findActiveCustomer(Integer id) {
-        return customerRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-    }
+//    public CustomerEntity findActiveCustomer(Integer id) {
+//        return customerRepository.findByIdAndIsVisibleTrue(id)
+//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//    }
+
+
 }
