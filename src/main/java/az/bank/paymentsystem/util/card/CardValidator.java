@@ -81,7 +81,8 @@ public class CardValidator {
                 List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
             errors.add(new ExceptionResponse(
                     403,
-                    "Cannot order a new card while having suspicious, lost or stolen card.",
+                    "Cannot order a new card while having suspicious, lost or stolen card." +
+                            "If you want to create a new card, you can close the cards that are in this status.",
                     LocalDateTime.now()
             ));
         }
