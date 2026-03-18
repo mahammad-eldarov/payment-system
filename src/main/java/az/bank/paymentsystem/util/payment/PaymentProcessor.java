@@ -1,6 +1,6 @@
 package az.bank.paymentsystem.util.payment;
 
-import az.bank.paymentsystem.service.EntityFinderService;
+//import az.bank.paymentsystem.service.EntityFinderService;
 import az.bank.paymentsystem.util.shared.BalanceUpdater;
 import az.bank.paymentsystem.util.shared.SuspiciousTransactionChecker;
 import az.bank.paymentsystem.util.shared.TransactionCreator;
@@ -27,14 +27,14 @@ public class PaymentProcessor {
     private final BalanceUpdater balanceUpdater;
     private final SuspiciousTransactionChecker suspiciousTransactionChecker;
     private final TransactionCreator transactionCreator;
-//    private final PaymentRepository paymentRepository;
-    private final EntityFinderService entityFinderService;
+    private final PaymentRepository paymentRepository;
+//    private final EntityFinderService entityFinderService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(Integer paymentId) {
-//        PaymentEntity payment = paymentRepository.findById(paymentId)
-//                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
-        PaymentEntity payment = entityFinderService.findPaymentById(paymentId);
+        PaymentEntity payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+//        PaymentEntity payment = entityFinderService.findPaymentById(paymentId);
         try {
             processPaymentLogic(payment);
             markSuccess(payment);
@@ -47,8 +47,8 @@ public class PaymentProcessor {
             markFailed(payment, "Unexpected error: " + e.getMessage());
             transactionCreator.create(payment, TransactionStatus.FAILED);
         }
-//        paymentRepository.save(payment);
-        entityFinderService.savePayment(payment);
+        paymentRepository.save(payment);
+//        entityFinderService.savePayment(payment);
     }
 
     private void processPaymentLogic(PaymentEntity payment) {

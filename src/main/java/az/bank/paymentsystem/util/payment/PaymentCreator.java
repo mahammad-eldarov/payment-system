@@ -1,6 +1,6 @@
 package az.bank.paymentsystem.util.payment;
 
-import az.bank.paymentsystem.service.EntityFinderService;
+//import az.bank.paymentsystem.service.EntityFinderService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,26 +21,26 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentCreator {
 
-//    private final PaymentRepository paymentRepository;
-//    private final CustomerRepository customerRepository;
-    private final EntityFinderService entityFinderService;
+    private final PaymentRepository paymentRepository;
+    private final CustomerRepository customerRepository;
+//    private final EntityFinderService entityFinderService;
 
     public PaymentEntity buildPayment(Integer customerId, BigDecimal amount,
                                       PaymentSourceType fromType, PaymentSourceType toType) {
-//        if (paymentRepository.existsByCustomerIdAndScheduledDateAndStatus(
-//                customerId, LocalDate.now(), PaymentStatus.PENDING)) {
-//            throw new MultiValidationException(List.of(
-//                    new ExceptionResponse(400, "You have a pending payment.", LocalDateTime.now())));
-//        }
-        if (entityFinderService.findExistingScheduledCustomerPaymentStatus(customerId)){
+        if (paymentRepository.existsByCustomerIdAndScheduledDateAndStatus(
+                customerId, LocalDate.now(), PaymentStatus.PENDING)) {
             throw new MultiValidationException(List.of(
                     new ExceptionResponse(400, "You have a pending payment.", LocalDateTime.now())));
         }
+//        if (entityFinderService.findExistingScheduledCustomerPaymentStatus(customerId)){
+//            throw new MultiValidationException(List.of(
+//                    new ExceptionResponse(400, "You have a pending payment.", LocalDateTime.now())));
+//        }
 
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-//                .orElseThrow(() -> new MultiValidationException(List.of(
-//                        new ExceptionResponse(404, "Customer not found", LocalDateTime.now()))));
-        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+                .orElseThrow(() -> new MultiValidationException(List.of(
+                        new ExceptionResponse(404, "Customer not found", LocalDateTime.now()))));
+//        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
 
         BigDecimal safeAmount = (amount != null && amount.compareTo(BigDecimal.ZERO) > 0)
                 ? amount : BigDecimal.ZERO;

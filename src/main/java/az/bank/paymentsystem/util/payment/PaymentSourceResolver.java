@@ -3,7 +3,7 @@ package az.bank.paymentsystem.util.payment;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
-import az.bank.paymentsystem.service.EntityFinderService;
+//import az.bank.paymentsystem.service.EntityFinderService;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,18 +23,18 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PaymentSourceResolver {
-//    private final CardRepository cardRepository;
-//    private final CurrentAccountRepository currentAccountRepository;
+    private final CardRepository cardRepository;
+    private final CurrentAccountRepository currentAccountRepository;
     private final BankConfig bankConfig;
     private final CurrencyConverter currencyConverter;
-    private final EntityFinderService entityFinderService;
+//    private final EntityFinderService entityFinderService;
 
 
     // FROM CHECKS
     public void fromCheckCard(PaymentEntity payment, Integer customerId,
                                String fromPan, List<ExceptionResponse> errors) {
-//        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(fromPan).orElse(null);
-        CardEntity card = entityFinderService.findOptionalCardPanVisibleTrue(fromPan).orElse(null);
+        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(fromPan).orElse(null);
+//        CardEntity card = entityFinderService.findOptionalCardPanVisibleTrue(fromPan).orElse(null);
         if (card == null) {
             errors.add(new ExceptionResponse(404, "Source card not found", LocalDateTime.now()));
             return;
@@ -69,9 +69,9 @@ public class PaymentSourceResolver {
 
     public void fromCheckAccount(PaymentEntity payment, Integer customerId,
                                   String fromAccountNumber, List<ExceptionResponse> errors) {
-//        CurrentAccountEntity account = currentAccountRepository
-//                .findByAccountNumberAndIsVisibleTrue(fromAccountNumber).orElse(null);
-        CurrentAccountEntity account = entityFinderService.findCurrentAccountNumberVisibleTrue(fromAccountNumber).orElse(null);
+        CurrentAccountEntity account = currentAccountRepository
+                .findByAccountNumberAndIsVisibleTrue(fromAccountNumber).orElse(null);
+//        CurrentAccountEntity account = entityFinderService.findCurrentAccountNumberVisibleTrue(fromAccountNumber).orElse(null);
         if (account == null) {
             errors.add(new ExceptionResponse(404, "Source current account not found", LocalDateTime.now()));
             return;
@@ -115,10 +115,10 @@ public class PaymentSourceResolver {
 
     private void fallbackToAccount(PaymentEntity payment, Integer customerId,
                                    Currency cardCurrency, List<ExceptionResponse> errors) {
-//        CurrentAccountEntity account = currentAccountRepository
-//                .findSufficientAccount(customerId, payment.getAmount()).orElse(null);
-        CurrentAccountEntity account = entityFinderService
-                .findOptionalCurrentAccountBalance(customerId, payment.getAmount()).orElse(null);
+        CurrentAccountEntity account = currentAccountRepository
+                .findSufficientAccount(customerId, payment.getAmount()).orElse(null);
+//        CurrentAccountEntity account = entityFinderService
+//                .findOptionalCurrentAccountBalance(customerId, payment.getAmount()).orElse(null);
         if (account == null) {
             errors.add(new ExceptionResponse(400, "Insufficient balance in both card and current account", LocalDateTime.now()));
             return;
@@ -145,7 +145,8 @@ public class PaymentSourceResolver {
 
     private void fallbackToCard(PaymentEntity payment, Integer customerId,
                                 List<ExceptionResponse> errors) {
-        CardEntity card = entityFinderService.findOptionalCardBalance(customerId, payment.getAmount()).orElse(null);
+        CardEntity card = cardRepository.findSufficientCard(customerId, payment.getAmount()).orElse(null);
+//        CardEntity card = entityFinderService.findOptionalCardBalance(customerId, payment.getAmount()).orElse(null);
         if (card == null) {
             errors.add(new ExceptionResponse(400, "Insufficient balance in both current account and card", LocalDateTime.now()));
             return;
@@ -157,8 +158,8 @@ public class PaymentSourceResolver {
 
     // TO CHECKS
     public void toCheckCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
-//        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(toPan).orElse(null);
-        CardEntity card = entityFinderService.findOptionalCardPanVisibleTrue(toPan).orElse(null);
+        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(toPan).orElse(null);
+//        CardEntity card = entityFinderService.findOptionalCardPanVisibleTrue(toPan).orElse(null);
         if (card == null) {
             errors.add(new ExceptionResponse(404, "Destination card not found", LocalDateTime.now()));
             return;
@@ -179,9 +180,9 @@ public class PaymentSourceResolver {
     }
 
     public void toCheckAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
-//        CurrentAccountEntity account = currentAccountRepository
-//                .findByAccountNumberAndIsVisibleTrue(toAccountNumber).orElse(null);
-        CurrentAccountEntity account = entityFinderService.findCurrentAccountNumberVisibleTrue(toAccountNumber).orElse(null);
+        CurrentAccountEntity account = currentAccountRepository
+                .findByAccountNumberAndIsVisibleTrue(toAccountNumber).orElse(null);
+//        CurrentAccountEntity account = entityFinderService.findCurrentAccountNumberVisibleTrue(toAccountNumber).orElse(null);
         if (account == null) {
             errors.add(new ExceptionResponse(404, "Destination current account not found", LocalDateTime.now()));
             return;

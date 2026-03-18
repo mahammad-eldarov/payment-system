@@ -10,7 +10,7 @@ import az.bank.paymentsystem.exception.AccountLimitExceededException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.CustomerSuspiciousException;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.service.EntityFinderService;
+//import az.bank.paymentsystem.service.EntityFinderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CurrentAccountValidator {
 
-//    private final CustomerRepository customerRepository;
-    private final EntityFinderService entityFinderService;
+    private final CustomerRepository customerRepository;
+//    private final EntityFinderService entityFinderService;
 
     public void validateDeletion(CurrentAccountEntity account) {
         if (account.getStatus() == CurrentAccountStatus.CLOSED) {
@@ -32,9 +32,9 @@ public class CurrentAccountValidator {
 
     public void validateAccountOrder(Integer customerId, Integer accountCount) {
 
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
 
         if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
             throw new CustomerSuspiciousException("Your account is suspended due to suspicious activity.");

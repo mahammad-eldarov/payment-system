@@ -2,7 +2,7 @@ package az.bank.paymentsystem.util.customer;
 
 import az.bank.paymentsystem.mapper.CardMapper;
 import az.bank.paymentsystem.mapper.CurrentAccountMapper;
-import az.bank.paymentsystem.service.EntityFinderService;
+//import az.bank.paymentsystem.service.EntityFinderService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,25 +20,25 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomerResponseBuilder {
 
-//    private final CardRepository cardRepository;
-//    private final CurrentAccountRepository currentAccountRepository;
+    private final CardRepository cardRepository;
+    private final CurrentAccountRepository currentAccountRepository;
     private final TransactionService transactionService;
     private final CardMapper cardMapper;
     private final CurrentAccountMapper currentAccountMapper;
-    private final EntityFinderService entityFinderService;
+//    private final EntityFinderService entityFinderService;
 
     public void setCardsAndAccounts(CustomerResponse response, Integer customerId) {
-//        List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
-//                .stream().map(cardMapper::toResponse).collect(Collectors.toList());
-        List<CardResponse> cardResponses = entityFinderService.findCardsCustomerId(customerId)
+        List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
                 .stream().map(cardMapper::toResponse).collect(Collectors.toList());
+//        List<CardResponse> cardResponses = entityFinderService.findCardsCustomerId(customerId)
+//                .stream().map(cardMapper::toResponse).collect(Collectors.toList());
 
-//        List<CurrentAccountResponse> accountResponses = currentAccountRepository
-//                .findCurrentAccountByCustomerId(customerId)
-//                .stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
-        List<CurrentAccountResponse> accountResponses = entityFinderService
-                .findCurrentAccountsCustomerId(customerId)
+        List<CurrentAccountResponse> accountResponses = currentAccountRepository
+                .findCurrentAccountByCustomerId(customerId)
                 .stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
+//        List<CurrentAccountResponse> accountResponses = entityFinderService
+//                .findCurrentAccountsCustomerId(customerId)
+//                .stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
 
         response.setCardResponse(cardResponses);
         response.setCardMessage(cardMessage(cardResponses));
@@ -47,39 +47,39 @@ public class CustomerResponseBuilder {
     }
 
     public void setCardTransactions(CustomerResponse response, Integer customerId) {
-//        List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
-//                .stream().map(card -> {
-//                    CardResponse cardResponse = cardMapper.toResponse(card);
-//                    cardResponse.setTransactions(transactionService.getTransactionsByCardId(card.getId(), 1).getContent());
-//                    return cardResponse;
-//                }).collect(Collectors.toList());
-        List<CardResponse> cardResponses = entityFinderService.findCardsCustomerId(customerId)
+        List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
                 .stream().map(card -> {
                     CardResponse cardResponse = cardMapper.toResponse(card);
                     cardResponse.setTransactions(transactionService.getTransactionsByCardId(card.getId(), 1).getContent());
                     return cardResponse;
                 }).collect(Collectors.toList());
+//        List<CardResponse> cardResponses = entityFinderService.findCardsCustomerId(customerId)
+//                .stream().map(card -> {
+//                    CardResponse cardResponse = cardMapper.toResponse(card);
+//                    cardResponse.setTransactions(transactionService.getTransactionsByCardId(card.getId(), 1).getContent());
+//                    return cardResponse;
+//                }).collect(Collectors.toList());
 
         response.setCardResponse(cardResponses);
         response.setCardMessage(cardMessage(cardResponses));
     }
 
     public void setAccountTransactions(CustomerResponse response, Integer customerId) {
-//        List<CurrentAccountResponse> accountResponses = currentAccountRepository
-//                .findCurrentAccountByCustomerId(customerId)
-//                .stream().map(account -> {
-//                    CurrentAccountResponse accountResponse = currentAccountMapper.toResponse(account);
-//                    accountResponse.setTransactions(transactionService.getTransactionsByAccountId(account.getId(),1).getContent());
-//                    return accountResponse;
-//                }).collect(Collectors.toList());
-
-        List<CurrentAccountResponse> accountResponses = entityFinderService
-                .findCurrentAccountsCustomerId(customerId)
+        List<CurrentAccountResponse> accountResponses = currentAccountRepository
+                .findCurrentAccountByCustomerId(customerId)
                 .stream().map(account -> {
                     CurrentAccountResponse accountResponse = currentAccountMapper.toResponse(account);
                     accountResponse.setTransactions(transactionService.getTransactionsByAccountId(account.getId(),1).getContent());
                     return accountResponse;
                 }).collect(Collectors.toList());
+
+//        List<CurrentAccountResponse> accountResponses = entityFinderService
+//                .findCurrentAccountsCustomerId(customerId)
+//                .stream().map(account -> {
+//                    CurrentAccountResponse accountResponse = currentAccountMapper.toResponse(account);
+//                    accountResponse.setTransactions(transactionService.getTransactionsByAccountId(account.getId(),1).getContent());
+//                    return accountResponse;
+//                }).collect(Collectors.toList());
 
         response.setCurrentAccountResponse(accountResponses);
         response.setAccountMessage(accountMessage(accountResponses));

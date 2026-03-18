@@ -1,6 +1,6 @@
 package az.bank.paymentsystem.util.customer;
 
-import az.bank.paymentsystem.service.EntityFinderService;
+//import az.bank.paymentsystem.service.EntityFinderService;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.request.CreateCustomerRequest;
@@ -14,16 +14,16 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomerCreator {
 
-//    private final CustomerRepository customerRepository;
-    private final EntityFinderService entityFinderService;
+    private final CustomerRepository customerRepository;
+//    private final EntityFinderService entityFinderService;
 
     public CustomerEntity createCustomer(CreateCustomerRequest request) {
-//        if (customerRepository.existsByPinAndIsVisibleTrue(request.getPin())) {
-//            throw new CustomerPinAlreadyExistsException("This pin is already available.");
-//        }
-        if (entityFinderService.findExistingPinVisibleTrue(request.getPin())) {
+        if (customerRepository.existsByPinAndIsVisibleTrue(request.getPin())) {
             throw new CustomerPinAlreadyExistsException("This pin is already available.");
         }
+//        if (entityFinderService.findExistingPinVisibleTrue(request.getPin())) {
+//            throw new CustomerPinAlreadyExistsException("This pin is already available.");
+//        }
 
         CustomerEntity customer = new CustomerEntity();
         customer.setName(request.getName());
