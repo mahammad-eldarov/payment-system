@@ -1,0 +1,46 @@
+package az.bank.paymentsystem.service;
+
+import az.bank.paymentsystem.dto.request.OrderCurrentAccountRequest;
+import az.bank.paymentsystem.dto.response.CurrentAccountOrderResponse;
+import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
+import az.bank.paymentsystem.entity.CustomerEntity;
+import az.bank.paymentsystem.enums.OrderStatus;
+import az.bank.paymentsystem.exception.CustomerNotFoundException;
+import az.bank.paymentsystem.mapper.CurrentAccountOrderMapper;
+import az.bank.paymentsystem.repository.CurrentAccountOrderRepository;
+import az.bank.paymentsystem.repository.CustomerRepository;
+import az.bank.paymentsystem.util.currentAccount.CurrentAccountOrderProcessor;
+import java.time.Instant;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class CurrentAccountOrderService {
+
+    private final CurrentAccountOrderRepository currentAccountOrderRequestRepository;
+    private final CurrentAccountOrderProcessor currentAccountOrderRequestProcessor;
+    private final CustomerRepository customerRepository;
+//    private final EntityFinderService entityFinderService;
+    private final CurrentAccountOrderMapper currentAccountOrderRequestMapper;
+
+    public CurrentAccountOrderResponse orderAccount(Integer customerId, OrderCurrentAccountRequest request) {
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        CurrentAccountOrderEntity orderRequest = buildRequest(customer, request);
+        currentAccountOrderRequestRepository.save(orderRequest);
+        currentAccountOrderRequestProcessor.process(orderRequest);
+        currentAccountOrderRequestRepository.save(orderRequest);
+        return currentAccountOrderRequestMapper.toResponse(orderRequest);
+    }
+
+    private CurrentAccountOrderEntity buildRequest(CustomerEntity customer, OrderCurrentAccountRequest request) {
+        CurrentAccountOrderEntity orderRequest = new CurrentAccountOrderEntity();
+        orderRequest.setCustomer(customer);
+        orderRequest.setStatus(OrderStatus.PENDING);
+        orderRequest.setAccountHolderName(request.getCurrentAccountHolderName());
+        orderRequest.setCurrency(request.getCurrency());
+        orderRequest.setCreatedAt(Instant.now());
+        return orderRequest;
+    }
+}

@@ -19,11 +19,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "card_order")
 public class CardOrderEntity extends BaseEntity {
@@ -70,6 +74,5 @@ public class CardOrderEntity extends BaseEntity {
     @Pattern(regexp = "^[0-9]{4}$")
     @Column(name = "password", length = 4)
     private String password;
-
 
 }

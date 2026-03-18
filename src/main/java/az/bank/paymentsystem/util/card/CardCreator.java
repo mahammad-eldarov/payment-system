@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.card;
 
+import az.bank.paymentsystem.entity.CardOrderEntity;
 import az.bank.paymentsystem.util.shared.LuhnPanGenerator;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -36,6 +37,25 @@ public class CardCreator {
         card.setActivationDate(LocalDate.now());
         card.setExpiryDate(LocalDate.now().plusYears(5));
         card.setCustomer(customer);
+        card.setIsVisible(true);
+        card.setCreatedAt(Instant.now());
+        return card;
+    }
+
+    public CardEntity createOrderCard(CardOrderEntity request) {
+        CardEntity card = new CardEntity();
+        card.setCardholderName(request.getCardHolderName());
+        card.setCardName(request.getCardName());
+        card.setCardBrand(request.getCardBrand());
+//        card.setCardType(request.getCardType());
+        card.setPan(luhnPanGenerator.generate());
+        card.setCvv(cvvGenerator.generate());
+        card.setBalance(BigDecimal.ZERO);
+        card.setCurrency(request.getCurrency());
+        card.setStatus(CardStatus.ACTIVE);
+        card.setActivationDate(LocalDate.now());
+        card.setExpiryDate(LocalDate.now().plusYears(5));
+        card.setCustomer(request.getCustomer());
         card.setIsVisible(true);
         card.setCreatedAt(Instant.now());
         return card;

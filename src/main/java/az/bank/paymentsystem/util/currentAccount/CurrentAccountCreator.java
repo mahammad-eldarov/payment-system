@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.currentAccount;
 
+import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -30,6 +31,21 @@ public class CurrentAccountCreator {
         account.setActivationDate(LocalDate.now());
         account.setExpiryDate(LocalDate.now().plusYears(5));
         account.setCustomer(customer);
+        account.setIsVisible(true);
+        account.setCreatedAt(Instant.now());
+        return account;
+    }
+
+    public CurrentAccountEntity createOrderAccount(CurrentAccountOrderEntity request) {
+        CurrentAccountEntity account = new CurrentAccountEntity();
+        account.setCurrentAccountHolderName(request.getAccountHolderName());
+        account.setAccountNumber(accountNumberGenerator.generate());
+        account.setBalance(BigDecimal.ZERO);
+        account.setCurrency(request.getCurrency());
+        account.setStatus(CurrentAccountStatus.ACTIVE);
+        account.setActivationDate(LocalDate.now());
+        account.setExpiryDate(LocalDate.now().plusYears(5));
+        account.setCustomer(request.getCustomer());
         account.setIsVisible(true);
         account.setCreatedAt(Instant.now());
         return account;
