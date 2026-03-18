@@ -94,7 +94,7 @@ public class CardValidator {
         if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
             errors.add(new ExceptionResponse(
                     403,
-                    "Account is suspended due to suspicious activity.",
+                    "Profile is suspended due to suspicious activity.",
                     LocalDateTime.now()
             ));
         }

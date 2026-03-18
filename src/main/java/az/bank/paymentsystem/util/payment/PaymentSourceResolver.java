@@ -52,7 +52,7 @@ public class PaymentSourceResolver {
             return;
         }
         if (payment.getCustomer().getStatus() == CustomerStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(403, "Your account is suspended due to suspicious activity.", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, "Your profile is suspended due to suspicious activity.", LocalDateTime.now()));
             return;
         }
 
@@ -85,15 +85,15 @@ public class PaymentSourceResolver {
             return;
         }
         if (payment.getCustomer().getStatus() == CustomerStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(403, "Your account is suspended due to suspicious activity.", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, "Your profile is suspended due to suspicious activity.", LocalDateTime.now()));
             return;
         }
         if (account.getStatus() == CurrentAccountStatus.EXPIRED) {
-            errors.add(new ExceptionResponse(403, "Your account is expired.", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, "Your current account is expired.", LocalDateTime.now()));
             return;
         }
         if (account.getStatus() == CurrentAccountStatus.CLOSED) {
-            errors.add(new ExceptionResponse(403, "Your account is closed.", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, "Your current account is closed.", LocalDateTime.now()));
             return;
         }
 
@@ -188,15 +188,15 @@ public class PaymentSourceResolver {
             return;
         }
         if (account.getStatus() == CurrentAccountStatus.EXPIRED) {
-            errors.add(new ExceptionResponse(403, "Destination account is expired.", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, "Destination current account is expired.", LocalDateTime.now()));
             return;
         }
         if (account.getStatus() == CurrentAccountStatus.CLOSED) {
-            errors.add(new ExceptionResponse(403, "Destination account is closed.", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, "Destination current account is closed.", LocalDateTime.now()));
             return;
         }
         if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(403, "Destination account is suspended due to suspicious activity.", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, "Destination current account is suspended due to suspicious activity.", LocalDateTime.now()));
             return;
         }
         payment.setToAccount(account);
