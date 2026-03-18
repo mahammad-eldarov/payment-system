@@ -7,11 +7,15 @@ import az.bank.paymentsystem.enums.OrderStatus;
 import az.bank.paymentsystem.exception.CardOrderRejectedException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.CustomerSuspiciousException;
+import az.bank.paymentsystem.exception.ExceptionResponse;
+import az.bank.paymentsystem.exception.MultiValidationException;
 import az.bank.paymentsystem.repository.CustomerRepository;
 //import az.bank.paymentsystem.service.EntityFinderService;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.CardEntity;
 import az.bank.paymentsystem.enums.CardStatus;
@@ -29,17 +33,72 @@ public class CardValidator {
     private final CardCreator cardCreator;
 //    private final EntityFinderService entityFinderService;
 
+    //    public void process(CardOrderEntity request) {
+//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(
+//                        request.getCustomer().getId())
+//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//
+//        List<String> violations = collectViolations(customer);
+//
+//        if (!violations.isEmpty()) {
+//            request.setStatus(OrderStatus.REJECTED);
+//            request.setRejectionReason(String.join(", ", violations));
+//            throw new CardOrderRejectedException(String.join(", ", violations));
+//        }
+//
+//        CardEntity card = cardCreator.createOrderCard(request);
+//        cardRepository.save(card);
+//        request.setStatus(OrderStatus.APPROVED);
+//        request.setUpdatedAt(Instant.now());
+//    }
+//public void process(CardOrderEntity request) {
+//    CustomerEntity customer = request.getCustomer();
+//    List<String> violations = collectViolations(customer);
+//
+//    if (!violations.isEmpty()) {
+//        request.setStatus(OrderStatus.REJECTED);
+//        request.setRejectionReason(String.join(", ", violations));
+//        return; // ← exception yox, sadəcə qayıt
+//    }
+//
+//    CardEntity card = cardCreator.createOrderCard(request);
+//    cardRepository.save(card);
+//    request.setStatus(OrderStatus.APPROVED);
+//    request.setUpdatedAt(Instant.now());
+//}
     public void process(CardOrderEntity request) {
-        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(
-                        request.getCustomer().getId())
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        CustomerEntity customer = request.getCustomer();
+        List<ExceptionResponse> errors = new ArrayList<>();
 
-        List<String> violations = collectViolations(customer);
+        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+            errors.add(new ExceptionResponse(
+                    403,
+                    "Account is suspended due to suspicious activity.",
+                    LocalDateTime.now()
+            ));
+        }
+        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
+                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
+            errors.add(new ExceptionResponse(
+                    403,
+                    "Cannot order a new card while having suspicious, lost or stolen card.",
+                    LocalDateTime.now()
+            ));
+        }
+        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
+            errors.add(new ExceptionResponse(
+                    422,
+                    "The customer already has 2 cards. A new card cannot be ordered.",
+                    LocalDateTime.now()
+            ));
+        }
 
-        if (!violations.isEmpty()) {
+        if (!errors.isEmpty()) {
             request.setStatus(OrderStatus.REJECTED);
-            request.setRejectionReason(String.join(", ", violations));
-            throw new CardOrderRejectedException(String.join(", ", violations));
+            request.setRejectionReason(
+                    errors.stream().map(ExceptionResponse::getMessage).collect(Collectors.joining(", "))
+            );
+            throw new MultiValidationException(errors);
         }
 
         CardEntity card = cardCreator.createOrderCard(request);
@@ -48,22 +107,22 @@ public class CardValidator {
         request.setUpdatedAt(Instant.now());
     }
 
-    private List<String> collectViolations(CustomerEntity customer) {
-        List<String> violations = new ArrayList<>();
-
-        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-            violations.add("Account is suspended due to suspicious activity.");
-        }
-        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
-                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
-            violations.add("Cannot order a new card while having suspicious, lost or stolen card.");
-        }
-        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
-            violations.add("The customer already has 2 cards. A new card cannot be ordered.");
-        }
-
-        return violations;
-    }
+//    private List<String> collectViolations(CustomerEntity customer) {
+//        List<String> violations = new ArrayList<>();
+//
+//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+//            violations.add("Account is suspended due to suspicious activity.");
+//        }
+//        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
+//                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
+//            violations.add("Cannot order a new card while having suspicious, lost or stolen card.");
+//        }
+//        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
+//            violations.add("The customer already has 2 cards. A new card cannot be ordered.");
+//        }
+//
+//        return violations;
+//    }
 
 //    public void process(CardOrderEntity request) {
 //        List<String> reasons = new ArrayList<>();

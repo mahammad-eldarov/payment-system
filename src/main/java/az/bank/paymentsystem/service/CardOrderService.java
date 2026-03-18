@@ -5,7 +5,9 @@ import az.bank.paymentsystem.dto.response.CardOrderResponse;
 import az.bank.paymentsystem.entity.CardOrderEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.OrderStatus;
+import az.bank.paymentsystem.exception.CardOrderRejectedException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
+import az.bank.paymentsystem.exception.MultiValidationException;
 import az.bank.paymentsystem.mapper.CardOrderMapper;
 import az.bank.paymentsystem.mapper.CurrentAccountOrderMapper;
 import az.bank.paymentsystem.repository.CardOrderRepository;
@@ -31,12 +33,43 @@ public class CardOrderService {
     public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+
         CardOrderEntity orderRequest = buildRequest(customer, request);
-        cardOrderRepository.save(orderRequest);
-        cardValidator.process(orderRequest);
-        cardOrderRepository.save(orderRequest);
+
+        try {
+            cardValidator.process(orderRequest);
+        } catch (MultiValidationException ex) {
+            cardOrderRepository.save(orderRequest); // REJECTED kimi saxla
+            throw ex;                               // yenidən at → GlobalExceptionHandler tutur
+        }
+
+        cardOrderRepository.save(orderRequest); // APPROVED kimi saxla
         return cardOrderMapper.toResponse(orderRequest);
     }
+
+//    public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
+//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//        CardOrderEntity orderRequest = buildRequest(customer, request);
+//        cardOrderRepository.save(orderRequest);
+//        cardValidator.process(orderRequest);
+//        cardOrderRepository.save(orderRequest);
+//        return cardOrderMapper.toResponse(orderRequest);
+//    }
+//public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
+//    CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+//            .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//
+//    CardOrderEntity orderRequest = buildRequest(customer, request);
+//    cardValidator.process(orderRequest);         // statusu qur
+//    cardOrderRepository.save(orderRequest);      // ← bir dəfə, final status ilə saxla
+//
+//    if (orderRequest.getStatus() == OrderStatus.REJECTED) {
+//        throw new CardOrderRejectedException(orderRequest.getRejectionReason());
+//    }
+//
+//    return cardOrderMapper.toResponse(orderRequest);
+//}
 
 //    public CardResponse orderCard(Integer customerId, OrderCardRequest request) {
 //        CustomerEntity customer = findActiveCustomer(customerId);

@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MultiValidationException.class)
     public ResponseEntity<List<ExceptionResponse>> handleMultiValidation(MultiValidationException ex) {
-        return ResponseEntity.badRequest().body(ex.getErrors());
+        return ResponseEntity.unprocessableContent().body(ex.getErrors());
     }
 
     // JSON formatını və ya enumları səhv yazsan bu exception həmin xətanı tutacaq.
