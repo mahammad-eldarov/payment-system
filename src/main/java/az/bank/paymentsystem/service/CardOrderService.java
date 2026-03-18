@@ -5,6 +5,7 @@ import az.bank.paymentsystem.dto.response.CardOrderResponse;
 import az.bank.paymentsystem.entity.CardOrderEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.OrderStatus;
+import az.bank.paymentsystem.enums.OrderType;
 import az.bank.paymentsystem.exception.CardOrderRejectedException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.MultiValidationException;
@@ -29,23 +30,45 @@ public class CardOrderService {
     private final CardValidator cardValidator;
 //    private final EntityFinderService entityFinderService;
     private final CardOrderMapper cardOrderMapper;
+    private final OrderRateLimitService orderRateLimitService;
 
     public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+
+        orderRateLimitService.checkCooldown(customer, OrderType.CARD); // ← yoxla
 
         CardOrderEntity orderRequest = buildRequest(customer, request);
 
         try {
             cardValidator.process(orderRequest);
         } catch (MultiValidationException ex) {
-            cardOrderRepository.save(orderRequest); // REJECTED kimi saxla
-            throw ex;                               // yenidən at → GlobalExceptionHandler tutur
+            orderRateLimitService.handleRejection(customer, OrderType.CARD); // ← say
+            cardOrderRepository.save(orderRequest);
+            throw ex;
         }
 
-        cardOrderRepository.save(orderRequest); // APPROVED kimi saxla
+        orderRateLimitService.resetLimit(customer, OrderType.CARD); // ← sıfırla
+        cardOrderRepository.save(orderRequest);
         return cardOrderMapper.toResponse(orderRequest);
     }
+
+//    public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
+//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//
+//        CardOrderEntity orderRequest = buildRequest(customer, request);
+//
+//        try {
+//            cardValidator.process(orderRequest);
+//        } catch (MultiValidationException ex) {
+//            cardOrderRepository.save(orderRequest); // REJECTED kimi saxla
+//            throw ex;                               // yenidən at → GlobalExceptionHandler tutur
+//        }
+//
+//        cardOrderRepository.save(orderRequest); // APPROVED kimi saxla
+//        return cardOrderMapper.toResponse(orderRequest);
+//    }
 
 //    public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
 //        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)

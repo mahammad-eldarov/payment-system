@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.exception;
 
 import az.bank.paymentsystem.exception.base.ForbiddenException;
+import az.bank.paymentsystem.exception.base.TooManyRequestsException;
 import az.bank.paymentsystem.exception.base.UnprocessableContentException;
 import java.util.List;
 import az.bank.paymentsystem.exception.base.BadRequestException;
@@ -89,6 +90,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleUnprocessableEntity(UnprocessableContentException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
                 .body(new ExceptionResponse(422, ex.getMessage(), LocalDateTime.now()));
+    }
+
+    // Exception 429
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ExceptionResponse> handleTooManyRequest(TooManyRequestsException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ExceptionResponse(429, ex.getMessage(), LocalDateTime.now()));
     }
 
     // MultiValidation
