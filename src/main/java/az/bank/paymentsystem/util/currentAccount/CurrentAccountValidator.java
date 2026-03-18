@@ -13,9 +13,11 @@ import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.CustomerSuspiciousException;
 import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.exception.MultiValidationException;
+import az.bank.paymentsystem.exception.OperationNotAllowedException;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 //import az.bank.paymentsystem.service.EntityFinderService;
+import az.bank.paymentsystem.util.shared.CustomerSuspiciousValidator;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,15 +34,18 @@ public class CurrentAccountValidator {
     private final CurrentAccountRepository currentAccountRepository;
 //    private final EntityFinderService entityFinderService;
     private final CurrentAccountCreator currentAccountCreator;
+    private final CustomerSuspiciousValidator suspiciousValidator;
 
     public void process(CurrentAccountOrderEntity request) {
         CustomerEntity customer = request.getCustomer();
         List<ExceptionResponse> errors = new ArrayList<>();
 
+        suspiciousValidator.validate(customer, errors);
+
         if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
             errors.add(new ExceptionResponse(
                     403,
-                    "Account is suspended due to suspicious activity.",
+                    "All your operations have been suspended due to suspicious activity.",
                     LocalDateTime.now()
             ));
         }
@@ -95,6 +100,10 @@ public class CurrentAccountValidator {
         if (account.getStatus() == CurrentAccountStatus.EXPIRED) {
             throw new AccountExpiredException("An expired current account cannot be canceled.");
         }
+        if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
+            throw new OperationNotAllowedException("Cannot delete a suspicious current account. Please contact support.");
+        }
+
     }
 
 //    public void validateAccountOrder(Integer customerId, Integer accountCount) {

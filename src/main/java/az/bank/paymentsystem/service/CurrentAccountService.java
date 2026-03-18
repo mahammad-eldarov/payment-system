@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.exception.OperationNotAllowedException;
 import az.bank.paymentsystem.util.shared.CurrentAccountBalanceTransfer;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
@@ -148,7 +149,12 @@ public class CurrentAccountService {
     public MessageResponse deleteCurrentAccount(Integer id) {
         CurrentAccountEntity account = findActiveAccount(id);
         currentAccountValidator.validateDeletion(account);
-        statusAuditLogger.logAccount(account, CurrentAccountStatus.CLOSED.name(), "Account closed by customer");
+        statusAuditLogger.logAccount(account, CurrentAccountStatus.CLOSED.name(), "Current account closed by customer");
+//        if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
+//            throw new OperationNotAllowedException(
+//                    "Cannot delete a suspicious current account. Please contact support."
+//            );
+//        }
         account.setStatus(CurrentAccountStatus.CLOSED);
         account.setIsVisible(false);
         account.setUpdatedAt(Instant.now());

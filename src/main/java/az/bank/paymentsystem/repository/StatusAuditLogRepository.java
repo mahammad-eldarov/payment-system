@@ -10,4 +10,10 @@ public interface StatusAuditLogRepository extends JpaRepository <StatusAuditLogE
 //    List<StatusAuditLogEntity> findByEntityTypeAndEntityIdOrderByCreatedAtDesc(String entityType, Integer entityId);
     Page<StatusAuditLogEntity> findByEntityTypeAndEntityIdOrderByCreatedAtDesc(
             String entityType, Integer entityId, Pageable pageable);
+
+    Integer countByEntityTypeAndEntityIdAndNewStatus(
+            String entityType,
+            Integer entityId,
+            String newStatus
+    );
 }
