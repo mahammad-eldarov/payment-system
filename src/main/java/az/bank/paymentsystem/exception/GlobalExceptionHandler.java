@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.exception;
 
 import az.bank.paymentsystem.exception.base.ForbiddenException;
+import az.bank.paymentsystem.exception.base.UnprocessableContentException;
 import java.util.List;
 import az.bank.paymentsystem.exception.base.BadRequestException;
 import az.bank.paymentsystem.exception.base.ConflictException;
@@ -80,6 +81,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleGone(GoneException ex) {
         return ResponseEntity.status(HttpStatus.GONE)
                 .body(new ExceptionResponse(410, ex.getMessage(), LocalDateTime.now()));
+    }
+
+    // Exception 422
+
+    @ExceptionHandler(UnprocessableContentException.class)
+    public ResponseEntity<ExceptionResponse> handleUnprocessableEntity(UnprocessableContentException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
+                .body(new ExceptionResponse(422, ex.getMessage(), LocalDateTime.now()));
     }
 
     // MultiValidation

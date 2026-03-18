@@ -4,6 +4,7 @@ import az.bank.paymentsystem.entity.CardOrderEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.enums.OrderStatus;
+import az.bank.paymentsystem.exception.CardOrderRejectedException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.CustomerSuspiciousException;
 import az.bank.paymentsystem.repository.CustomerRepository;
@@ -29,30 +30,66 @@ public class CardValidator {
 //    private final EntityFinderService entityFinderService;
 
     public void process(CardOrderEntity request) {
-        List<String> reasons = new ArrayList<>();
-        CustomerEntity customer = request.getCustomer();
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(
+                        request.getCustomer().getId())
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+
+        List<String> violations = collectViolations(customer);
+
+        if (!violations.isEmpty()) {
+            request.setStatus(OrderStatus.REJECTED);
+            request.setRejectionReason(String.join(", ", violations));
+            throw new CardOrderRejectedException(String.join(", ", violations));
+        }
+
+        CardEntity card = cardCreator.createOrderCard(request);
+        cardRepository.save(card);
+        request.setStatus(OrderStatus.APPROVED);
+        request.setUpdatedAt(Instant.now());
+    }
+
+    private List<String> collectViolations(CustomerEntity customer) {
+        List<String> violations = new ArrayList<>();
 
         if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-            reasons.add("Customer is suspended due to suspicious activity.");
+            violations.add("Account is suspended due to suspicious activity.");
         }
         if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
                 List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
-            reasons.add("Customer has suspicious, lost or stolen card.");
+            violations.add("Cannot order a new card while having suspicious, lost or stolen card.");
         }
         if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
-            reasons.add("Card limit exceeded.");
+            violations.add("The customer already has 2 cards. A new card cannot be ordered.");
         }
 
-        if (!reasons.isEmpty()) {
-            request.setStatus(OrderStatus.REJECTED);
-            request.setRejectionReason(String.join(", ", reasons));
-        } else {
-            CardEntity card = cardCreator.createOrderCard(request);
-            cardRepository.save(card);
-            request.setStatus(OrderStatus.APPROVED);
-            request.setUpdatedAt(Instant.now());
-        }
+        return violations;
     }
+
+//    public void process(CardOrderEntity request) {
+//        List<String> reasons = new ArrayList<>();
+//        CustomerEntity customer = request.getCustomer();
+//
+//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+//            reasons.add("Customer is suspended due to suspicious activity.");
+//        }
+//        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
+//                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
+//            reasons.add("Customer has suspicious, lost or stolen card.");
+//        }
+//        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
+//            reasons.add("Card limit exceeded.");
+//        }
+//
+//        if (!reasons.isEmpty()) {
+//            request.setStatus(OrderStatus.REJECTED);
+//            request.setRejectionReason(String.join(", ", reasons));
+//        } else {
+//            CardEntity card = cardCreator.createOrderCard(request);
+//            cardRepository.save(card);
+//            request.setStatus(OrderStatus.APPROVED);
+//            request.setUpdatedAt(Instant.now());
+//        }
+//    }
 
     public void validateCardOrder(Integer customerId) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
