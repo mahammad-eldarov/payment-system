@@ -9,7 +9,8 @@ import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.mapper.CurrentAccountOrderMapper;
 import az.bank.paymentsystem.repository.CurrentAccountOrderRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.util.currentAccount.CurrentAccountOrderProcessor;
+//import az.bank.paymentsystem.util.currentAccount.CurrentAccountOrderProcessor;
+import az.bank.paymentsystem.util.currentAccount.CurrentAccountValidator;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,17 +20,18 @@ import org.springframework.stereotype.Service;
 public class CurrentAccountOrderService {
 
     private final CurrentAccountOrderRepository currentAccountOrderRequestRepository;
-    private final CurrentAccountOrderProcessor currentAccountOrderRequestProcessor;
+//    private final CurrentAccountOrderProcessor currentAccountOrderRequestProcessor;
     private final CustomerRepository customerRepository;
 //    private final EntityFinderService entityFinderService;
     private final CurrentAccountOrderMapper currentAccountOrderRequestMapper;
+    private final CurrentAccountValidator currentAccountValidator;
 
     public CurrentAccountOrderResponse orderAccount(Integer customerId, OrderCurrentAccountRequest request) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
         CurrentAccountOrderEntity orderRequest = buildRequest(customer, request);
         currentAccountOrderRequestRepository.save(orderRequest);
-        currentAccountOrderRequestProcessor.process(orderRequest);
+        currentAccountValidator.process(orderRequest);
         currentAccountOrderRequestRepository.save(orderRequest);
         return currentAccountOrderRequestMapper.toResponse(orderRequest);
     }

@@ -31,14 +31,14 @@ public class CurrentAccountV1Controller {
     private final CurrentAccountService currentAccountService;
 
     // POST /api/current-accounts/order/{customerId}
-    @PostMapping("/order/{customerId}")
-    @Operation(summary = "Create a current account.", description = "Creates a new current account for a customer.")
-    public ResponseEntity<CurrentAccountResponse> orderCurrentAccount(
-            @PathVariable Integer customerId,
-            @Valid @RequestBody OrderCurrentAccountRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(currentAccountService.orderCurrentAccount(customerId, request));
-    }
+//    @PostMapping("/order/{customerId}")
+//    @Operation(summary = "Create a current account.", description = "Creates a new current account for a customer.")
+//    public ResponseEntity<CurrentAccountResponse> orderCurrentAccount(
+//            @PathVariable Integer customerId,
+//            @Valid @RequestBody OrderCurrentAccountRequest request) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(currentAccountService.orderCurrentAccount(customerId, request));
+//    }
 
     @PatchMapping("/{currentAccountId}/status")
     @Operation(summary = "Update current account status using ID.",

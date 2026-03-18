@@ -40,20 +40,20 @@ public class CardService {
 
 
     // CREATE
-    public CardResponse orderCard(Integer customerId, OrderCardRequest request) {
-        CustomerEntity customer = findActiveCustomer(customerId);
-        cardValidator.validateCardOrder(customerId);
-
-        CardEntity card = cardCreator.createCard(request, customer);
-        cardRepository.save(card);
-//        entityFinderService.saveCard(card);
-
-        CardResponse response = cardMapper.toResponse(card);
-        response.setCvv(card.getCvv());
-        response.setPassword(request.getPassword());
-
-        return response;
-    }
+//    public CardResponse orderCard(Integer customerId, OrderCardRequest request) {
+//        CustomerEntity customer = findActiveCustomer(customerId);
+//        cardValidator.validateCardOrder(customerId);
+//
+//        CardEntity card = cardCreator.createCard(request, customer);
+//        cardRepository.save(card);
+////        entityFinderService.saveCard(card);
+//
+//        CardResponse response = cardMapper.toResponse(card);
+//        response.setCvv(card.getCvv());
+//        response.setPassword(request.getPassword());
+//
+//        return response;
+//    }
 
     // DELETE
 //    public MessageResponse deleteCard(Integer cardId) {

@@ -32,14 +32,14 @@ public class CardV1Controller {
     private final CardService cardService;
 
     // POST /api/cards/order/{customerId}
-    @PostMapping("/order/{customerId}")
-    @Operation(summary = "Create a card.", description = "Creates a new card.")
-    public ResponseEntity<CardResponse> orderCard(
-            @PathVariable Integer customerId,
-            @Valid @RequestBody OrderCardRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(cardService.orderCard(customerId, request));
-    }
+//    @PostMapping("/order/{customerId}")
+//    @Operation(summary = "Create a card.", description = "Creates a new card.")
+//    public ResponseEntity<CardResponse> orderCard(
+//            @PathVariable Integer customerId,
+//            @Valid @RequestBody OrderCardRequest request) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(cardService.orderCard(customerId, request));
+//    }
 
 
     // PATCH /api/cards/{id}/status

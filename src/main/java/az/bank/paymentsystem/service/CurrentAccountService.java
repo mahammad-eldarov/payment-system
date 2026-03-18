@@ -30,7 +30,7 @@ public class CurrentAccountService {
     private final CurrentAccountRepository currentAccountRepository;
     private final CustomerRepository customerRepository;
     private final CurrentAccountMapper currentAccountMapper;
-    private final CurrentAccountCreator currentAccountCreator;
+//    private final CurrentAccountCreator currentAccountCreator;
     private final CurrentAccountValidator currentAccountValidator;
     private final CurrentAccountBalanceTransfer currentAccountBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
@@ -38,21 +38,21 @@ public class CurrentAccountService {
 
 
     // CREATE
-    public CurrentAccountResponse orderCurrentAccount(Integer customerId,
-                                                      OrderCurrentAccountRequest request) {
-        CustomerEntity customer = findActiveCustomer(customerId);
-
-        currentAccountValidator.validateAccountOrder(customerId,
-                currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customerId));
-
+//    public CurrentAccountResponse orderCurrentAccount(Integer customerId,
+//                                                      OrderCurrentAccountRequest request) {
+//        CustomerEntity customer = findActiveCustomer(customerId);
+//
 //        currentAccountValidator.validateAccountOrder(customerId,
-//                entityFinderService.countCurrentAccountVisibleTrue(customerId));
-
-        CurrentAccountEntity account = currentAccountCreator.createAccount(request, customer);
-        currentAccountRepository.save(account);
-//        entityFinderService.saveCurrentAccount(account);
-        return currentAccountMapper.toResponse(account);
-    }
+//                currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customerId));
+//
+////        currentAccountValidator.validateAccountOrder(customerId,
+////                entityFinderService.countCurrentAccountVisibleTrue(customerId));
+//
+//        CurrentAccountEntity account = currentAccountCreator.createAccount(request, customer);
+//        currentAccountRepository.save(account);
+////        entityFinderService.saveCurrentAccount(account);
+//        return currentAccountMapper.toResponse(account);
+//    }
 
     //GET
     public List<CurrentAccountResponse> getAccountsByCustomerId(Integer id) {

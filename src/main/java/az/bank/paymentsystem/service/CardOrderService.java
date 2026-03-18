@@ -11,7 +11,8 @@ import az.bank.paymentsystem.mapper.CurrentAccountOrderMapper;
 import az.bank.paymentsystem.repository.CardOrderRepository;
 import az.bank.paymentsystem.repository.CurrentAccountOrderRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.util.card.CardOrderProcessor;
+//import az.bank.paymentsystem.util.card.CardOrderProcessor;
+import az.bank.paymentsystem.util.card.CardValidator;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,21 +21,39 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CardOrderService {
 
-    private final CardOrderRepository cardOrderRequestRepository;
-    private final CardOrderProcessor cardOrderRequestProcessor;
+    private final CardOrderRepository cardOrderRepository;
+//    private final CardOrderProcessor cardOrderProcessor;
     private final CustomerRepository customerRepository;
+    private final CardValidator cardValidator;
 //    private final EntityFinderService entityFinderService;
-    private final CardOrderMapper cardOrderRequestMapper;
+    private final CardOrderMapper cardOrderMapper;
 
     public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
         CardOrderEntity orderRequest = buildRequest(customer, request);
-        cardOrderRequestRepository.save(orderRequest);
-        cardOrderRequestProcessor.process(orderRequest);
-        cardOrderRequestRepository.save(orderRequest);
-        return cardOrderRequestMapper.toResponse(orderRequest);
+        cardOrderRepository.save(orderRequest);
+        cardValidator.process(orderRequest);
+        cardOrderRepository.save(orderRequest);
+        return cardOrderMapper.toResponse(orderRequest);
     }
+
+//    public CardResponse orderCard(Integer customerId, OrderCardRequest request) {
+//        CustomerEntity customer = findActiveCustomer(customerId);
+//        cardValidator.validateCardOrder(customerId);
+//
+//        CardEntity card = cardCreator.createCard(request, customer);
+//        cardRepository.save(card);
+////        entityFinderService.saveCard(card);
+//
+//        CardResponse response = cardMapper.toResponse(card);
+//        response.setCvv(card.getCvv());
+//        response.setPassword(request.getPassword());
+//
+//        return response;
+//    }
+
+
 
     private CardOrderEntity buildRequest(CustomerEntity customer, OrderCardRequest request) {
         CardOrderEntity orderRequest = new CardOrderEntity();
