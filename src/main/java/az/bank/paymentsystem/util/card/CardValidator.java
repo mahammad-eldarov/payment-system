@@ -91,19 +91,19 @@ public class CardValidator {
 //        }
 
 
-        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(
-                    403,
-                    "Profile is suspended due to suspicious activity.",
-                    LocalDateTime.now()
-            ));
-        }
+//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+//            errors.add(new ExceptionResponse(
+//                    403,
+//                    "Profile is suspended due to suspicious activity.",
+//                    LocalDateTime.now()
+//            ));
+//        }
         if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
                 List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
             errors.add(new ExceptionResponse(
                     403,
-                    "Cannot order a new card while having suspicious, lost or stolen card." +
-                            "If you want to create a new card, you can close the cards that are in this status.",
+                    "Cannot order a new card while having suspicious, lost or stolen card. " +
+                            "If you want to create a new card, you should close the cards that are in this status.",
                     LocalDateTime.now()
             ));
         }

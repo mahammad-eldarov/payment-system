@@ -18,13 +18,13 @@ public class CustomerSuspiciousValidator {
     public void validate(CustomerEntity customer, List<ExceptionResponse> errors) {
 
         // Customer hazırda suspicious-dursa
-        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(
-                    403,
-                    "Profile is suspended due to suspicious activity.",
-                    LocalDateTime.now()
-            ));
-        }
+//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+//            errors.add(new ExceptionResponse(
+//                    403,
+//                    "Profile is suspended due to suspicious activity.",
+//                    LocalDateTime.now()
+//            ));
+//        }
 
         // Customer əvvəllər suspicious olubsa → permanent block
         int suspiciousCount = statusAuditLogRepository
@@ -41,5 +41,8 @@ public class CustomerSuspiciousValidator {
                     LocalDateTime.now()
             ));
         }
+
+        //-------------------------------------------------------------
+
     }
 }
