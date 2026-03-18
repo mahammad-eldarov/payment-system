@@ -43,7 +43,8 @@ public class CardOrderService {
         orderRequest.setCardHolderName(request.getCardholderName());
         orderRequest.setCardName(request.getCardName());
         orderRequest.setCardBrand(request.getCardBrand());
-//        orderRequest.setCardType(request.getCardType());
+        orderRequest.setCardType(request.getCardType());
+        orderRequest.setPassword(request.getPassword());
         orderRequest.setCurrency(request.getCurrency());
         orderRequest.setCreatedAt(Instant.now());
         return orderRequest;

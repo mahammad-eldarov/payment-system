@@ -47,9 +47,10 @@ public class CardCreator {
         card.setCardholderName(request.getCardHolderName());
         card.setCardName(request.getCardName());
         card.setCardBrand(request.getCardBrand());
-//        card.setCardType(request.getCardType());
+        card.setCardType(request.getCardType());
         card.setPan(luhnPanGenerator.generate());
         card.setCvv(cvvGenerator.generate());
+        card.setPassword(request.getPassword());
         card.setBalance(BigDecimal.ZERO);
         card.setCurrency(request.getCurrency());
         card.setStatus(CardStatus.ACTIVE);

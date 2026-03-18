@@ -2,6 +2,7 @@ package az.bank.paymentsystem.entity;
 
 import az.bank.paymentsystem.enums.CardBrand;
 import az.bank.paymentsystem.enums.CardName;
+import az.bank.paymentsystem.enums.CardType;
 import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.OrderStatus;
 import jakarta.persistence.Column;
@@ -63,6 +64,11 @@ public class CardOrderEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customer;
+
+//    @NotNull
+    @Column(name = "card_type", nullable = false, length = Integer.MAX_VALUE)
+    @Enumerated(EnumType.STRING)
+    private CardType cardType;
 
 //    @Column(name = "created_at")
 //    private Instant createdAt;
