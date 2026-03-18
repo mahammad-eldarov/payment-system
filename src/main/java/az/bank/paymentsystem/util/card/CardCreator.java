@@ -19,30 +19,30 @@ public class CardCreator {
     private final CvvGenerator cvvGenerator;
 
 
-    public CardEntity createCard(OrderCardRequest request, CustomerEntity customer) {
-        String pan = luhnPanGenerator.generate();
-        String cvv = cvvGenerator.generate();
+//    public CardEntity createCard(OrderCardRequest request, CustomerEntity customer) {
+//        String pan = luhnPanGenerator.generate();
+//        String cvv = cvvGenerator.generate();
+//
+//        CardEntity card = new CardEntity();
+//        card.setCardholderName(request.getCardholderName());
+//        card.setCardName(request.getCardName());
+//        card.setCardBrand(request.getCardBrand());
+//        card.setCardType(request.getCardType());
+//        card.setPan(pan);
+//        card.setCvv(cvv);
+//        card.setPassword(request.getPassword());
+//        card.setBalance(BigDecimal.ZERO);
+//        card.setCurrency(request.getCurrency());
+//        card.setStatus(CardStatus.ACTIVE);
+//        card.setActivationDate(LocalDate.now());
+//        card.setExpiryDate(LocalDate.now().plusYears(5));
+//        card.setCustomer(customer);
+//        card.setIsVisible(true);
+//        card.setCreatedAt(Instant.now());
+//        return card;
+//    }
 
-        CardEntity card = new CardEntity();
-        card.setCardholderName(request.getCardholderName());
-        card.setCardName(request.getCardName());
-        card.setCardBrand(request.getCardBrand());
-        card.setCardType(request.getCardType());
-        card.setPan(pan);
-        card.setCvv(cvv);
-        card.setPassword(request.getPassword());
-        card.setBalance(BigDecimal.ZERO);
-        card.setCurrency(request.getCurrency());
-        card.setStatus(CardStatus.ACTIVE);
-        card.setActivationDate(LocalDate.now());
-        card.setExpiryDate(LocalDate.now().plusYears(5));
-        card.setCustomer(customer);
-        card.setIsVisible(true);
-        card.setCreatedAt(Instant.now());
-        return card;
-    }
-
-    public CardEntity createOrderCard(CardOrderEntity request) {
+    public CardEntity createOrderCard(CardOrderEntity request, CustomerEntity customer) {
         CardEntity card = new CardEntity();
         card.setCardholderName(request.getCardHolderName());
         card.setCardName(request.getCardName());
@@ -56,7 +56,7 @@ public class CardCreator {
         card.setStatus(CardStatus.ACTIVE);
         card.setActivationDate(LocalDate.now());
         card.setExpiryDate(LocalDate.now().plusYears(5));
-        card.setCustomer(request.getCustomer());
+        card.setCustomer(customer);
         card.setIsVisible(true);
         card.setCreatedAt(Instant.now());
         return card;

@@ -20,7 +20,7 @@ public class OrderCardRequest {
 //    private Integer customerId;
 
     @NotNull(message = "Cardholder name cannot be empty.")
-    private String cardholderName;
+    private String cardHolderName;
 
     @NotNull(message = "Card name cannot be empty.")
     private CardName cardName;

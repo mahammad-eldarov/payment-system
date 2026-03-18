@@ -32,7 +32,7 @@ public class CardOrderService {
     private final CardOrderMapper cardOrderMapper;
     private final OrderRateLimitService orderRateLimitService;
 
-    public CardOrderResponse orderCard(Integer customerId, OrderCardRequest request) {
+    public CardOrderResponse orderCard(Integer customerId, CardOrderEntity request) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
@@ -111,11 +111,11 @@ public class CardOrderService {
 
 
 
-    private CardOrderEntity buildRequest(CustomerEntity customer, OrderCardRequest request) {
+    private CardOrderEntity buildRequest(CustomerEntity customer, CardOrderEntity request) {
         CardOrderEntity orderRequest = new CardOrderEntity();
         orderRequest.setCustomer(customer);
         orderRequest.setStatus(OrderStatus.PENDING);
-        orderRequest.setCardHolderName(request.getCardholderName());
+        orderRequest.setCardHolderName(request.getCardHolderName());
         orderRequest.setCardName(request.getCardName());
         orderRequest.setCardBrand(request.getCardBrand());
         orderRequest.setCardType(request.getCardType());

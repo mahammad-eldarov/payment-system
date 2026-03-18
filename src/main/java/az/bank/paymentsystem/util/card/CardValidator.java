@@ -123,7 +123,7 @@ public class CardValidator {
             throw new MultiValidationException(errors);
         }
 
-        CardEntity card = cardCreator.createOrderCard(request);
+        CardEntity card = cardCreator.createOrderCard(request,customer);
         cardRepository.save(card);
         request.setStatus(OrderStatus.APPROVED);
         request.setUpdatedAt(Instant.now());
