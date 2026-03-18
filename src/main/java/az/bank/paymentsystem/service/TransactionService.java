@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.response.TransactionResponse;
 import az.bank.paymentsystem.entity.TransactionEntity;
@@ -24,12 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TransactionService {
 
-//    private final TransactionRepository transactionRepository;
-//    private final CardRepository cardRepository;
-//    private final CurrentAccountRepository currentAccountRepository;
+    private final TransactionRepository transactionRepository;
+    private final CardRepository cardRepository;
+    private final CurrentAccountRepository currentAccountRepository;
     private final TransactionMapper transactionMapper;
-//    private final PaymentRepository paymentRepository;
-    private final EntityFinderService entityFinderService;
+    private final PaymentRepository paymentRepository;
+//    private final EntityFinderService entityFinderService;
 
 
     // BURDA DƏYİŞİKLİKLƏR OLACAQ - Description düz deyil, full data gəlir olmaz!
@@ -39,14 +40,14 @@ public class TransactionService {
 
 //    @Transactional(readOnly = true)
     public Page<TransactionResponse> getTransactionsByCardId(Integer cardId, int page) {
-//        cardRepository.findByIdAndIsVisibleTrue(cardId)
-//                .orElseThrow(() -> new CardNotFoundException("Card not found"));
-        entityFinderService.findActiveCurrentAccount(cardId);
+        cardRepository.findByIdAndIsVisibleTrue(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+//        entityFinderService.findActiveCurrentAccount(cardId);
 
         Pageable pageable = buildPageable(page);
-//        Page<TransactionEntity> transactions = transactionRepository
-//                .findByFromCardIdOrToCardId(cardId, cardId, pageable);
-        Page<TransactionEntity> transactions = entityFinderService.findCardToCard(cardId, cardId, pageable);
+        Page<TransactionEntity> transactions = transactionRepository
+                .findByFromCardIdOrToCardId(cardId, cardId, pageable);
+//        Page<TransactionEntity> transactions = entityFinderService.findCardToCard(cardId, cardId, pageable);
 
         if (transactions.isEmpty()) throw new EmptyListException("No transactions found for this card.");
         return transactions.map(transactionMapper::toResponse);
@@ -55,13 +56,13 @@ public class TransactionService {
     // current account üçün son 100 tranzaksiyanı tapıb gətirir
 
     public Page<TransactionResponse> getTransactionsByAccountId(Integer accountId, int page) {
-//        currentAccountRepository.findByIdAndIsVisibleTrue(accountId)
-//                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
-        entityFinderService.findActiveCurrentAccount(accountId);
+        currentAccountRepository.findByIdAndIsVisibleTrue(accountId)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+//        entityFinderService.findActiveCurrentAccount(accountId);
         Pageable pageable = buildPageable(page);
-//        Page<TransactionEntity> transactions = transactionRepository
-//                .findByFromAccountIdOrToAccountId(accountId, accountId, pageable);
-        Page<TransactionEntity> transactions = entityFinderService.findAccountToAccount(accountId, accountId, pageable);
+        Page<TransactionEntity> transactions = transactionRepository
+                .findByFromAccountIdOrToAccountId(accountId, accountId, pageable);
+//        Page<TransactionEntity> transactions = entityFinderService.findAccountToAccount(accountId, accountId, pageable);
 
         if (transactions.isEmpty()) throw new EmptyListException("No transactions found for this account.");
         return transactions.map(transactionMapper::toResponse);
@@ -70,14 +71,14 @@ public class TransactionService {
     // payment id-yə görə tranzaksiyalarını tapıb gətirir
 
     public Page<TransactionResponse> getTransactionsByPaymentId(Integer paymentId, int page) {
-//        paymentRepository.findById(paymentId)
-//                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
-        entityFinderService.findPaymentById(paymentId);
+        paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+//        entityFinderService.findPaymentById(paymentId);
         Pageable pageable = buildPageable(page);
-//        Page<TransactionEntity> transactions = transactionRepository
-//                .findAllByPaymentId(paymentId, pageable);
-        Page<TransactionEntity> transactions = entityFinderService
-                .findAllPayment(paymentId, pageable);
+        Page<TransactionEntity> transactions = transactionRepository
+                .findAllByPaymentId(paymentId, pageable);
+//        Page<TransactionEntity> transactions = entityFinderService
+//                .findAllPayment(paymentId, pageable);
 
         if (transactions.isEmpty()) throw new EmptyListException("No transactions found for this payment.");
         return transactions.map(transactionMapper::toResponse);
@@ -92,6 +93,21 @@ public class TransactionService {
         if (page < 1) throw new PageRequestException("Page number must be at least 1");
         return PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
     }
+
+//    public void findActiveCard(Integer id) {
+//        cardRepository.findByIdAndIsVisibleTrue(id)
+//                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+//    }
+
+//    public void findActiveCustomer(Integer id) {
+//        customerRepository.findByIdAndIsVisibleTrue(id)
+//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//    }
+
+//    public void findActiveAccount(Integer id) {
+//        currentAccountRepository.findByIdAndIsVisibleTrue(id)
+//                .orElseThrow(() -> new AccountNotFoundException("Current account not found"));
+//    }
 
 
 }

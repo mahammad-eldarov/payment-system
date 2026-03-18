@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.repository.CustomerRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -23,17 +24,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomerService {
 
-//    private final CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final CustomerResponseBuilder customerResponseBuilder;
     private final CustomerCreator customerCreator;
-    private final EntityFinderService entityFinderService;
+//    private final EntityFinderService entityFinderService;
 
     //Create
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
         CustomerEntity customer = customerCreator.createCustomer(request);
-        entityFinderService.saveCustomer(customer);
-//        customerRepository.save(customer);
+//        entityFinderService.saveCustomer(customer);
+        customerRepository.save(customer);
 
         CustomerResponse response = customerMapper.toResponse(customer);
         response.setPin(request.getPin());
@@ -44,47 +45,47 @@ public class CustomerService {
 
     public CustomerResponse getCustomerById(Integer id) {
 
-//        Optional<CustomerEntity> activeCustomer = customerRepository.findByIdAndIsVisibleTrue(id);
-        Optional<CustomerEntity> activeCustomer = entityFinderService.findCustomerIdVisibleTrue(id);
+        Optional<CustomerEntity> activeCustomer = customerRepository.findByIdAndIsVisibleTrue(id);
+//        Optional<CustomerEntity> activeCustomer = entityFinderService.findCustomerIdVisibleTrue(id);
         if (activeCustomer.isPresent()) {
             return customerMapper.toResponse(activeCustomer.get());
         }
-//        if (customerRepository.findByIdAndIsVisibleFalse(id).isPresent()) {
-//            throw new CustomerDeletedException("This customer has been deleted.");
-//        }
-        if (entityFinderService.findCustomerIdVisibleFalse(id).isPresent()) {
+        if (customerRepository.findByIdAndIsVisibleFalse(id).isPresent()) {
             throw new CustomerDeletedException("This customer has been deleted.");
         }
+//        if (entityFinderService.findCustomerIdVisibleFalse(id).isPresent()) {
+//            throw new CustomerDeletedException("This customer has been deleted.");
+//        }
         throw new CustomerNotFoundException("Customer not found");
     }
 
     public List<CustomerResponse> getCustomersByStatus(CustomerStatus status) {
-//        List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
+        List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
 
-        List<CustomerEntity> activeCustomers = entityFinderService.findCustomerStatusVisibleTrue(status);
+//        List<CustomerEntity> activeCustomers = entityFinderService.findCustomerStatusVisibleTrue(status);
         if (!activeCustomers.isEmpty()) {
             return activeCustomers.stream().map(customerMapper::toResponse).collect(Collectors.toList());
         }
-//        if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
-//            throw new CustomerDeletedException("Customers with this status have been deleted.");
-//        }
-        if (!entityFinderService.findCustomerStatusVisibleFalse(status).isEmpty()) {
+        if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
             throw new CustomerDeletedException("Customers with this status have been deleted.");
         }
+//        if (!entityFinderService.findCustomerStatusVisibleFalse(status).isEmpty()) {
+//            throw new CustomerDeletedException("Customers with this status have been deleted.");
+//        }
         throw new CustomerNotFoundException("No customers found with this status");
     }
 
     public CustomerResponse getDeletedCustomerById(Integer id) {
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-        CustomerEntity customer = entityFinderService.findCustomerIdVisibleFalse(id).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//        CustomerEntity customer = entityFinderService.findCustomerIdVisibleFalse(id).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
         CustomerResponse response = customerMapper.toResponse(customer);
         customerResponseBuilder.setCardsAndAccounts(response, id);
         return response;
     }
 
     public List<CustomerResponse> getAllCustomers() {
-//        List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
-        List<CustomerEntity> activeCustomer = entityFinderService.findAllCustomerVisibleTrue();
+        List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
+//        List<CustomerEntity> activeCustomer = entityFinderService.findAllCustomerVisibleTrue();
 
         if (activeCustomer.isEmpty()) {
             throw new EmptyListException("List is Empty.");
@@ -94,21 +95,21 @@ public class CustomerService {
     }
 
     public CustomerResponse getCustomersCardsAndAccounts(Integer id) {
-        CustomerResponse response = customerMapper.toResponse(entityFinderService.findActiveCustomer(id));
+        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(id));
         customerResponseBuilder.setCardsAndAccounts(response, id);
         return response;
     }
 
     // Müştərinin kartlarını tranzaksiyalarla birlikdə gətirir
     public CustomerResponse getCustomerWithCardTransactions(Integer customerId) {
-        CustomerResponse response = customerMapper.toResponse(entityFinderService.findActiveCustomer(customerId));
+        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
         customerResponseBuilder.setCardTransactions(response, customerId);
         return response;
     }
 
     // Müştərinin cari hesablarını tranzaksiyalarla birlikdə gətirir
     public CustomerResponse getCustomerWithAccountTransactions(Integer customerId) {
-        CustomerResponse response = customerMapper.toResponse(entityFinderService.findActiveCustomer(customerId));
+        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
         customerResponseBuilder.setAccountTransactions(response, customerId);
         return response;
     }
@@ -116,17 +117,17 @@ public class CustomerService {
     // UPDATE
 
     public MessageResponse updateCustomerStatus(Integer id, CustomerStatus status) {
-        CustomerEntity customer = entityFinderService.findActiveCustomer(id);
+        CustomerEntity customer = findActiveCustomer(id);
         customer.setStatus(status);
         customer.setUpdatedAt(Instant.now());
-        entityFinderService.saveCustomer(customer);
-//        customerRepository.save(customer);
+//        entityFinderService.saveCustomer(customer);
+        customerRepository.save(customer);
         return new MessageResponse("Status updated successfully");
     }
 
     public MessageResponse updateCustomer(Integer id, UpdateCustomerRequest request) {
 
-        CustomerEntity customer = entityFinderService.findActiveCustomer(id);
+        CustomerEntity customer = findActiveCustomer(id);
 
         if (request.getName() != null) {
             customer.setName(request.getName());
@@ -142,8 +143,8 @@ public class CustomerService {
         }
         customer.setUpdatedAt(Instant.now());
 
-        entityFinderService.saveCustomer(customer);
-//        customerRepository.save(customer);
+//        entityFinderService.saveCustomer(customer);
+        customerRepository.save(customer);
 
         return new MessageResponse("Customer information updated successfully.");
     }
@@ -151,11 +152,11 @@ public class CustomerService {
     // DELETE
 
     public MessageResponse deleteCustomer(Integer id) {
-        CustomerEntity customer = entityFinderService.findActiveCustomer(id);
+        CustomerEntity customer = findActiveCustomer(id);
         customer.setIsVisible(false);
         customer.setStatus(CustomerStatus.CLOSED);
-        entityFinderService.saveCustomer(customer);
-//        customerRepository.save(customer);
+//        entityFinderService.saveCustomer(customer);
+        customerRepository.save(customer);
         return new MessageResponse("Customer information has been deleted successfully.");
     }
 
@@ -165,10 +166,10 @@ public class CustomerService {
 //    }
 
     // Auxiliary method
-//    public CustomerEntity findActiveCustomer(Integer id) {
-//        return customerRepository.findByIdAndIsVisibleTrue(id)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-//    }
+    public CustomerEntity findActiveCustomer(Integer id) {
+        return customerRepository.findByIdAndIsVisibleTrue(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+    }
 
 
 }

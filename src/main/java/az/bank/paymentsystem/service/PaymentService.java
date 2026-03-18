@@ -27,13 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PaymentService {
 
-//    private final PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentValidator paymentValidator;
     private final PaymentProcessor paymentProcessor;
     private final PaymentSourceResolver paymentSourceResolver;
     private final PaymentMapper paymentMapper;
     private final PaymentCreator paymentCreator;
-    private final EntityFinderService entityFinderService;
+//    private final EntityFinderService entityFinderService;
 
     @Transactional
     public PaymentResponse cardToCard(Integer customerId, CardToCardRequest request) {
@@ -49,8 +49,8 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-//        return paymentMapper.toResponse(paymentRepository.save(payment));
-        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
+//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     @Transactional
@@ -67,8 +67,8 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-//        return paymentMapper.toResponse(paymentRepository.save(payment));
-        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
+//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     @Transactional
@@ -85,8 +85,8 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-//        return paymentMapper.toResponse(paymentRepository.save(payment));
-        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
+//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     @Transactional
@@ -103,23 +103,29 @@ public class PaymentService {
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
-//        return paymentMapper.toResponse(paymentRepository.save(payment));
-        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
+        return paymentMapper.toResponse(paymentRepository.save(payment));
+//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     // PROCESS
     @Transactional
     public void processPayments() {
-//        List<PaymentEntity> pendingPayments = paymentRepository.findAllByStatus(PaymentStatus.PENDING);
-        List<PaymentEntity> pendingPayments = entityFinderService.findAllPaymentStatus();
+        List<PaymentEntity> pendingPayments = paymentRepository.findAllByStatus(PaymentStatus.PENDING);
+//        List<PaymentEntity> pendingPayments = entityFinderService.findAllPaymentStatus();
         for (PaymentEntity payment : pendingPayments) {
             paymentProcessor.process(payment.getId());
         }
     }
     // GET
     public PaymentResponse getPaymentById(Integer paymentId) {
-        return paymentMapper.toResponse(entityFinderService.findPaymentById(paymentId));
+        return paymentMapper.toResponse(findPaymentById(paymentId));
     }
+
+    public PaymentEntity findPaymentById(Integer paymentId) {
+        return paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+    }
+
 
     // RESPONSE
 //    public PaymentResponse toResponse(PaymentEntity payment) {

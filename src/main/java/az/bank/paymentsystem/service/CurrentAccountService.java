@@ -27,41 +27,41 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CurrentAccountService {
 
-//    private final CurrentAccountRepository currentAccountRepository;
-//    private final CustomerRepository customerRepository;
+    private final CurrentAccountRepository currentAccountRepository;
+    private final CustomerRepository customerRepository;
     private final CurrentAccountMapper currentAccountMapper;
     private final CurrentAccountCreator currentAccountCreator;
     private final CurrentAccountValidator currentAccountValidator;
     private final CurrentAccountBalanceTransfer currentAccountBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
-    private final EntityFinderService entityFinderService;
+//    private final EntityFinderService entityFinderService;
 
 
     // CREATE
     public CurrentAccountResponse orderCurrentAccount(Integer customerId,
                                                       OrderCurrentAccountRequest request) {
-        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
-
-//        currentAccountValidator.validateAccountOrder(customerId,
-//                currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customerId));
+        CustomerEntity customer = findActiveCustomer(customerId);
 
         currentAccountValidator.validateAccountOrder(customerId,
-                entityFinderService.countCurrentAccountVisibleTrue(customerId));
+                currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customerId));
+
+//        currentAccountValidator.validateAccountOrder(customerId,
+//                entityFinderService.countCurrentAccountVisibleTrue(customerId));
 
         CurrentAccountEntity account = currentAccountCreator.createAccount(request, customer);
-//        currentAccountRepository.save(account);
-        entityFinderService.saveCurrentAccount(account);
+        currentAccountRepository.save(account);
+//        entityFinderService.saveCurrentAccount(account);
         return currentAccountMapper.toResponse(account);
     }
 
     //GET
     public List<CurrentAccountResponse> getAccountsByCustomerId(Integer id) {
 
-//        findActiveCustomerById(id);
-        entityFinderService.findActiveCustomer(id);
+        findActiveCustomer(id);
+//        entityFinderService.findActiveCustomer(id);
 
-//        List<CurrentAccountEntity> accounts = currentAccountRepository.findByCustomerIdAndIsVisibleTrue(id);
-        List<CurrentAccountEntity> accounts = entityFinderService.findCurrentAccountsCustomerId(id);
+        List<CurrentAccountEntity> accounts = currentAccountRepository.findByCustomerIdAndIsVisibleTrue(id);
+//        List<CurrentAccountEntity> accounts = entityFinderService.findCurrentAccountsCustomerId(id);
         if (accounts.isEmpty()) {
             throw new EmptyListException("This customer does not have any current accounts.");
         }
@@ -70,13 +70,13 @@ public class CurrentAccountService {
     }
 
     public CurrentAccountResponse getAccountByAccountNumber(String accountNumber) {
-        return currentAccountMapper.toResponse(entityFinderService.findActiveCurrentAccountByNumber(accountNumber));
+        return currentAccountMapper.toResponse(findActiveAccountByNumber(accountNumber));
     }
 
     public List<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status) {
 
-//        List<CurrentAccountEntity> accounts = currentAccountRepository.findByStatusAndIsVisibleTrue(status);
-        List<CurrentAccountEntity> accounts = entityFinderService.findCurrentAccountStatusVisibleTrue(status);
+        List<CurrentAccountEntity> accounts = currentAccountRepository.findByStatusAndIsVisibleTrue(status);
+//        List<CurrentAccountEntity> accounts = entityFinderService.findCurrentAccountStatusVisibleTrue(status);
         if (accounts.isEmpty()) {
             throw new AccountNotFoundException("No current account found with this status");
         }
@@ -92,12 +92,12 @@ public class CurrentAccountService {
 //        return new MessageResponse("Current account status updated successfully");
 //    }
     public MessageResponse updateCurrentAccountStatus(Integer id, CurrentAccountStatus status) {
-        CurrentAccountEntity account = entityFinderService.findActiveCurrentAccount(id);
+        CurrentAccountEntity account = findActiveAccount(id);
         statusAuditLogger.logAccount(account, status.name(), "Status updated manually");
         account.setStatus(status);
         account.setUpdatedAt(Instant.now());
-//        currentAccountRepository.save(account);
-        entityFinderService.saveCurrentAccount(account);
+        currentAccountRepository.save(account);
+//        entityFinderService.saveCurrentAccount(account);
         return new MessageResponse("Current account status updated successfully");
     }
 
@@ -115,9 +115,9 @@ public class CurrentAccountService {
 
 
     public void updateExpiredCurrentAccounts() {
-//        List<CurrentAccountEntity> expiredAccounts = currentAccountRepository
-//                .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CurrentAccountStatus.EXPIRED);
-        List<CurrentAccountEntity> expiredAccounts = entityFinderService.findAllCurrentAccountNotReachExpiryDate();
+        List<CurrentAccountEntity> expiredAccounts = currentAccountRepository
+                .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CurrentAccountStatus.EXPIRED);
+//        List<CurrentAccountEntity> expiredAccounts = entityFinderService.findAllCurrentAccountNotReachExpiryDate();
 
 //        expiredAccounts.forEach(account -> {
 //            account.setStatus(CurrentAccountStatus.EXPIRED);
@@ -131,8 +131,8 @@ public class CurrentAccountService {
             currentAccountBalanceTransfer.transfer(account);
         });
 
-//        currentAccountRepository.saveAll(expiredAccounts);
-        entityFinderService.saveAllExpiredCurrentAccounts(expiredAccounts);
+        currentAccountRepository.saveAll(expiredAccounts);
+//        entityFinderService.saveAllExpiredCurrentAccounts(expiredAccounts);
     }
 
     // DELETE
@@ -146,14 +146,14 @@ public class CurrentAccountService {
 //        return new MessageResponse("Current account was successfully deleted.");
 //    }
     public MessageResponse deleteCurrentAccount(Integer id) {
-        CurrentAccountEntity account = entityFinderService.findActiveCurrentAccount(id);
+        CurrentAccountEntity account = findActiveAccount(id);
         currentAccountValidator.validateDeletion(account);
         statusAuditLogger.logAccount(account, CurrentAccountStatus.CLOSED.name(), "Account closed by customer");
         account.setStatus(CurrentAccountStatus.CLOSED);
         account.setIsVisible(false);
         account.setUpdatedAt(Instant.now());
-//        currentAccountRepository.save(account);
-        entityFinderService.saveCurrentAccount(account);
+        currentAccountRepository.save(account);
+//        entityFinderService.saveCurrentAccount(account);
         return new MessageResponse("Current account was successfully deleted.");
     }
 
@@ -162,19 +162,19 @@ public class CurrentAccountService {
 //        return currentAccountMapper.toResponse(account);
 //    }
 
-//    public CurrentAccountEntity findActiveAccountById(Integer id) {
-//        return currentAccountRepository.findByIdAndIsVisibleTrue(id)
-//                .orElseThrow(() -> new AccountNotFoundException("Current account not found"));
-//    }
+    public CurrentAccountEntity findActiveAccount(Integer id) {
+        return currentAccountRepository.findByIdAndIsVisibleTrue(id)
+                .orElseThrow(() -> new AccountNotFoundException("Current account not found"));
+    }
 
-//    public CurrentAccountEntity findActiveAccountByNumber(String accountNumber) {
-//        return currentAccountRepository.findByAccountNumberAndIsVisibleTrue(accountNumber)
-//                .orElseThrow(() -> new AccountNotFoundException("Current account not found"));
-//    }
+    public CurrentAccountEntity findActiveAccountByNumber(String accountNumber) {
+        return currentAccountRepository.findByAccountNumberAndIsVisibleTrue(accountNumber)
+                .orElseThrow(() -> new AccountNotFoundException("Current account not found"));
+    }
 
-//    public CustomerEntity findActiveCustomerById(Integer id) {
-//        return customerRepository.findByIdAndIsVisibleTrue(id)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-//    }
+    public CustomerEntity findActiveCustomer(Integer id) {
+        return customerRepository.findByIdAndIsVisibleTrue(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+    }
 
 }
