@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.util.currentAccount;
 
 import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
+import az.bank.paymentsystem.enums.OrderStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -32,6 +33,16 @@ public class CurrentAccountCreator {
         account.setIsVisible(true);
         account.setCreatedAt(Instant.now());
         return account;
+    }
+
+    public CurrentAccountOrderEntity createOrder(CustomerEntity customer,
+                                                      OrderCurrentAccountRequest request) {
+        CurrentAccountOrderEntity entity = new CurrentAccountOrderEntity();
+        entity.setCustomer(customer);
+        entity.setStatus(OrderStatus.PENDING);
+        entity.setCurrency(request.getCurrency());
+        entity.setCreatedAt(Instant.now());
+        return entity;
     }
 
 }

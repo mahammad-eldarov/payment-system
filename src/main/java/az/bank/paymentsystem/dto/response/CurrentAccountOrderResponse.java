@@ -1,9 +1,12 @@
 package az.bank.paymentsystem.dto.response;
 
 import az.bank.paymentsystem.enums.Currency;
+import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +19,11 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CurrentAccountOrderResponse {
     private Integer id;
-    private OrderStatus status;
-    private String rejectionReason;
-    private String accountHolderName;
+    private String accountNumber;
+    private String currentAccountHolderName;
+    private BigDecimal balance;
     private Currency currency;
-    private Instant processedAt;
-    private Instant createdAt;
+    private CurrentAccountStatus status;
+    private LocalDate activationDate;
+    private LocalDate expiryDate;
 }

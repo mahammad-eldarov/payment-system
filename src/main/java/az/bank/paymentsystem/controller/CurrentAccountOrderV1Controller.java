@@ -26,7 +26,7 @@ public class CurrentAccountOrderV1Controller {
 
     @PostMapping("/customer/{customerId}")
     @Operation(summary = "Order a current account", description = "Creates a current account order request for a customer")
-    public ResponseEntity<CurrentAccountResponse> orderAccount(
+    public ResponseEntity<CurrentAccountOrderResponse> orderAccount(
             @PathVariable Integer customerId,
             @RequestBody @Valid OrderCurrentAccountRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
