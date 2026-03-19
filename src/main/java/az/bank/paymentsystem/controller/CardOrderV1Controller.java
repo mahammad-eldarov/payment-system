@@ -2,6 +2,7 @@ package az.bank.paymentsystem.controller;
 
 import az.bank.paymentsystem.dto.request.OrderCardRequest;
 import az.bank.paymentsystem.dto.response.CardOrderResponse;
+import az.bank.paymentsystem.dto.response.CardResponse;
 import az.bank.paymentsystem.service.CardOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +26,7 @@ public class CardOrderV1Controller {
 
     @PostMapping("/customer/{customerId}")
     @Operation(summary = "Order a card", description = "Creates a card order request for a customer")
-    public ResponseEntity<CardOrderResponse> orderCard(
+    public ResponseEntity<CardResponse> orderCard(
             @PathVariable Integer customerId,
             @RequestBody @Valid OrderCardRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)

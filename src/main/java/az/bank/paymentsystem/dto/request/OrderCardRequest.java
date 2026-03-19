@@ -1,6 +1,9 @@
 package az.bank.paymentsystem.dto.request;
+import az.bank.paymentsystem.entity.CustomerEntity;
+import az.bank.paymentsystem.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +28,10 @@ public class OrderCardRequest {
     @NotNull(message = "Card name cannot be empty.")
     private CardName cardName;
 
+//    private OrderStatus status;
+//
+//    private String rejectionReason;
+
     @NotNull(message = "Password cannot be empty.")
     @Pattern(regexp = "^[0-9]{4}$", message = "Password must be exactly 4 digits")
     private String password;
@@ -37,6 +44,10 @@ public class OrderCardRequest {
 
     @NotNull(message = "Card type cannot be empty.")
     private CardType cardType;
+
+//    private Instant updatedAt;
+//
+//    private CustomerEntity customer;
 
 
 }

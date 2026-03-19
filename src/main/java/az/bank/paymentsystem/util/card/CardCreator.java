@@ -41,8 +41,8 @@ public class CardCreator {
 //        card.setCreatedAt(Instant.now());
 //        return card;
 //    }
-
-    public CardEntity createOrderCard(CardOrderEntity request, CustomerEntity customer) {
+//CardOrderEntity request, CustomerEntity customer
+    public CardEntity createCard(OrderCardRequest request, CustomerEntity customer) {
         CardEntity card = new CardEntity();
         card.setCardholderName(request.getCardHolderName());
         card.setCardName(request.getCardName());

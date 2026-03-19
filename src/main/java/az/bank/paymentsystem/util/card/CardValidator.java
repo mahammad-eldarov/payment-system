@@ -1,10 +1,10 @@
 package az.bank.paymentsystem.util.card;
 
-import az.bank.paymentsystem.entity.CardOrderEntity;
+import az.bank.paymentsystem.dto.request.OrderCardRequest;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.enums.OrderStatus;
-import az.bank.paymentsystem.exception.CardOrderRejectedException;
+import az.bank.paymentsystem.exception.CardLimitExceededException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.CustomerSuspiciousException;
 import az.bank.paymentsystem.exception.ExceptionResponse;
@@ -23,7 +23,6 @@ import az.bank.paymentsystem.entity.CardEntity;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.exception.CardAlreadyCancelledException;
 import az.bank.paymentsystem.exception.CardExpiredException;
-import az.bank.paymentsystem.exception.CardLimitExceededException;
 import az.bank.paymentsystem.repository.CardRepository;
 import org.springframework.stereotype.Component;
 
@@ -69,108 +68,74 @@ public class CardValidator {
 //    cardRepository.save(card);
 //    request.setStatus(OrderStatus.APPROVED);
 //    request.setUpdatedAt(Instant.now());
-//}
-    public void process(CardOrderEntity request) {
-        CustomerEntity customer = request.getCustomer();
-        List<ExceptionResponse> errors = new ArrayList<>();
-        suspiciousValidator.validate(customer, errors);
-
-//        int suspiciousCount = statusAuditLogRepository
-//                .countByEntityTypeAndEntityIdAndNewStatus(
-//                        "CUSTOMER",
-//                        customer.getId(),
-//                        "SUSPICIOUS"
-//                );
+//}OrderCardRequest request
+//    public void validateCardOrder(Integer customerId) {
+//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//        List<ExceptionResponse> errors = new ArrayList<>();
+//        suspiciousValidator.validate(customer, errors);
 //
-//        if (suspiciousCount >= 2) {
+//        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
+//                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
 //            errors.add(new ExceptionResponse(
 //                    403,
-//                    "Your account has been permanently blocked due to repeated suspicious activity.",
+//                    "Cannot order a new card while having suspicious, lost or stolen card. " +
+//                            "If you want to create a new card, you should close the cards that are in this status.",
 //                    LocalDateTime.now()
 //            ));
 //        }
-
-
-//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+//        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
 //            errors.add(new ExceptionResponse(
-//                    403,
-//                    "Profile is suspended due to suspicious activity.",
+//                    422,
+//                    "The customer already has 2 cards. A new card cannot be ordered.",
 //                    LocalDateTime.now()
 //            ));
 //        }
-        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
-                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
-            errors.add(new ExceptionResponse(
-                    403,
-                    "Cannot order a new card while having suspicious, lost or stolen card. " +
-                            "If you want to create a new card, you should close the cards that are in this status.",
-                    LocalDateTime.now()
-            ));
-        }
-        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
-            errors.add(new ExceptionResponse(
-                    422,
-                    "The customer already has 2 cards. A new card cannot be ordered.",
-                    LocalDateTime.now()
-            ));
-        }
+//
+//        if (!errors.isEmpty()) {
+//            request.setStatus(OrderStatus.REJECTED);
+//            request.setRejectionReason(
+//                    errors.stream().map(ExceptionResponse::getMessage).collect(Collectors.joining(", "))
+//            );
+//            throw new MultiValidationException(errors);
+//        }
+////CardEntity card = cardCreator.createOrderCard(request,customer);
+//        CardEntity card = cardCreator.createOrderCard(request);
+//        cardRepository.save(card);
+//        request.setStatus(OrderStatus.APPROVED);
+//        request.setUpdatedAt(Instant.now());
+//    }
 
-        if (!errors.isEmpty()) {
-            request.setStatus(OrderStatus.REJECTED);
-            request.setRejectionReason(
-                    errors.stream().map(ExceptionResponse::getMessage).collect(Collectors.joining(", "))
-            );
-            throw new MultiValidationException(errors);
-        }
+public void validateCardOrder(Integer customerId) {
+    CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-        CardEntity card = cardCreator.createOrderCard(request,customer);
-        cardRepository.save(card);
-        request.setStatus(OrderStatus.APPROVED);
-        request.setUpdatedAt(Instant.now());
+    List<ExceptionResponse> errors = new ArrayList<>();
+
+    suspiciousValidator.validate(customer, errors);
+
+    if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
+            List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
+        errors.add(new ExceptionResponse(
+                403,
+                "Cannot order a new card while having suspicious, lost or stolen card. " +
+                        "If you want to create a new card, you should close the cards that are in this status.",
+                LocalDateTime.now()
+        ));
+    }
+    if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
+        errors.add(new ExceptionResponse(
+                422,
+                "The customer already has 2 cards. A new card cannot be ordered.",
+                LocalDateTime.now()
+        ));
     }
 
-//    private List<String> collectViolations(CustomerEntity customer) {
-//        List<String> violations = new ArrayList<>();
-//
-//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-//            violations.add("Account is suspended due to suspicious activity.");
-//        }
-//        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
-//                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
-//            violations.add("Cannot order a new card while having suspicious, lost or stolen card.");
-//        }
-//        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
-//            violations.add("The customer already has 2 cards. A new card cannot be ordered.");
-//        }
-//
-//        return violations;
-//    }
+    if (!errors.isEmpty()) {
+        throw new MultiValidationException(errors);
+    }
+}
 
-//    public void process(CardOrderEntity request) {
-//        List<String> reasons = new ArrayList<>();
-//        CustomerEntity customer = request.getCustomer();
-//
-//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-//            reasons.add("Customer is suspended due to suspicious activity.");
-//        }
-//        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
-//                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
-//            reasons.add("Customer has suspicious, lost or stolen card.");
-//        }
-//        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
-//            reasons.add("Card limit exceeded.");
-//        }
-//
-//        if (!reasons.isEmpty()) {
-//            request.setStatus(OrderStatus.REJECTED);
-//            request.setRejectionReason(String.join(", ", reasons));
-//        } else {
-//            CardEntity card = cardCreator.createOrderCard(request);
-//            cardRepository.save(card);
-//            request.setStatus(OrderStatus.APPROVED);
-//            request.setUpdatedAt(Instant.now());
-//        }
-//    }
 
 //    public void validateCardOrder(Integer customerId) {
 //        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
