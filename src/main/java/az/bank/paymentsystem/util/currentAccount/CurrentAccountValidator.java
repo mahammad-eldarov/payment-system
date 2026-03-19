@@ -21,10 +21,11 @@ import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 //import az.bank.paymentsystem.service.EntityFinderService;
 import az.bank.paymentsystem.util.shared.CustomerSuspiciousValidator;
-import az.bank.paymentsystem.util.shared.EnumParser;
+//import az.bank.paymentsystem.util.shared.EnumParser;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class CurrentAccountValidator {
 //    private final EntityFinderService entityFinderService;
     private final CurrentAccountCreator currentAccountCreator;
     private final CustomerSuspiciousValidator suspiciousValidator;
-    private final EnumParser enumParser;
+//    private final EnumParser enumParser;
 
 //    public void validateRequestFields(OrderCurrentAccountRequest request) {
 //        List<ExceptionResponse> errors = new ArrayList<>();
@@ -151,20 +152,4 @@ public class CurrentAccountValidator {
         }
 
     }
-
-//    public void validateAccountOrder(Integer customerId, Integer accountCount) {
-//
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-////        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
-//
-//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-//            throw new CustomerSuspiciousException("Your account is suspended due to suspicious activity.");
-//        }
-//
-//        if (accountCount >= 3) {
-//            throw new AccountLimitExceededException(
-//                    "The customer already has 3 current accounts. A new account cannot be ordered.");
-//        }
-//    }
 }

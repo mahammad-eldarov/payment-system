@@ -3,7 +3,7 @@ package az.bank.paymentsystem.util.currentAccount;
 import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
 import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.OrderStatus;
-import az.bank.paymentsystem.util.shared.EnumParser;
+//import az.bank.paymentsystem.util.shared.EnumParser;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class CurrentAccountCreator {
 
     private final AccountNumberGenerator accountNumberGenerator;
-    private final EnumParser enumParser;
+//    private final EnumParser enumParser;
 
     public CurrentAccountEntity createOrderAccount(OrderCurrentAccountRequest request,
                                               CustomerEntity customer) {
@@ -31,6 +31,7 @@ public class CurrentAccountCreator {
         account.setCurrentAccountHolderName(request.getCurrentAccountHolderName());
         account.setBalance(BigDecimal.ZERO);
         account.setCurrency(request.getCurrency());
+//        account.setCurrency(Currency.valueOf(request.getCurrency().trim().toUpperCase()));
 //        account.setCurrency(Currency.valueOf(request.getCurrency().toUpperCase()));
 //        account.setCurrency(enumParser.parse(Currency.class, request.getCurrency(), "currency"));
         account.setStatus(CurrentAccountStatus.ACTIVE);
@@ -48,6 +49,7 @@ public class CurrentAccountCreator {
         entity.setCustomer(customer);
         entity.setStatus(OrderStatus.PENDING);
         entity.setCurrency(request.getCurrency());
+//        entity.setCurrency(Currency.valueOf(request.getCurrency().trim().toUpperCase()));
 //        entity.setCurrency(Currency.valueOf(request.getCurrency().toUpperCase()));
 //        entity.setCurrency(enumParser.parse(Currency.class, request.getCurrency(), "currency"));
         entity.setCreatedAt(Instant.now());
