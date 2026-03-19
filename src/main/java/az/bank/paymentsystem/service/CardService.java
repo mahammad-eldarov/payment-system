@@ -35,6 +35,7 @@ public class CardService {
     private final CardMapper cardMapper;
     private final CardBalanceTransfer cardBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
+    private final NotificationService notificationService;
 
     // DELETE
     public MessageResponse deleteCard(Integer cardId) {
@@ -48,6 +49,9 @@ public class CardService {
 
         String message = cardBalanceTransfer.transfer(card);
         cardRepository.save(card);
+        notificationService.send(card.getCustomer(),
+                "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
+                        + " has been successfully closed. " + message);
         return new MessageResponse(message);
     }
 
@@ -62,7 +66,10 @@ public class CardService {
             statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), "Card expiry date reached");
             card.setStatus(CardStatus.EXPIRED);
             card.setUpdatedAt(Instant.now());
-            cardBalanceTransfer.transfer(card);
+            String message = cardBalanceTransfer.transfer(card);
+            notificationService.send(card.getCustomer(),
+                    "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
+                            + " has expired. " + message);
         });
 
         cardRepository.saveAll(expiredCards);

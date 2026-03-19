@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.util.shared;
 
 import az.bank.paymentsystem.repository.StatusAuditLogRepository;
+import az.bank.paymentsystem.service.NotificationService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class SuspiciousTransactionChecker {
     private final CustomerRepository customerRepository;
     private final BankConfig bankConfig;
     private final StatusAuditLogger statusAuditLogger;
+    private final NotificationService notificationService;
 
     public void check(PaymentEntity payment) {
         if (isUnderThreshold(payment)) return;
@@ -55,11 +57,17 @@ public class SuspiciousTransactionChecker {
             statusAuditLogger.logCard(card, CardStatus.SUSPICIOUS.name(), "Suspicious transaction detected");
             card.setStatus(CardStatus.SUSPICIOUS);
             cardRepository.save(card);
+            notificationService.send(card.getCustomer(),
+                    "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
+                            + " has been suspended due to suspicious activity.");
         } else if (payment.getFromAccount() != null) {
             CurrentAccountEntity account = payment.getFromAccount();
             statusAuditLogger.logAccount(account, CurrentAccountStatus.SUSPICIOUS.name(), "Suspicious transaction detected");
             account.setStatus(CurrentAccountStatus.SUSPICIOUS);
             currentAccountRepository.save(account);
+            notificationService.send(account.getCustomer(),
+                    "Your account " + account.getAccountNumber()
+                            + " has been suspended due to suspicious activity.");
         }
     }
 
@@ -68,6 +76,8 @@ public class SuspiciousTransactionChecker {
         statusAuditLogger.logCustomer(customer, CustomerStatus.SUSPICIOUS.name(), "Second suspicious transaction detected");
         customer.setStatus(CustomerStatus.SUSPICIOUS);
         customerRepository.save(customer);
+        notificationService.send(customer,
+                "Your account has been suspended due to repeated suspicious activity.");
 
         if (payment.getFromCard() != null) {
             payment.getFromCard().setStatus(CardStatus.SUSPICIOUS);

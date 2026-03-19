@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.util.payment;
 
 //import az.bank.paymentsystem.service.EntityFinderService;
+import az.bank.paymentsystem.service.NotificationService;
 import az.bank.paymentsystem.util.shared.BalanceUpdater;
 import az.bank.paymentsystem.util.shared.SuspiciousTransactionChecker;
 import az.bank.paymentsystem.util.shared.TransactionCreator;
@@ -28,6 +29,7 @@ public class PaymentProcessor {
     private final SuspiciousTransactionChecker suspiciousTransactionChecker;
     private final TransactionCreator transactionCreator;
     private final PaymentRepository paymentRepository;
+    private final NotificationService notificationService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(Integer paymentId) {
@@ -63,6 +65,8 @@ public class PaymentProcessor {
         payment.setProcessedAt(Instant.now());
         payment.setUpdatedAt(Instant.now());
         payment.setFailureReason("");
+        notificationService.send(payment.getCustomer(),
+                "Your payment of " + payment.getAmount() + " " + payment.getCurrency() + " was successful.");
     }
 
     private void markFailed(PaymentEntity payment, String reason) {
@@ -70,5 +74,8 @@ public class PaymentProcessor {
         payment.setFailureReason(reason);
         payment.setProcessedAt(Instant.now());
         payment.setUpdatedAt(Instant.now());
+        notificationService.send(payment.getCustomer(),
+                "Your payment of " + payment.getAmount() + " " + payment.getCurrency()
+                        + " failed. Reason: " + reason);
     }
 }

@@ -34,6 +34,7 @@ public class CurrentAccountService {
     private final CurrentAccountValidator currentAccountValidator;
     private final CurrentAccountBalanceTransfer currentAccountBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
+    private final NotificationService notificationService;
 
     //GET
     public List<CurrentAccountResponse> getAccountsByCustomerId(Integer id) {
@@ -79,7 +80,9 @@ public class CurrentAccountService {
             statusAuditLogger.logAccount(account, CurrentAccountStatus.EXPIRED.name(), "Account expiry date reached");
             account.setStatus(CurrentAccountStatus.EXPIRED);
             account.setUpdatedAt(Instant.now());
-            currentAccountBalanceTransfer.transfer(account);
+            String message = currentAccountBalanceTransfer.transfer(account);
+            notificationService.send(account.getCustomer(),
+                    "Your account " + account.getAccountNumber() + " has expired. " + message);
         });
 
         currentAccountRepository.saveAll(expiredAccounts);
@@ -94,6 +97,8 @@ public class CurrentAccountService {
         account.setIsVisible(false);
         account.setUpdatedAt(Instant.now());
         currentAccountRepository.save(account);
+        notificationService.send(account.getCustomer(),
+                "Your account " + account.getAccountNumber() + " has been successfully closed.");
         return new MessageResponse("Current account was successfully deleted.");
     }
 
