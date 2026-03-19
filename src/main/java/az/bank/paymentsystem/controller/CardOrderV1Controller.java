@@ -26,7 +26,7 @@ public class CardOrderV1Controller {
 
     @PostMapping("/customer/{customerId}")
     @Operation(summary = "Order a card", description = "Creates a card order request for a customer")
-    public ResponseEntity<CardResponse> orderCard(
+    public ResponseEntity<CardOrderResponse> orderCard(
             @PathVariable Integer customerId,
             @RequestBody @Valid OrderCardRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)

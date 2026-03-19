@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.util.card;
 
 import az.bank.paymentsystem.entity.CardOrderEntity;
+import az.bank.paymentsystem.enums.OrderStatus;
 import az.bank.paymentsystem.util.shared.LuhnPanGenerator;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -37,5 +38,21 @@ public class CardCreator {
         card.setCreatedAt(Instant.now());
         return card;
     }
+
+
+    public CardOrderEntity createOrder(CustomerEntity customer, OrderCardRequest request) {
+        CardOrderEntity entity = new CardOrderEntity();
+        entity.setCustomer(customer);
+        entity.setStatus(OrderStatus.PENDING);
+        entity.setCardHolderName(request.getCardHolderName());
+        entity.setCardName(request.getCardName());
+        entity.setCardBrand(request.getCardBrand());
+        entity.setCardType(request.getCardType());
+        entity.setPassword(request.getPassword());
+        entity.setCurrency(request.getCurrency());
+        entity.setCreatedAt(Instant.now());
+        return entity;
+    }
+
 
 }
