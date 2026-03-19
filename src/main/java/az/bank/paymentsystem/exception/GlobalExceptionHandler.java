@@ -107,6 +107,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.unprocessableContent().body(ex.getErrors());
     }
 
+//    @ExceptionHandler(IllegalArgumentException.class)
+//    public ResponseEntity<ExceptionResponse> handleIllegalArgument(IllegalArgumentException ex) {
+//        return ResponseEntity.badRequest()
+//                .body(new ExceptionResponse(ex.getMessage()));
+//    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationException(IllegalArgumentException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(new ExceptionResponse(400, ex.getMessage(), LocalDateTime.now()));
+    }
+
     // JSON formatını və ya enumları səhv yazsan bu exception həmin xətanı tutacaq.
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
