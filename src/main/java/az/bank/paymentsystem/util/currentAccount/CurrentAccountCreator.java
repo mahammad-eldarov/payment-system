@@ -19,11 +19,10 @@ public class CurrentAccountCreator {
     private final AccountNumberGenerator accountNumberGenerator;
 //    private final CurrentAccountRepository currentAccountRepository;
 
-    public CurrentAccountEntity createAccount(OrderCurrentAccountRequest request,
+    public CurrentAccountEntity createOrderAccount(OrderCurrentAccountRequest request,
                                               CustomerEntity customer) {
-        String accountNumber = accountNumberGenerator.generate();
         CurrentAccountEntity account = new CurrentAccountEntity();
-        account.setAccountNumber(accountNumber);
+        account.setAccountNumber(accountNumberGenerator.generate());
         account.setCurrentAccountHolderName(request.getCurrentAccountHolderName());
         account.setBalance(BigDecimal.ZERO);
         account.setCurrency(request.getCurrency());
@@ -36,20 +35,20 @@ public class CurrentAccountCreator {
         return account;
     }
 
-    public CurrentAccountEntity createOrderAccount(CurrentAccountOrderEntity request) {
-        CurrentAccountEntity account = new CurrentAccountEntity();
-        account.setCurrentAccountHolderName(request.getAccountHolderName());
-        account.setAccountNumber(accountNumberGenerator.generate());
-        account.setBalance(BigDecimal.ZERO);
-        account.setCurrency(request.getCurrency());
-        account.setStatus(CurrentAccountStatus.ACTIVE);
-        account.setActivationDate(LocalDate.now());
-        account.setExpiryDate(LocalDate.now().plusYears(5));
-        account.setCustomer(request.getCustomer());
-        account.setIsVisible(true);
-        account.setCreatedAt(Instant.now());
-        return account;
-    }
+//    public CurrentAccountEntity createOrderAccount(CurrentAccountOrderEntity request) {
+//        CurrentAccountEntity account = new CurrentAccountEntity();
+//        account.setCurrentAccountHolderName(request.getAccountHolderName());
+//        account.setAccountNumber(accountNumberGenerator.generate());
+//        account.setBalance(BigDecimal.ZERO);
+//        account.setCurrency(request.getCurrency());
+//        account.setStatus(CurrentAccountStatus.ACTIVE);
+//        account.setActivationDate(LocalDate.now());
+//        account.setExpiryDate(LocalDate.now().plusYears(5));
+//        account.setCustomer(request.getCustomer());
+//        account.setIsVisible(true);
+//        account.setCreatedAt(Instant.now());
+//        return account;
+//    }
 
 
 }

@@ -2,6 +2,7 @@ package az.bank.paymentsystem.controller;
 
 import az.bank.paymentsystem.dto.request.OrderCurrentAccountRequest;
 import az.bank.paymentsystem.dto.response.CurrentAccountOrderResponse;
+import az.bank.paymentsystem.dto.response.CurrentAccountResponse;
 import az.bank.paymentsystem.service.CurrentAccountOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,10 +26,10 @@ public class CurrentAccountOrderV1Controller {
 
     @PostMapping("/customer/{customerId}")
     @Operation(summary = "Order a current account", description = "Creates a current account order request for a customer")
-    public ResponseEntity<CurrentAccountOrderResponse> orderAccount(
+    public ResponseEntity<CurrentAccountResponse> orderAccount(
             @PathVariable Integer customerId,
             @RequestBody @Valid OrderCurrentAccountRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(currentAccountOrderRequestService.orderAccount(customerId, request));
+                .body(currentAccountOrderRequestService.orderCurrentAccount(customerId, request));
     }
 }

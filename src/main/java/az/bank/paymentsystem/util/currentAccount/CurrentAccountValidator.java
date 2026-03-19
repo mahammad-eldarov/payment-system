@@ -36,19 +36,14 @@ public class CurrentAccountValidator {
     private final CurrentAccountCreator currentAccountCreator;
     private final CustomerSuspiciousValidator suspiciousValidator;
 
-    public void process(CurrentAccountOrderEntity request) {
-        CustomerEntity customer = request.getCustomer();
+    public void validateCurrentAccountOrder(Integer customerId) {
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+
         List<ExceptionResponse> errors = new ArrayList<>();
 
         suspiciousValidator.validate(customer, errors);
 
-        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(
-                    403,
-                    "All your operations have been suspended due to suspicious activity.",
-                    LocalDateTime.now()
-            ));
-        }
         if (currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 3) {
             errors.add(new ExceptionResponse(
                     422,
@@ -58,18 +53,44 @@ public class CurrentAccountValidator {
         }
 
         if (!errors.isEmpty()) {
-            request.setStatus(OrderStatus.REJECTED);
-            request.setRejectionReason(
-                    errors.stream().map(ExceptionResponse::getMessage).collect(Collectors.joining(", "))
-            );
             throw new MultiValidationException(errors);
         }
-
-        CurrentAccountEntity account = currentAccountCreator.createOrderAccount(request);
-        currentAccountRepository.save(account);
-        request.setStatus(OrderStatus.APPROVED);
-        request.setUpdatedAt(Instant.now());
     }
+
+//    public void process(CurrentAccountOrderEntity request) {
+//        CustomerEntity customer = request.getCustomer();
+//        List<ExceptionResponse> errors = new ArrayList<>();
+//
+//        suspiciousValidator.validate(customer, errors);
+//
+//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
+//            errors.add(new ExceptionResponse(
+//                    403,
+//                    "All your operations have been suspended due to suspicious activity.",
+//                    LocalDateTime.now()
+//            ));
+//        }
+//        if (currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 3) {
+//            errors.add(new ExceptionResponse(
+//                    422,
+//                    "The customer already has 3 current accounts. A new account cannot be ordered.",
+//                    LocalDateTime.now()
+//            ));
+//        }
+//
+//        if (!errors.isEmpty()) {
+//            request.setStatus(OrderStatus.REJECTED);
+//            request.setRejectionReason(
+//                    errors.stream().map(ExceptionResponse::getMessage).collect(Collectors.joining(", "))
+//            );
+//            throw new MultiValidationException(errors);
+//        }
+//
+//        CurrentAccountEntity account = currentAccountCreator.createOrderAccount(request);
+//        currentAccountRepository.save(account);
+//        request.setStatus(OrderStatus.APPROVED);
+//        request.setUpdatedAt(Instant.now());
+//    }
 
 //    public void process(CurrentAccountOrderEntity request) {
 //        List<String> reasons = new ArrayList<>();
