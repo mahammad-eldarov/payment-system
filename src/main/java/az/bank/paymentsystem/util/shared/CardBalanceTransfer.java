@@ -5,6 +5,7 @@ import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.service.NotificationService;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ public class CardBalanceTransfer {
 
     private final CardRepository cardRepository;
     private final TransactionCreator transactionCreator;
+    private final NotificationService notificationService;
 
     public String transfer(CardEntity card) {
         BigDecimal balance = card.getBalance();
@@ -23,8 +25,10 @@ public class CardBalanceTransfer {
             return "Card was successfully deleted.";
         }
         if (card.getStatus() == CardStatus.SUSPICIOUS) {
-            return "Your balance of " + balance + " " + card.getCurrency()
+            String message =  "Your balance of " + balance + " " + card.getCurrency()
                     + " has been frozen due to suspicious activity on your card.";
+            notificationService.send(card.getCustomer(), message);
+            return message;
         }
 
         Integer customerId = card.getCustomer().getId();
@@ -35,7 +39,9 @@ public class CardBalanceTransfer {
             return transferToCard(card, otherCard, balance);
         }
 
-        return "Your remaining balance of " + balance + card.getCurrency() +" can be collected by visiting your nearest branch.";
+        String message =  "Your remaining balance of " + balance + card.getCurrency() +" can be collected by visiting your nearest branch.";
+        notificationService.send(card.getCustomer(), message);
+        return message;
     }
 
     private boolean isTransferableCard(CardEntity card) {
