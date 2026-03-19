@@ -32,48 +32,15 @@ public class CardService {
     private final CardRepository cardRepository;
     private final CustomerRepository customerRepository;
     private final CardValidator cardValidator;
-    private final CardCreator cardCreator;
     private final CardMapper cardMapper;
     private final CardBalanceTransfer cardBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
-//    private final EntityFinderService entityFinderService;
-
-
-    // CREATE
-//    public CardResponse orderCard(Integer customerId, OrderCardRequest request) {
-//        CustomerEntity customer = findActiveCustomer(customerId);
-//        cardValidator.validateCardOrder(customerId);
-//
-//        CardEntity card = cardCreator.createCard(request, customer);
-//        cardRepository.save(card);
-////        entityFinderService.saveCard(card);
-//
-//        CardResponse response = cardMapper.toResponse(card);
-//        response.setCvv(card.getCvv());
-//        response.setPassword(request.getPassword());
-//
-//        return response;
-//    }
 
     // DELETE
-//    public MessageResponse deleteCard(Integer cardId) {
-//        CardEntity card = findActiveCard(cardId);
-//        cardValidator.validateCardDeletion(card);
-//        card.setStatus(CardStatus.CLOSED);
-//        card.setIsVisible(false);
-//        card.setUpdatedAt(Instant.now());
-//        cardRepository.save(card);
-//        return new MessageResponse("Card was successfully deleted.");
-//    }
     public MessageResponse deleteCard(Integer cardId) {
         CardEntity card = findActiveCard(cardId);
         cardValidator.validateCardDeletion(card);
         statusAuditLogger.logCard(card, CardStatus.CLOSED.name(), "Card closed by customer");
-//        if (card.getStatus() == CardStatus.SUSPICIOUS) {
-//            throw new OperationNotAllowedException(
-//                    "Cannot delete a suspicious card. Please contact support."
-//            );
-//        }
 
         card.setStatus(CardStatus.CLOSED);
         card.setIsVisible(false);
@@ -81,34 +48,16 @@ public class CardService {
 
         String message = cardBalanceTransfer.transfer(card);
         cardRepository.save(card);
-//        entityFinderService.saveCard(card);
         return new MessageResponse(message);
     }
 
     // UPDATE
-//    public void updateExpiredCards() {
-//        List<CardEntity> expiredCards = cardRepository
-//                .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
-//        expiredCards.forEach(card -> {
-//            card.setStatus(CardStatus.EXPIRED);
-//            card.setUpdatedAt(Instant.now());
-//        });
-//        cardRepository.saveAll(expiredCards);
-//    }
 
     @Transactional
     public void updateExpiredCards() {
         List<CardEntity> expiredCards = cardRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
 
-//        List<CardEntity> expiredCards = entityFinderService.findAllCardNotReachExpiryDate();
-
-//        expiredCards.forEach(card -> {
-//            card.setStatus(CardStatus.EXPIRED);
-////            card.setIsVisible(false); //why?
-//            card.setUpdatedAt(Instant.now());
-//            cardBalanceTransfer.transfer(card);
-//        });
         expiredCards.forEach(card -> {
             statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), "Card expiry date reached");
             card.setStatus(CardStatus.EXPIRED);
@@ -117,7 +66,6 @@ public class CardService {
         });
 
         cardRepository.saveAll(expiredCards);
-//        entityFinderService.saveAllExpiredCards(expiredCards);
     }
 
     public MessageResponse updateCardStatus(Integer id, CardStatus status) {
@@ -126,7 +74,6 @@ public class CardService {
         card.setStatus(status);
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
-//        entityFinderService.saveCard(card);
         return new MessageResponse("Card status updated successfully");
     }
 
@@ -135,7 +82,6 @@ public class CardService {
         card.setPassword(request.getPassword());
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
-//        entityFinderService.saveCard(card);
         return new MessageResponse("Card password updated successfully");
     }
 
@@ -143,7 +89,6 @@ public class CardService {
     public List<CardResponse> getCardsByCustomerId(Integer customerId) {
         findActiveCustomer(customerId);
         List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
-//        List<CardEntity> cards = entityFinderService.findCardsCustomerId(customerId);
         if (cards.isEmpty()) {
             throw new EmptyListException("This customer does not have any cards.");
         }
@@ -152,23 +97,16 @@ public class CardService {
 
     public CardResponse getCardByPan(String pan) {
         CardEntity card = cardRepository.findByPanAndIsVisibleTrue(pan).orElseThrow(() -> new CardNotFoundException("Card not found"));
-//        CardEntity card = entityFinderService.findCardPanVisibleTrue(pan);
         return cardMapper.toResponse(card);
     }
 
     public List<CardResponse> getCardsByStatus(CardStatus status) {
         List<CardEntity> cards = cardRepository.findByStatusAndIsVisibleTrue(status);
-//        List<CardEntity> cards = entityFinderService.findCardStatusVisibleTrue(status);
         if (cards.isEmpty()) {
             throw new CardNotFoundException("No cards found with this status");
         }
         return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
     }
-
-    // RESPONSE
-//    public CardResponse toResponse(CardEntity card) {
-//        return cardMapper.toResponse(card);
-//    }
 
     // AUXILIARY METHODS
     public CardEntity findActiveCard(Integer id) {

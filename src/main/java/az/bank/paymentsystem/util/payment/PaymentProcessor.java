@@ -28,13 +28,11 @@ public class PaymentProcessor {
     private final SuspiciousTransactionChecker suspiciousTransactionChecker;
     private final TransactionCreator transactionCreator;
     private final PaymentRepository paymentRepository;
-//    private final EntityFinderService entityFinderService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(Integer paymentId) {
         PaymentEntity payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
-//        PaymentEntity payment = entityFinderService.findPaymentById(paymentId);
         try {
             processPaymentLogic(payment);
             markSuccess(payment);
@@ -48,7 +46,6 @@ public class PaymentProcessor {
             transactionCreator.create(payment, TransactionStatus.FAILED);
         }
         paymentRepository.save(payment);
-//        entityFinderService.savePayment(payment);
     }
 
     private void processPaymentLogic(PaymentEntity payment) {

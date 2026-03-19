@@ -25,7 +25,6 @@ public class StatusAuditLogService {
 
     private final StatusAuditLogRepository statusAuditLogRepository;
     private final StatusAuditLogMapper statusAuditLogMapper;
-//    private final EntityFinderService entityFinderService;
     private final CardRepository cardRepository;
     private final CurrentAccountRepository currentAccountRepository;
     private final CustomerRepository customerRepository;

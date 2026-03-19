@@ -35,21 +35,9 @@ public class CardBalanceTransfer {
             return transferToCard(card, otherCard, balance);
         }
 
-//        card.setBalance(BigDecimal.ZERO);
         return "Your remaining balance of " + balance + card.getCurrency() +" can be collected by visiting your nearest branch.";
     }
 
-//    private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance) {
-//        otherCard.setBalance(otherCard.getBalance().add(balance));
-//        card.setBalance(BigDecimal.ZERO);
-//        cardRepository.save(otherCard);
-//        // transaction yarat
-//        transactionCreator.createBalanceTransfer(card, otherCard, balance,
-//                "Balance transferred from expired/closed card ending in "
-//                        + card.getPan().substring(card.getPan().length() - 4));
-//        return "Your remaining balance of " + balance + " AZN has been transferred to your card ending in "
-//                + otherCard.getPan().substring(otherCard.getPan().length() - 4) + ".";
-//    }
     private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance) {
         otherCard.setBalance(otherCard.getBalance().add(balance));
         card.setBalance(BigDecimal.ZERO);
@@ -61,9 +49,6 @@ public class CardBalanceTransfer {
 
         String creditDescription = "Balance transferred from card ending in " + card.getPan().substring(card.getPan().length() - 4)
                 + " to card ending in " + otherCard.getPan().substring(otherCard.getPan().length() - 4);
-
-//                "Balance of " + balance + " AZN transferred from your expired/closed card ending in "
-//                + card.getPan().substring(card.getPan().length() - 4) + ".";
 
         transactionCreator.createBalanceTransfer(card, otherCard, balance, debitDescription, creditDescription);
 

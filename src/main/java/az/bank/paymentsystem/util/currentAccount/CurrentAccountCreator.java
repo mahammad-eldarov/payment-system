@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 public class CurrentAccountCreator {
 
     private final AccountNumberGenerator accountNumberGenerator;
-//    private final CurrentAccountRepository currentAccountRepository;
 
     public CurrentAccountEntity createOrderAccount(OrderCurrentAccountRequest request,
                                               CustomerEntity customer) {
@@ -34,21 +33,5 @@ public class CurrentAccountCreator {
         account.setCreatedAt(Instant.now());
         return account;
     }
-
-//    public CurrentAccountEntity createOrderAccount(CurrentAccountOrderEntity request) {
-//        CurrentAccountEntity account = new CurrentAccountEntity();
-//        account.setCurrentAccountHolderName(request.getAccountHolderName());
-//        account.setAccountNumber(accountNumberGenerator.generate());
-//        account.setBalance(BigDecimal.ZERO);
-//        account.setCurrency(request.getCurrency());
-//        account.setStatus(CurrentAccountStatus.ACTIVE);
-//        account.setActivationDate(LocalDate.now());
-//        account.setExpiryDate(LocalDate.now().plusYears(5));
-//        account.setCustomer(request.getCustomer());
-//        account.setIsVisible(true);
-//        account.setCreatedAt(Instant.now());
-//        return account;
-//    }
-
 
 }

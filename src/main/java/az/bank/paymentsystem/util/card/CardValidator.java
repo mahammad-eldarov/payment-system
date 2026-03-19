@@ -31,135 +31,38 @@ import org.springframework.stereotype.Component;
 public class CardValidator {
     private final CardRepository cardRepository;
     private final CustomerRepository customerRepository;
-    private final CardCreator cardCreator;
     private final CustomerSuspiciousValidator suspiciousValidator;
 
-//    private final EntityFinderService entityFinderService;
+    public void validateCardOrder(Integer customerId) {
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-    //    public void process(CardOrderEntity request) {
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(
-//                        request.getCustomer().getId())
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-//
-//        List<String> violations = collectViolations(customer);
-//
-//        if (!violations.isEmpty()) {
-//            request.setStatus(OrderStatus.REJECTED);
-//            request.setRejectionReason(String.join(", ", violations));
-//            throw new CardOrderRejectedException(String.join(", ", violations));
-//        }
-//
-//        CardEntity card = cardCreator.createOrderCard(request);
-//        cardRepository.save(card);
-//        request.setStatus(OrderStatus.APPROVED);
-//        request.setUpdatedAt(Instant.now());
-//    }
-//public void process(CardOrderEntity request) {
-//    CustomerEntity customer = request.getCustomer();
-//    List<String> violations = collectViolations(customer);
-//
-//    if (!violations.isEmpty()) {
-//        request.setStatus(OrderStatus.REJECTED);
-//        request.setRejectionReason(String.join(", ", violations));
-//        return; // ← exception yox, sadəcə qayıt
-//    }
-//
-//    CardEntity card = cardCreator.createOrderCard(request);
-//    cardRepository.save(card);
-//    request.setStatus(OrderStatus.APPROVED);
-//    request.setUpdatedAt(Instant.now());
-//}OrderCardRequest request
-//    public void validateCardOrder(Integer customerId) {
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-//        List<ExceptionResponse> errors = new ArrayList<>();
-//        suspiciousValidator.validate(customer, errors);
-//
-//        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
-//                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
-//            errors.add(new ExceptionResponse(
-//                    403,
-//                    "Cannot order a new card while having suspicious, lost or stolen card. " +
-//                            "If you want to create a new card, you should close the cards that are in this status.",
-//                    LocalDateTime.now()
-//            ));
-//        }
-//        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
-//            errors.add(new ExceptionResponse(
-//                    422,
-//                    "The customer already has 2 cards. A new card cannot be ordered.",
-//                    LocalDateTime.now()
-//            ));
-//        }
-//
-//        if (!errors.isEmpty()) {
-//            request.setStatus(OrderStatus.REJECTED);
-//            request.setRejectionReason(
-//                    errors.stream().map(ExceptionResponse::getMessage).collect(Collectors.joining(", "))
-//            );
-//            throw new MultiValidationException(errors);
-//        }
-////CardEntity card = cardCreator.createOrderCard(request,customer);
-//        CardEntity card = cardCreator.createOrderCard(request);
-//        cardRepository.save(card);
-//        request.setStatus(OrderStatus.APPROVED);
-//        request.setUpdatedAt(Instant.now());
-//    }
+        List<ExceptionResponse> errors = new ArrayList<>();
 
-public void validateCardOrder(Integer customerId) {
-    CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-            .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        suspiciousValidator.validate(customer, errors);
 
-    List<ExceptionResponse> errors = new ArrayList<>();
+        if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
+                List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
+            errors.add(new ExceptionResponse(
+                    403,
+                    "Cannot order a new card while having suspicious, lost or stolen card. " +
+                            "If you want to create a new card, you should close the cards that are in this status.",
+                    LocalDateTime.now()
+            ));
+        }
+        if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
+            errors.add(new ExceptionResponse(
+                    422,
+                    "The customer already has 2 cards. A new card cannot be ordered.",
+                    LocalDateTime.now()
+            ));
+        }
 
-    suspiciousValidator.validate(customer, errors);
-
-    if (cardRepository.existsByCustomerIdAndStatusIn(customer.getId(),
-            List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
-        errors.add(new ExceptionResponse(
-                403,
-                "Cannot order a new card while having suspicious, lost or stolen card. " +
-                        "If you want to create a new card, you should close the cards that are in this status.",
-                LocalDateTime.now()
-        ));
-    }
-    if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
-        errors.add(new ExceptionResponse(
-                422,
-                "The customer already has 2 cards. A new card cannot be ordered.",
-                LocalDateTime.now()
-        ));
+        if (!errors.isEmpty()) {
+            throw new MultiValidationException(errors);
+        }
     }
 
-    if (!errors.isEmpty()) {
-        throw new MultiValidationException(errors);
-    }
-}
-
-
-//    public void validateCardOrder(Integer customerId) {
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-////        CustomerEntity customer = entityFinderService.findActiveCustomer(customerId);
-//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-//            throw new CustomerSuspiciousException("All your operations have been suspended due to suspicious activity.");
-//        }
-//
-//        boolean hasSuspiciousCard = cardRepository.existsByCustomerIdAndStatusIn(
-//                customerId, List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN));
-////        Boolean hasSuspiciousCard = entityFinderService.findCustomerExistingCardStatus(customerId);
-//
-//        if (hasSuspiciousCard) {
-//            throw new CardLimitExceededException("Cannot order a new card while having suspicious, lost or stolen card. " +
-//                    "If you want to create a new card, you can close the cards that are in this status.");
-//        }
-//
-//        Integer cardCount = cardRepository.countByCustomerIdAndIsVisibleTrue(customerId);
-////        Integer cardCount = entityFinderService.countCustomerCardVisibleTrue(customerId);
-//        if (cardCount >= 2) {
-//            throw new CardLimitExceededException("The customer already has 2 cards. A new card cannot be ordered.");
-//        }
-//    }
 
     public void validateCardDeletion(CardEntity card) {
         if (card.getStatus() == CardStatus.CLOSED) {

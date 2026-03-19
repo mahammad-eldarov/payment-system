@@ -28,8 +28,6 @@ public class CurrentAccountBalanceTransfer {
                     + " has been frozen due to suspicious activity on your account.";
         }
 
-//        transactionCreator.createAccountExpiredTransfer(account, balance);
-//        account.setBalance(BigDecimal.ZERO);
         return "Your remaining balance of " + balance + " " + account.getCurrency()
                 + " can be collected by visiting your nearest branch.";
     }

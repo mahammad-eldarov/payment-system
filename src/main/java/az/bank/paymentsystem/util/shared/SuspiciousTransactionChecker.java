@@ -50,13 +50,6 @@ public class SuspiciousTransactionChecker {
     }
 
     private void markSourceSuspicious(PaymentEntity payment) {
-//        if (payment.getFromCard() != null) {
-//            payment.getFromCard().setStatus(CardStatus.SUSPICIOUS);
-//            cardRepository.save(payment.getFromCard());
-//        } else if (payment.getFromAccount() != null) {
-//            payment.getFromAccount().setStatus(CurrentAccountStatus.SUSPICIOUS);
-//            currentAccountRepository.save(payment.getFromAccount());
-//        }
         if (payment.getFromCard() != null) {
             CardEntity card = payment.getFromCard();
             statusAuditLogger.logCard(card, CardStatus.SUSPICIOUS.name(), "Suspicious transaction detected");
@@ -71,9 +64,6 @@ public class SuspiciousTransactionChecker {
     }
 
     private void markCustomerSuspicious(PaymentEntity payment) {
-//        CustomerEntity customer = payment.getCustomer();
-//        customer.setStatus(CustomerStatus.SUSPICIOUS);
-//        customerRepository.save(customer);
         CustomerEntity customer = payment.getCustomer();
         statusAuditLogger.logCustomer(customer, CustomerStatus.SUSPICIOUS.name(), "Second suspicious transaction detected");
         customer.setStatus(CustomerStatus.SUSPICIOUS);

@@ -21,7 +21,6 @@ public class AccountNumberGenerator {
     private int randomPartLength;
     private final SecureRandom secureRandom = new SecureRandom();
     private final CurrentAccountRepository currentAccountRepository;
-//    private final EntityFinderService entityFinderService;
 
     @PostConstruct
     public void init() {
@@ -34,11 +33,6 @@ public class AccountNumberGenerator {
             accountNumber = buildAccountNumber();
         } while (currentAccountRepository.existsByAccountNumber(accountNumber));
         return accountNumber;
-
-
-//        do {
-//            accountNumber = buildAccountNumber();
-//        } while (entityFinderService.findExistingAccountNumber(accountNumber));
     }
 
     private String buildAccountNumber() {

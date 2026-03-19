@@ -1,7 +1,6 @@
 package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.dto.request.OrderCurrentAccountRequest;
-import az.bank.paymentsystem.dto.response.CurrentAccountOrderResponse;
 import az.bank.paymentsystem.dto.response.CurrentAccountResponse;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
@@ -12,7 +11,6 @@ import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.exception.MultiValidationException;
 import az.bank.paymentsystem.mapper.CurrentAccountMapper;
-import az.bank.paymentsystem.mapper.CurrentAccountOrderMapper;
 import az.bank.paymentsystem.repository.CurrentAccountOrderRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
@@ -29,10 +27,7 @@ import org.springframework.stereotype.Service;
 public class CurrentAccountOrderService {
 
     private final CurrentAccountOrderRepository currentAccountOrderRepository;
-//    private final CurrentAccountOrderProcessor currentAccountOrderRequestProcessor;
     private final CustomerRepository customerRepository;
-//    private final EntityFinderService entityFinderService;
-    private final CurrentAccountOrderMapper currentAccountOrderMapper;
     private final CurrentAccountValidator currentAccountValidator;
     private final OrderRateLimitService  orderRateLimitService;
     private final CurrentAccountRepository currentAccountRepository;
@@ -80,64 +75,6 @@ public class CurrentAccountOrderService {
         entity.setCreatedAt(Instant.now());
         return entity;
     }
-
-//        public CurrentAccountResponse orderCurrentAccount(Integer customerId,
-//                                                          OrderCurrentAccountRequest request) {
-//        CustomerEntity customer = findActiveCustomer(customerId);
-//
-//        currentAccountValidator.validateCurrentAccountOrder(customerId,
-//                currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customerId));
-//
-////        currentAccountValidator.validateAccountOrder(customerId,
-////                entityFinderService.countCurrentAccountVisibleTrue(customerId));
-//
-//        CurrentAccountEntity account = currentAccountCreator.createAccount(request, customer);
-//        currentAccountRepository.save(account);
-//        return currentAccountMapper.toResponse(account);
-//    }
-
-//    public CurrentAccountOrderResponse orderAccount(Integer customerId, OrderCurrentAccountRequest request) {
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-//        CurrentAccountOrderEntity orderRequest = buildRequest(customer, request);
-//        currentAccountOrderRequestRepository.save(orderRequest);
-//        currentAccountValidator.process(orderRequest);
-//        currentAccountOrderRequestRepository.save(orderRequest);
-//        return currentAccountOrderRequestMapper.toResponse(orderRequest);
-//    }
-
-//    public CurrentAccountOrderResponse orderAccount(Integer customerId, OrderCurrentAccountRequest request) {
-//        CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-//
-//        orderRateLimitService.checkCooldown(customer, OrderType.CURRENT_ACCOUNT);
-//
-//        CurrentAccountOrderEntity orderRequest = buildRequest(customer, request);
-//
-//        try {
-//            currentAccountValidator.process(orderRequest);
-//        } catch (MultiValidationException ex) {
-//            orderRateLimitService.handleRejection(customer, OrderType.CURRENT_ACCOUNT);
-//            currentAccountOrderRepository.save(orderRequest);
-//            throw ex;
-//        }
-//
-//        orderRateLimitService.resetLimit(customer, OrderType.CURRENT_ACCOUNT);
-//        currentAccountOrderRepository.save(orderRequest);
-//        return currentAccountOrderMapper.toResponse(orderRequest);
-//    }
-
-
-
-//    private CurrentAccountOrderEntity buildRequest(CustomerEntity customer, OrderCurrentAccountRequest request) {
-//        CurrentAccountOrderEntity orderRequest = new CurrentAccountOrderEntity();
-//        orderRequest.setCustomer(customer);
-//        orderRequest.setStatus(OrderStatus.PENDING);
-//        orderRequest.setAccountHolderName(request.getCurrentAccountHolderName());
-//        orderRequest.setCurrency(request.getCurrency());
-//        orderRequest.setCreatedAt(Instant.now());
-//        return orderRequest;
-//    }
 
     public CustomerEntity findActiveCustomer(Integer id) {
         return customerRepository.findByIdAndIsVisibleTrue(id)

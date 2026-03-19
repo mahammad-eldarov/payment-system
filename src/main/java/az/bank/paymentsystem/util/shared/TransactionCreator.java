@@ -54,7 +54,6 @@ public class TransactionCreator {
 
     public void createBalanceTransfer(CardEntity fromCard, CardEntity toCard,
                                       BigDecimal amount, String debitDescription, String creditDescription) {
-        // Expired/closed kartdan pul çıxdı — müştəri üçün CREDIT (balans azaldı)
         TransactionEntity credit = new TransactionEntity();
         credit.setFromCard(fromCard);
         credit.setAmount(amount);
@@ -65,7 +64,6 @@ public class TransactionCreator {
         credit.setCustomer(fromCard.getCustomer());
         credit.setCreatedAt(Instant.now());
 
-        // Digər karta pul gəldi — müştəri üçün DEBIT (balans artdı)
         TransactionEntity debit = new TransactionEntity();
         debit.setToCard(toCard);
         debit.setAmount(amount);
@@ -79,49 +77,4 @@ public class TransactionCreator {
         transactionRepository.saveAll(List.of(debit, credit));
     }
 
-
-//    public void createAccountExpiredTransfer(CurrentAccountEntity account, BigDecimal amount) {
-//        TransactionEntity transaction = new TransactionEntity();
-//        transaction.setFromAccount(account);
-//        transaction.setAmount(amount);
-//        transaction.setCurrency(account.getCurrency());
-//        transaction.setStatus(TransactionStatus.SUCCESS);
-//        transaction.setTransactionType(TransactionType.CREDIT);
-//        transaction.setDescription("Your account " + account.getAccountNumber()
-//                + " was expired. Remaining balance of " + amount + " " + account.getCurrency()
-//                + " can be collected by visiting your nearest branch.");
-//        transaction.setCustomer(account.getCustomer());
-//        transaction.setCreatedAt(Instant.now());
-//        transactionRepository.save(transaction);
-//    }
-
-//    public void createBalanceTransfer(CardEntity fromCard, CardEntity toCard,
-//                                      BigDecimal amount, String description) {
-//        TransactionEntity transaction = new TransactionEntity();
-//        transaction.setFromCard(fromCard);
-//        transaction.setToCard(toCard);
-//        transaction.setAmount(amount);
-//        transaction.setCurrency(fromCard.getCurrency());
-//        transaction.setStatus(TransactionStatus.SUCCESS);
-//        transaction.setTransactionType(TransactionType.CREDIT);
-//        transaction.setDescription(description);
-//        transaction.setCustomer(fromCard.getCustomer());
-//        transaction.setCreatedAt(Instant.now());
-//        transactionRepository.save(transaction);
-//    }
-
-//    public void createBalanceTransfer(CardEntity fromCard, CurrentAccountEntity toAccount,
-//                                      BigDecimal amount, String description) {
-//        TransactionEntity transaction = new TransactionEntity();
-//        transaction.setFromCard(fromCard);
-//        transaction.setToAccount(toAccount);
-//        transaction.setAmount(amount);
-//        transaction.setCurrency(fromCard.getCurrency());
-//        transaction.setStatus(TransactionStatus.SUCCESS);
-//        transaction.setTransactionType(TransactionType.CREDIT);
-//        transaction.setDescription(description);
-//        transaction.setCustomer(fromCard.getCustomer());
-//        transaction.setCreatedAt(Instant.now());
-//        transactionRepository.save(transaction);
-//    }
 }

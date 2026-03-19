@@ -15,15 +15,11 @@ import org.springframework.stereotype.Component;
 public class CustomerCreator {
 
     private final CustomerRepository customerRepository;
-//    private final EntityFinderService entityFinderService;
 
     public CustomerEntity createCustomer(CreateCustomerRequest request) {
         if (customerRepository.existsByPinAndIsVisibleTrue(request.getPin())) {
             throw new CustomerPinAlreadyExistsException("This pin is already available.");
         }
-//        if (entityFinderService.findExistingPinVisibleTrue(request.getPin())) {
-//            throw new CustomerPinAlreadyExistsException("This pin is already available.");
-//        }
 
         CustomerEntity customer = new CustomerEntity();
         customer.setName(request.getName());

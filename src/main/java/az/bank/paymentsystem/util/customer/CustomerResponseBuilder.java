@@ -25,20 +25,15 @@ public class CustomerResponseBuilder {
     private final TransactionService transactionService;
     private final CardMapper cardMapper;
     private final CurrentAccountMapper currentAccountMapper;
-//    private final EntityFinderService entityFinderService;
 
     public void setCardsAndAccounts(CustomerResponse response, Integer customerId) {
         List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
                 .stream().map(cardMapper::toResponse).collect(Collectors.toList());
-//        List<CardResponse> cardResponses = entityFinderService.findCardsCustomerId(customerId)
-//                .stream().map(cardMapper::toResponse).collect(Collectors.toList());
+
 
         List<CurrentAccountResponse> accountResponses = currentAccountRepository
                 .findCurrentAccountByCustomerId(customerId)
                 .stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
-//        List<CurrentAccountResponse> accountResponses = entityFinderService
-//                .findCurrentAccountsCustomerId(customerId)
-//                .stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
 
         response.setCardResponse(cardResponses);
         response.setCardMessage(cardMessage(cardResponses));
@@ -53,12 +48,6 @@ public class CustomerResponseBuilder {
                     cardResponse.setTransactions(transactionService.getTransactionsByCardId(card.getId(), 1).getContent());
                     return cardResponse;
                 }).collect(Collectors.toList());
-//        List<CardResponse> cardResponses = entityFinderService.findCardsCustomerId(customerId)
-//                .stream().map(card -> {
-//                    CardResponse cardResponse = cardMapper.toResponse(card);
-//                    cardResponse.setTransactions(transactionService.getTransactionsByCardId(card.getId(), 1).getContent());
-//                    return cardResponse;
-//                }).collect(Collectors.toList());
 
         response.setCardResponse(cardResponses);
         response.setCardMessage(cardMessage(cardResponses));
@@ -72,14 +61,6 @@ public class CustomerResponseBuilder {
                     accountResponse.setTransactions(transactionService.getTransactionsByAccountId(account.getId(),1).getContent());
                     return accountResponse;
                 }).collect(Collectors.toList());
-
-//        List<CurrentAccountResponse> accountResponses = entityFinderService
-//                .findCurrentAccountsCustomerId(customerId)
-//                .stream().map(account -> {
-//                    CurrentAccountResponse accountResponse = currentAccountMapper.toResponse(account);
-//                    accountResponse.setTransactions(transactionService.getTransactionsByAccountId(account.getId(),1).getContent());
-//                    return accountResponse;
-//                }).collect(Collectors.toList());
 
         response.setCurrentAccountResponse(accountResponses);
         response.setAccountMessage(accountMessage(accountResponses));

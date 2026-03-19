@@ -33,7 +33,7 @@ public class PaymentService {
     private final PaymentSourceResolver paymentSourceResolver;
     private final PaymentMapper paymentMapper;
     private final PaymentCreator paymentCreator;
-//    private final EntityFinderService entityFinderService;
+
 
     @Transactional
     public PaymentResponse cardToCard(Integer customerId, CardToCardRequest request) {
@@ -50,7 +50,6 @@ public class PaymentService {
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
         return paymentMapper.toResponse(paymentRepository.save(payment));
-//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     @Transactional
@@ -68,7 +67,6 @@ public class PaymentService {
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
         return paymentMapper.toResponse(paymentRepository.save(payment));
-//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     @Transactional
@@ -86,7 +84,6 @@ public class PaymentService {
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
         return paymentMapper.toResponse(paymentRepository.save(payment));
-//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     @Transactional
@@ -104,14 +101,12 @@ public class PaymentService {
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
         return paymentMapper.toResponse(paymentRepository.save(payment));
-//        return paymentMapper.toResponse(entityFinderService.savePayment(payment));
     }
 
     // PROCESS
     @Transactional
     public void processPayments() {
         List<PaymentEntity> pendingPayments = paymentRepository.findAllByStatus(PaymentStatus.PENDING);
-//        List<PaymentEntity> pendingPayments = entityFinderService.findAllPaymentStatus();
         for (PaymentEntity payment : pendingPayments) {
             paymentProcessor.process(payment.getId());
         }
@@ -125,12 +120,6 @@ public class PaymentService {
         return paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
     }
-
-
-    // RESPONSE
-//    public PaymentResponse toResponse(PaymentEntity payment) {
-//        return paymentMapper.toResponse(payment);
-//    }
 
 
 
