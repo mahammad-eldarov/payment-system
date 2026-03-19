@@ -31,11 +31,19 @@ public class CardBalanceTransfer {
 
         CardEntity otherCard = cardRepository
                 .findFirstByCustomerIdAndIsVisibleTrueAndIdNot(customerId, card.getId()).orElse(null);
-        if (otherCard != null) {
+        if (otherCard != null && isTransferableCard(otherCard)) {
             return transferToCard(card, otherCard, balance);
         }
 
         return "Your remaining balance of " + balance + card.getCurrency() +" can be collected by visiting your nearest branch.";
+    }
+
+    private boolean isTransferableCard(CardEntity card) {
+        return card.getStatus() != CardStatus.SUSPICIOUS
+                && card.getStatus() != CardStatus.CLOSED
+                && card.getStatus() != CardStatus.LOST
+                && card.getStatus() != CardStatus.STOLEN
+                && card.getStatus() != CardStatus.EXPIRED;
     }
 
     private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance) {
