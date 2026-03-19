@@ -22,7 +22,7 @@ public class CurrentAccountOrderResponse {
     private String accountNumber;
     private String currentAccountHolderName;
     private BigDecimal balance;
-    private String currency;
+    private Currency currency;
     private CurrentAccountStatus status;
     private LocalDate activationDate;
     private LocalDate expiryDate;

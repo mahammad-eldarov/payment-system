@@ -3,6 +3,7 @@ package az.bank.paymentsystem.util.currentAccount;
 import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
 import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.OrderStatus;
+import az.bank.paymentsystem.util.shared.EnumParser;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class CurrentAccountCreator {
 
     private final AccountNumberGenerator accountNumberGenerator;
+    private final EnumParser enumParser;
 
     public CurrentAccountEntity createOrderAccount(OrderCurrentAccountRequest request,
                                               CustomerEntity customer) {
@@ -28,9 +30,9 @@ public class CurrentAccountCreator {
         account.setAccountNumber(accountNumberGenerator.generate());
         account.setCurrentAccountHolderName(request.getCurrentAccountHolderName());
         account.setBalance(BigDecimal.ZERO);
-//        account.setCurrency(request.getCurrency());
+        account.setCurrency(request.getCurrency());
 //        account.setCurrency(Currency.valueOf(request.getCurrency().toUpperCase()));
-        account.setCurrency(parseEnum(Currency.class, request.getCurrency(), "currency"));
+//        account.setCurrency(enumParser.parse(Currency.class, request.getCurrency(), "currency"));
         account.setStatus(CurrentAccountStatus.ACTIVE);
         account.setActivationDate(LocalDate.now());
         account.setExpiryDate(LocalDate.now().plusYears(5));
@@ -45,24 +47,24 @@ public class CurrentAccountCreator {
         CurrentAccountOrderEntity entity = new CurrentAccountOrderEntity();
         entity.setCustomer(customer);
         entity.setStatus(OrderStatus.PENDING);
-//        entity.setCurrency(request.getCurrency());
+        entity.setCurrency(request.getCurrency());
 //        entity.setCurrency(Currency.valueOf(request.getCurrency().toUpperCase()));
-        entity.setCurrency(parseEnum(Currency.class, request.getCurrency(), "currency"));
+//        entity.setCurrency(enumParser.parse(Currency.class, request.getCurrency(), "currency"));
         entity.setCreatedAt(Instant.now());
         return entity;
     }
 
-    private <T extends Enum<T>> T parseEnum(Class<T> enumClass, String value, String fieldName) {
-        try {
-            return Enum.valueOf(enumClass, value.trim().toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            String allowed = Arrays.stream(enumClass.getEnumConstants())
-                    .map(Enum::name)
-                    .collect(Collectors.joining(", "));
-            throw new IllegalArgumentException(
-                    "Invalid " + fieldName + ": '" + value + "'. Allowed values: " + allowed
-            );
-        }
-    }
+//    private <T extends Enum<T>> T parseEnum(Class<T> enumClass, String value, String fieldName) {
+//        try {
+//            return Enum.valueOf(enumClass, value.trim().toUpperCase());
+//        } catch (IllegalArgumentException ex) {
+//            String allowed = Arrays.stream(enumClass.getEnumConstants())
+//                    .map(Enum::name)
+//                    .collect(Collectors.joining(", "));
+//            throw new IllegalArgumentException(
+//                    "Invalid " + fieldName + ": '" + value + "'. Allowed values: " + allowed
+//            );
+//        }
+//    }
 
 }

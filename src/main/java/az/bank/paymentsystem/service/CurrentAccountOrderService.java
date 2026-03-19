@@ -40,6 +40,8 @@ public class CurrentAccountOrderService {
     public CurrentAccountOrderResponse orderCurrentAccount(Integer customerId,
                                                            OrderCurrentAccountRequest request) {
         CustomerEntity customer = customerService.findActiveCustomer(customerId);
+//        currentAccountValidator.validateRequestFields(request);
+
 
         orderRateLimitService.checkCooldown(customer, OrderType.CURRENT_ACCOUNT);
 

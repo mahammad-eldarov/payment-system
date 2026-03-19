@@ -113,12 +113,12 @@ public class GlobalExceptionHandler {
 //                .body(new ExceptionResponse(ex.getMessage()));
 //    }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationException(IllegalArgumentException ex) {
-        return ResponseEntity
-                .badRequest()
-                .body(new ExceptionResponse(400, ex.getMessage(), LocalDateTime.now()));
-    }
+//    @ExceptionHandler(IllegalArgumentException.class)
+//    public ResponseEntity<ExceptionResponse> handleValidationException(IllegalArgumentException ex) {
+//        return ResponseEntity
+//                .badRequest()
+//                .body(new ExceptionResponse(400, ex.getMessage(), LocalDateTime.now()));
+//    }
 
     // JSON formatını və ya enumları səhv yazsan bu exception həmin xətanı tutacaq.
 

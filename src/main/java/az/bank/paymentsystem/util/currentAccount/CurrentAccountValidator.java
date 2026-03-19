@@ -1,8 +1,11 @@
 package az.bank.paymentsystem.util.currentAccount;
 
+import az.bank.paymentsystem.dto.request.OrderCardRequest;
+import az.bank.paymentsystem.dto.request.OrderCurrentAccountRequest;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
+import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.enums.OrderStatus;
@@ -18,6 +21,7 @@ import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 //import az.bank.paymentsystem.service.EntityFinderService;
 import az.bank.paymentsystem.util.shared.CustomerSuspiciousValidator;
+import az.bank.paymentsystem.util.shared.EnumParser;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,6 +39,27 @@ public class CurrentAccountValidator {
 //    private final EntityFinderService entityFinderService;
     private final CurrentAccountCreator currentAccountCreator;
     private final CustomerSuspiciousValidator suspiciousValidator;
+    private final EnumParser enumParser;
+
+//    public void validateRequestFields(OrderCurrentAccountRequest request) {
+//        List<ExceptionResponse> errors = new ArrayList<>();
+//
+////        tryParse(() -> enumParser.parse(CardBrand.class, request.getCardBrand(), "cardBrand"), errors);
+////        tryParse(() -> enumParser.parse(CardType.class, request.getCardType(), "cardType"), errors);
+//        tryParse(() -> enumParser.parse(Currency.class, request.getCurrency(), "currency"), errors);
+//
+//        if (!errors.isEmpty()) {
+//            throw new MultiValidationException(errors);
+//        }
+//    }
+//
+//    private void tryParse(Runnable parser, List<ExceptionResponse> errors) {
+//        try {
+//            parser.run();
+//        } catch (IllegalArgumentException ex) {
+//            errors.add(new ExceptionResponse(ex.getMessage()));
+//        }
+//    }
 
     public void validateCurrentAccountOrder(Integer customerId) {
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)

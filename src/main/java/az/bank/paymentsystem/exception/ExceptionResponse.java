@@ -16,11 +16,14 @@ import org.springframework.http.HttpStatus;
 @JsonPropertyOrder({"status", "timestamp", "message"})
 public class ExceptionResponse{
     private int status;
-//    private HttpStatus status;
     private String message;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
+
+    public ExceptionResponse(String message) {
+    }
+
 
 //    public ExceptionResponse(String errorCode, String message) {
 ////        this.errorCode = errorCode;

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/current-account-order-requests")
+@RequestMapping("/api/v1/current-account-order")
 @RequiredArgsConstructor
 @Tag(name = "Current Account Order Request", description = "Current account order request management")
 public class CurrentAccountOrderV1Controller {

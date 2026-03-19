@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/card-order-requests")
+@RequestMapping("/api/v1/card-order")
 @RequiredArgsConstructor
 @Tag(name = "Card Order Request", description = "Card order request management")
 public class CardOrderV1Controller {
