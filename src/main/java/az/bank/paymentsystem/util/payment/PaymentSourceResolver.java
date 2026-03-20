@@ -1,13 +1,16 @@
 package az.bank.paymentsystem.util.payment;
 
+import az.bank.paymentsystem.entity.ExternalPartyEntity;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
 //import az.bank.paymentsystem.service.EntityFinderService;
+import az.bank.paymentsystem.service.ExternalPartyService;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.config.BankConfig;
 import az.bank.paymentsystem.entity.CardEntity;
@@ -27,6 +30,7 @@ public class PaymentSourceResolver {
     private final CurrentAccountRepository currentAccountRepository;
     private final BankConfig bankConfig;
     private final CurrencyConverter currencyConverter;
+    private final ExternalPartyService externalPartyService;
 
 
     // FROM CHECKS
@@ -193,6 +197,21 @@ public class PaymentSourceResolver {
             return;
         }
         payment.setToAccount(account);
+    }
+
+    public void toCheckExternal(PaymentEntity payment, String toNumber,
+                                String type, List<ExceptionResponse> errors) {
+        Optional<ExternalPartyEntity> external = type.equals("CARD")
+                ? externalPartyService.findByCardNumber(toNumber)
+                : externalPartyService.findByAccountNumber(toNumber);
+
+        if (external.isEmpty()) {
+            errors.add(new ExceptionResponse(404, "Destination not found in external bank", LocalDateTime.now()));
+            return;
+        }
+
+        payment.setToExternalParty(external.get());
+        payment.setToExternal(true);
     }
 
 

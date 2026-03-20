@@ -101,4 +101,12 @@ public class PaymentEntity extends BaseEntity {
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
+
+    @ManyToOne
+    @JoinColumn(name = "to_external_party_id")
+    private ExternalPartyEntity toExternalParty;
+
+    private boolean toExternal = false;
+
+
 }

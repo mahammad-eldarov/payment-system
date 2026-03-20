@@ -26,7 +26,7 @@ public class TransactionV1Controller {
             description = "Returns transactions where card is sender or receiver.")
     public ResponseEntity<List<TransactionResponse>> getByCardId(
             @PathVariable Integer cardId,
-            @RequestParam(required = false, defaultValue = "0") int page) {
+            @RequestParam(required = false, defaultValue = "1") int page) {
         return ResponseEntity.ok(transactionService.getTransactionsByCardId(cardId, page).getContent());
     }
 
@@ -35,7 +35,7 @@ public class TransactionV1Controller {
             description = "Returns transactions where account is sender or receiver.")
     public ResponseEntity<List<TransactionResponse>> getByAccountId(
             @PathVariable Integer accountId,
-            @RequestParam(required = false, defaultValue = "0") int page) {
+            @RequestParam(required = false, defaultValue = "1") int page) {
         return ResponseEntity.ok(transactionService.getTransactionsByAccountId(accountId, page).getContent());
     }
 
@@ -44,7 +44,7 @@ public class TransactionV1Controller {
             description = "Returns all transactions linked to a payment.")
     public ResponseEntity<List<TransactionResponse>> getByPaymentId(
             @PathVariable Integer paymentId,
-            @RequestParam(required = false, defaultValue = "0") int page) {
+            @RequestParam(required = false, defaultValue = "1") int page) {
         return ResponseEntity.ok(transactionService.getTransactionsByPaymentId(paymentId, page).getContent());
     }
 

@@ -47,12 +47,12 @@ public class CardService {
         card.setIsVisible(false);
         card.setUpdatedAt(Instant.now());
 
-        String message = cardBalanceTransfer.transfer(card);
+        cardBalanceTransfer.transfer(card);
         cardRepository.save(card);
-        notificationService.send(card.getCustomer(),
-                "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
-                        + " has been successfully closed. " + message);
-        return new MessageResponse(message);
+//        notificationService.send(card.getCustomer(),
+//                "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
+//                        + " has been successfully closed. " + message);
+        return new MessageResponse("Card closed successfully");
     }
 
     // UPDATE
@@ -66,10 +66,11 @@ public class CardService {
             statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), "Card expiry date reached");
             card.setStatus(CardStatus.EXPIRED);
             card.setUpdatedAt(Instant.now());
-            String message = cardBalanceTransfer.transfer(card);
-            notificationService.send(card.getCustomer(),
-                    "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
-                            + " has expired. " + message);
+            cardBalanceTransfer.transfer(card);
+//            String message = cardBalanceTransfer.transfer(card);
+//            notificationService.send(card.getCustomer(),
+//                    "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
+//                            + " has expired. " + message);
         });
 
         cardRepository.saveAll(expiredCards);

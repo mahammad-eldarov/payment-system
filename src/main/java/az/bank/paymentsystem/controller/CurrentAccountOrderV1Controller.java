@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/current-account-order")
 @RequiredArgsConstructor
-@Tag(name = "Current Account Order Request", description = "Current account order request management")
+@Tag(name = "Current Account Order Controller", description = "Current account order management")
 public class CurrentAccountOrderV1Controller {
 
     private final CurrentAccountOrderService currentAccountOrderRequestService;
 
     @PostMapping("/customer/{customerId}")
-    @Operation(summary = "Order a current account", description = "Creates a current account order request for a customer")
+    @Operation(summary = "Order a current account", description = "Creates a current account order for a customer")
     public ResponseEntity<CurrentAccountOrderResponse> orderAccount(
             @PathVariable Integer customerId,
             @RequestBody @Valid OrderCurrentAccountRequest request) {

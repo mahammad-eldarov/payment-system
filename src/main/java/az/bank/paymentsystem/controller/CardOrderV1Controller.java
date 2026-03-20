@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/card-order")
 @RequiredArgsConstructor
-@Tag(name = "Card Order Request", description = "Card order request management")
+@Tag(name = "Card Order Controller", description = "Card order management")
 public class CardOrderV1Controller {
 
     private final CardOrderService cardOrderRequestService;
 
     @PostMapping("/customer/{customerId}")
-    @Operation(summary = "Order a card", description = "Creates a card order request for a customer")
+    @Operation(summary = "Order a card", description = "Creates a card order for a customer")
     public ResponseEntity<CardOrderResponse> orderCard(
             @PathVariable Integer customerId,
             @RequestBody @Valid OrderCardRequest request) {

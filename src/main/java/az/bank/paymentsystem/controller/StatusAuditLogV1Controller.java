@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/audit")
 @RequiredArgsConstructor
-@Tag(name = "Audit Log", description = "Status change history for cards, accounts and customers")
+@Tag(name = "Audit Log Controller", description = "Status change history for cards, accounts and customers")
 public class StatusAuditLogV1Controller {
 
     private final StatusAuditLogService statusAuditLogService;

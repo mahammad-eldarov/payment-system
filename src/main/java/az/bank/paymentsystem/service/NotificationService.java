@@ -25,7 +25,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
     public void send(CustomerEntity customer, String message) {
         NotificationEntity notification = new NotificationEntity();
@@ -37,31 +37,41 @@ public class NotificationService {
     }
 
     public Page<NotificationResponse> getNotifications(Integer customerId, int page) {
-        customerRepository.findByIdAndIsVisibleTrue(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+//        customerRepository.findByIdAndIsVisibleTrue(customerId)
+//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        customerService.findActiveCustomer(customerId);
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
         Page<NotificationEntity> notifications = notificationRepository
                 .findByCustomerIdOrderByCreatedAtDesc(customerId, pageable);
         if (notifications.isEmpty()) throw new EmptyListException("No notifications found.");
+
+        List<NotificationEntity> unread = notifications.getContent().stream()
+                .filter(n -> !n.getIsRead()).toList();
+
+        if (!unread.isEmpty()) {
+            unread.forEach(n -> n.setIsRead(true));
+            notificationRepository.saveAll(unread);
+        }
+
         return notifications.map(notificationMapper::toResponse);
     }
 
-    public long getUnreadCount(Integer customerId) {
-        return notificationRepository.countByCustomerIdAndIsReadFalse(customerId);
-    }
-
-    public MessageResponse markAsRead(Integer notificationId) {
-        NotificationEntity notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
-        notification.setIsRead(true);
-        notificationRepository.save(notification);
-        return new MessageResponse("Notification marked as read.");
-    }
-
-    public MessageResponse markAllAsRead(Integer customerId) {
-        List<NotificationEntity> unread = notificationRepository.findByCustomerIdAndIsReadFalse(customerId);
-        unread.forEach(n -> n.setIsRead(true));
-        notificationRepository.saveAll(unread);
-        return new MessageResponse("All notifications marked as read.");
-    }
+//    public long getUnreadCount(Integer customerId) {
+//        return notificationRepository.countByCustomerIdAndIsReadFalse(customerId);
+//    }
+//
+//    public MessageResponse markAsRead(Integer notificationId) {
+//        NotificationEntity notification = notificationRepository.findById(notificationId)
+//                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
+//        notification.setIsRead(true);
+//        notificationRepository.save(notification);
+//        return new MessageResponse("Notification marked as read.");
+//    }
+//
+//    public MessageResponse markAllAsRead(Integer customerId) {
+//        List<NotificationEntity> unread = notificationRepository.findByCustomerIdAndIsReadFalse(customerId);
+//        unread.forEach(n -> n.setIsRead(true));
+//        notificationRepository.saveAll(unread);
+//        return new MessageResponse("All notifications marked as read.");
+//    }
 }

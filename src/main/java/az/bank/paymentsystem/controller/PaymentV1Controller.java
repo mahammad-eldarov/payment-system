@@ -1,5 +1,7 @@
 package az.bank.paymentsystem.controller;
 
+import az.bank.paymentsystem.dto.request.CardToExternalRequest;
+import az.bank.paymentsystem.dto.request.CurrentAccountToExternalRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +66,24 @@ public class PaymentV1Controller {
             @RequestBody AccountToAccountRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(paymentService.accountToAccount(customerId, request));
+    }
+
+    @PostMapping("/{customerId}/card-to-external")
+    @Operation(summary = "Card → External Party payment.")
+    public ResponseEntity<PaymentResponse> cardToExternal(
+            @PathVariable Integer customerId,
+            @RequestBody CardToExternalRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(paymentService.cardToExternal(customerId, request));
+    }
+
+    @PostMapping("/{customerId}/account-to-external")
+    @Operation(summary = "Account → External Party payment.")
+    public ResponseEntity<PaymentResponse> accountToExternal(
+            @PathVariable Integer customerId,
+            @RequestBody CurrentAccountToExternalRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(paymentService.accountToExternal(customerId, request));
     }
 
 
