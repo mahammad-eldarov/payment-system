@@ -3,11 +3,15 @@ package az.bank.paymentsystem.exception;
 import az.bank.paymentsystem.exception.base.ForbiddenException;
 import az.bank.paymentsystem.exception.base.TooManyRequestsException;
 import az.bank.paymentsystem.exception.base.UnprocessableContentException;
+import java.util.ArrayList;
 import java.util.List;
 import az.bank.paymentsystem.exception.base.BadRequestException;
 import az.bank.paymentsystem.exception.base.ConflictException;
 import az.bank.paymentsystem.exception.base.GoneException;
 import az.bank.paymentsystem.exception.base.NotFoundException;
+import java.util.Locale;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -23,6 +27,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private final MessageSource messageSource;
+
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
 //    // Exception 204
 //    @ExceptionHandler(EmptyListException.class)
@@ -168,6 +177,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(
                 new ExceptionResponse(HttpStatus.BAD_REQUEST.value(), message, LocalDateTime.now())
         );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationLanguageException(MethodArgumentNotValidException ex) {
+        Locale locale = LocaleContextHolder.getLocale();
+        List<String> exceptionMessages = new ArrayList<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String exceptionMessage = error.getDefaultMessage();
+            assert exceptionMessage != null;
+            String messageKey = exceptionMessage.substring(1, exceptionMessage.length() - 1);
+            exceptionMessage = messageSource.getMessage(messageKey, null, exceptionMessage, locale);
+            exceptionMessages.add(exceptionMessage);
+        });
+        String combinedMessages = String.join(", ", exceptionMessages);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(400, combinedMessages, LocalDateTime.now());
+
+        return new ResponseEntity<>(exceptionResponse,HttpStatus.BAD_REQUEST);
     }
 
 
