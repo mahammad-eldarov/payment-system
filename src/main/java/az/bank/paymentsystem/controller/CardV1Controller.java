@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/cards")
 @RequiredArgsConstructor
-@Tag(name = "Create Card Controller", description = "Card Management APIs.")
+@Tag(name = "Card Controller", description = "Card Management APIs.")
 public class CardV1Controller {
 
     private final CardService cardService;

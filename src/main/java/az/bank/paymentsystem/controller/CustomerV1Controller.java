@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor
-@Tag(name = "Create Customer Controller", description = "Customer Management APIs.")
+@Tag(name = "Customer Controller", description = "Customer Management APIs.")
 public class CustomerV1Controller {
 
     private final CustomerService customerService;
