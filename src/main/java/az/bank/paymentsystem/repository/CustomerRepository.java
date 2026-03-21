@@ -34,6 +34,10 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Intege
 
     List<CustomerEntity> findByStatusAndIsVisibleFalse(CustomerStatus status);
 
+    Optional<CustomerEntity> findFirstByPinAndIsVisibleFalse(String pin);
+
+    List<CustomerEntity> findAllByPinAndIsVisibleFalse(String pin);
+
 
 
 }

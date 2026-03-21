@@ -1,6 +1,6 @@
 package az.bank.paymentsystem.controller;
 
-import az.bank.paymentsystem.dto.response.CardForCustomerResponse;
+import az.bank.paymentsystem.dto.response.CustomerShortResponse;
 import az.bank.paymentsystem.dto.response.TransactionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,7 +13,6 @@ import az.bank.paymentsystem.dto.request.CreateCustomerRequest;
 import az.bank.paymentsystem.dto.request.UpdateCustomerRequest;
 import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.service.CustomerService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,8 +37,8 @@ public class CustomerV1Controller {
     @PostMapping
     @Operation(summary = "Create a customer.",
             description = "Creates a new customer.")
-    public ResponseEntity<CustomerResponse> createCustomer(@RequestBody @Valid CreateCustomerRequest request) {
-        CustomerResponse response = customerService.createCustomer(request);
+    public ResponseEntity<CustomerShortResponse> createCustomer(@RequestBody @Valid CreateCustomerRequest request) {
+        CustomerShortResponse response = customerService.createCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -47,8 +46,8 @@ public class CustomerV1Controller {
     @GetMapping("/{customerId}")
     @Operation(summary = "Search customer using ID.",
             description = "Search a customer.")
-    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Integer customerId) {
-        CustomerResponse response = customerService.getCustomerById(customerId);
+    public ResponseEntity<CustomerShortResponse> getCustomerById(@PathVariable Integer customerId) {
+        CustomerShortResponse response = customerService.getCustomerById(customerId);
         return ResponseEntity.ok(response);
     }
 
@@ -64,7 +63,7 @@ public class CustomerV1Controller {
     @GetMapping("/status")
     @Operation(summary = "Get a customer by status.",
             description = "Get customer by status.")
-    public ResponseEntity<List<CustomerResponse>> getCustomersByStatus(
+    public ResponseEntity<List<CustomerShortResponse>> getCustomersByStatus(
             @RequestParam CustomerStatus status) {
 
         return ResponseEntity.ok(customerService.getCustomersByStatus(status));
@@ -74,7 +73,7 @@ public class CustomerV1Controller {
     @GetMapping
     @Operation(summary = "Get all customers.",
             description = "Get all customers.")
-    public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
+    public ResponseEntity<List<CustomerShortResponse>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 

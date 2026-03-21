@@ -28,6 +28,7 @@ public class SuspiciousTransactionChecker {
     private final BankConfig bankConfig;
     private final StatusAuditLogger statusAuditLogger;
     private final NotificationService notificationService;
+    private final FraudBlacklistChecker fraudBlacklistChecker;
 
     public void check(PaymentEntity payment) {
         if (isUnderThreshold(payment)) return;
@@ -76,6 +77,7 @@ public class SuspiciousTransactionChecker {
         statusAuditLogger.logCustomer(customer, CustomerStatus.SUSPICIOUS.name(), "Second suspicious transaction detected");
         customer.setStatus(CustomerStatus.SUSPICIOUS);
         customerRepository.save(customer);
+        fraudBlacklistChecker.addToBlacklist(customer, "Multiple suspicious transactions detected");
         notificationService.send(customer,
                 "Your account has been suspended due to repeated suspicious activity.");
 

@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.config;
 
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,12 @@ public class BankConfig {
     private Card card = new Card();
     private Account account = new Account();
     private Transaction transaction = new Transaction();
+    private FraudConfig fraud;
+
+    @Getter @Setter
+    public static class FraudConfig {
+        private int maxAccountCreations;
+    }
 
     @Getter @Setter
     public static class Card {

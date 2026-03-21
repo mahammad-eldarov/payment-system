@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.mapper;
 
+import az.bank.paymentsystem.dto.response.CustomerShortResponse;
 import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import org.mapstruct.Mapper;
@@ -15,5 +16,7 @@ public interface CustomerMapper {
     @Mapping(target = "accountMessage", ignore = true)
     CustomerResponse toResponse(CustomerEntity customer);
 
+
+    CustomerShortResponse toShortResponse(CustomerEntity customer);
 
 }

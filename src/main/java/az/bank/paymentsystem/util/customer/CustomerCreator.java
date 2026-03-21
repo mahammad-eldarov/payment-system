@@ -1,6 +1,8 @@
 package az.bank.paymentsystem.util.customer;
 
 //import az.bank.paymentsystem.service.EntityFinderService;
+import az.bank.paymentsystem.util.shared.FraudBlacklistChecker;
+import az.bank.paymentsystem.util.shared.FraudDetectionChecker;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.request.CreateCustomerRequest;
@@ -15,8 +17,16 @@ import org.springframework.stereotype.Component;
 public class CustomerCreator {
 
     private final CustomerRepository customerRepository;
+    private final FraudBlacklistChecker fraudBlacklistChecker;
+    private final FraudDetectionChecker fraudDetectionChecker;
+
 
     public CustomerEntity createCustomer(CreateCustomerRequest request) {
+        fraudBlacklistChecker.checkBlacklist(
+                request.getPin(), request.getPhoneNumber(), request.getEmail());
+        fraudDetectionChecker.checkDeletedSuspiciousCustomer(request.getPin());
+        fraudDetectionChecker.checkAccountCreationFrequency(request.getPin());
+
         if (customerRepository.existsByPinAndIsVisibleTrue(request.getPin())) {
             throw new CustomerPinAlreadyExistsException("This pin is already available.");
         }

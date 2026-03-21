@@ -1,12 +1,7 @@
 package az.bank.paymentsystem.service;
 
-import az.bank.paymentsystem.dto.response.CardForCustomerResponse;
-import az.bank.paymentsystem.dto.response.CurrentAccountForCustomerResponse;
+import az.bank.paymentsystem.dto.response.CustomerShortResponse;
 import az.bank.paymentsystem.dto.response.TransactionResponse;
-import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.TransactionEntity;
-import az.bank.paymentsystem.exception.CardNotFoundException;
-import az.bank.paymentsystem.exception.base.ForbiddenException;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import java.time.Instant;
 import java.util.List;
@@ -26,9 +21,6 @@ import az.bank.paymentsystem.mapper.CustomerMapper;
 import az.bank.paymentsystem.util.customer.CustomerCreator;
 import az.bank.paymentsystem.util.customer.CustomerResponseBuilder;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,22 +34,23 @@ public class CustomerService {
 
 
     //Create
-    public CustomerResponse createCustomer(CreateCustomerRequest request) {
+    public CustomerShortResponse createCustomer(CreateCustomerRequest request) {
         CustomerEntity customer = customerCreator.createCustomer(request);
         customerRepository.save(customer);
 
-        CustomerResponse response = customerMapper.toResponse(customer);
+
+        CustomerShortResponse response = customerMapper.toShortResponse(customer);
         response.setPin(request.getPin());
         return response;
     }
 
     // GET
 
-    public CustomerResponse getCustomerById(Integer id) {
+    public CustomerShortResponse getCustomerById(Integer id) {
 
         Optional<CustomerEntity> activeCustomer = customerRepository.findByIdAndIsVisibleTrue(id);
         if (activeCustomer.isPresent()) {
-            return customerMapper.toResponse(activeCustomer.get());
+            return customerMapper.toShortResponse(activeCustomer.get());
         }
         if (customerRepository.findByIdAndIsVisibleFalse(id).isPresent()) {
             throw new CustomerDeletedException("This customer has been deleted.");
@@ -65,11 +58,11 @@ public class CustomerService {
         throw new CustomerNotFoundException("Customer not found");
     }
 
-    public List<CustomerResponse> getCustomersByStatus(CustomerStatus status) {
+    public List<CustomerShortResponse> getCustomersByStatus(CustomerStatus status) {
         List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
 
         if (!activeCustomers.isEmpty()) {
-            return activeCustomers.stream().map(customerMapper::toResponse).collect(Collectors.toList());
+            return activeCustomers.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
         }
         if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
             throw new CustomerDeletedException("Customers with this status have been deleted.");
@@ -84,14 +77,14 @@ public class CustomerService {
         return response;
     }
 
-    public List<CustomerResponse> getAllCustomers() {
+    public List<CustomerShortResponse> getAllCustomers() {
         List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
 
         if (activeCustomer.isEmpty()) {
             throw new EmptyListException("List is Empty.");
         }
 
-        return activeCustomer.stream().map(customerMapper::toResponse).collect(Collectors.toList());
+        return activeCustomer.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
     }
 
     public CustomerResponse getCustomersCardsAndAccounts(Integer id) {

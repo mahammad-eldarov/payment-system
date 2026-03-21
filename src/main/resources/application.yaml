@@ -46,6 +46,8 @@ spring:
 
 
 bank:
+  fraud:
+    max-account-creations: 3
   card:
     min-balance: 10
     min-balance-currency: AZN
