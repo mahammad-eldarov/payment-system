@@ -68,23 +68,23 @@ public class PaymentV1Controller {
                 .body(paymentService.accountToAccount(customerId, request));
     }
 
-    @PostMapping("/{customerId}/card-to-external")
-    @Operation(summary = "Card → External Party payment.")
-    public ResponseEntity<PaymentResponse> cardToExternal(
-            @PathVariable Integer customerId,
-            @RequestBody CardToExternalRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.cardToExternal(customerId, request));
-    }
-
-    @PostMapping("/{customerId}/account-to-external")
-    @Operation(summary = "Account → External Party payment.")
-    public ResponseEntity<PaymentResponse> accountToExternal(
-            @PathVariable Integer customerId,
-            @RequestBody CurrentAccountToExternalRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.accountToExternal(customerId, request));
-    }
+//    @PostMapping("/{customerId}/card-to-external")
+//    @Operation(summary = "Card → External Party payment.")
+//    public ResponseEntity<PaymentResponse> cardToExternal(
+//            @PathVariable Integer customerId,
+//            @RequestBody CardToExternalRequest request) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(paymentService.cardToExternal(customerId, request));
+//    }
+//
+//    @PostMapping("/{customerId}/account-to-external")
+//    @Operation(summary = "Account → External Party payment.")
+//    public ResponseEntity<PaymentResponse> accountToExternal(
+//            @PathVariable Integer customerId,
+//            @RequestBody CurrentAccountToExternalRequest request) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(paymentService.accountToExternal(customerId, request));
+//    }
 
 
     // GET /api/payments/{paymentId}

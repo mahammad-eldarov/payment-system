@@ -105,35 +105,35 @@ public class PaymentService {
         return paymentMapper.toResponse(paymentRepository.save(payment));
     }
 
-    @Transactional
-    public PaymentResponse cardToExternal(Integer customerId, CardToExternalRequest request) {
-        List<ExceptionResponse> errors = new ArrayList<>();
-        paymentValidator.validateAmount(request.getAmount(), errors);
-
-        PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CARD, PaymentSourceType.EXTERNAL);
-
-        paymentSourceResolver.fromCheckCard(payment, customerId, request.getFromPan(), errors);
-        paymentSourceResolver.toCheckExternal(payment, request.getToCardNumber(), "CARD", errors);
-
-        if (!errors.isEmpty()) throw new MultiValidationException(errors);
-        return paymentMapper.toResponse(paymentRepository.save(payment));
-    }
-
-    @Transactional
-    public PaymentResponse accountToExternal(Integer customerId, CurrentAccountToExternalRequest request) {
-        List<ExceptionResponse> errors = new ArrayList<>();
-        paymentValidator.validateAmount(request.getAmount(), errors);
-
-        PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.EXTERNAL);
-
-        paymentSourceResolver.fromCheckAccount(payment, customerId, request.getFromAccountNumber(), errors);
-        paymentSourceResolver.toCheckExternal(payment, request.getToAccountNumber(), "CURRENT ACCOUNT", errors);
-
-        if (!errors.isEmpty()) throw new MultiValidationException(errors);
-        return paymentMapper.toResponse(paymentRepository.save(payment));
-    }
+//    @Transactional
+//    public PaymentResponse cardToExternal(Integer customerId, CardToExternalRequest request) {
+//        List<ExceptionResponse> errors = new ArrayList<>();
+//        paymentValidator.validateAmount(request.getAmount(), errors);
+//
+//        PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
+//                PaymentSourceType.CARD, PaymentSourceType.EXTERNAL);
+//
+//        paymentSourceResolver.fromCheckCard(payment, customerId, request.getFromPan(), errors);
+//        paymentSourceResolver.toCheckExternal(payment, request.getToCardNumber(), "CARD", errors);
+//
+//        if (!errors.isEmpty()) throw new MultiValidationException(errors);
+//        return paymentMapper.toResponse(paymentRepository.save(payment));
+//    }
+//
+//    @Transactional
+//    public PaymentResponse accountToExternal(Integer customerId, CurrentAccountToExternalRequest request) {
+//        List<ExceptionResponse> errors = new ArrayList<>();
+//        paymentValidator.validateAmount(request.getAmount(), errors);
+//
+//        PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
+//                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.EXTERNAL);
+//
+//        paymentSourceResolver.fromCheckAccount(payment, customerId, request.getFromAccountNumber(), errors);
+//        paymentSourceResolver.toCheckExternal(payment, request.getToAccountNumber(), "CURRENT ACCOUNT", errors);
+//
+//        if (!errors.isEmpty()) throw new MultiValidationException(errors);
+//        return paymentMapper.toResponse(paymentRepository.save(payment));
+//    }
 
     // PROCESS
     @Transactional

@@ -156,7 +156,40 @@ public class PaymentSourceResolver {
     }
 
     // TO CHECKS
+//    public void toCheckCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
+//        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(toPan).orElse(null);
+//        if (card == null) {
+//            errors.add(new ExceptionResponse(404, "Destination card not found", LocalDateTime.now()));
+//            return;
+//        }
+//        if (card.getStatus() == CardStatus.EXPIRED) {
+//            errors.add(new ExceptionResponse(400, "Destination card is expired", LocalDateTime.now()));
+//            return;
+//        }
+//        if (card.getStatus() == CardStatus.CLOSED) {
+//            errors.add(new ExceptionResponse(403, "Destination card is closed.", LocalDateTime.now()));
+//            return;
+//        }
+//        if (card.getStatus() == CardStatus.SUSPICIOUS) {
+//            errors.add(new ExceptionResponse(403, "Destination card is suspended due to suspicious activity.", LocalDateTime.now()));
+//            return;
+//        }
+//        payment.setToCard(card);
+//    }
+
     public void toCheckCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
+        if (isInternalCard(toPan)) {
+            resolveInternalCard(payment, toPan, errors);
+        } else {
+            resolveExternalCard(payment, toPan, errors);
+        }
+    }
+
+    private boolean isInternalCard(String pan) {
+        return pan != null && pan.startsWith("9988");
+    }
+
+    private void resolveInternalCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
         CardEntity card = cardRepository.findByPanAndIsVisibleTrue(toPan).orElse(null);
         if (card == null) {
             errors.add(new ExceptionResponse(404, "Destination card not found", LocalDateTime.now()));
@@ -175,9 +208,55 @@ public class PaymentSourceResolver {
             return;
         }
         payment.setToCard(card);
+        payment.setToExternal(false);
     }
 
+    private void resolveExternalCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
+        Optional<ExternalPartyEntity> external = externalPartyService.findByCardNumber(toPan);
+        if (external.isEmpty()) {
+            errors.add(new ExceptionResponse(404, "Destination card not found", LocalDateTime.now()));
+            return;
+        }
+        payment.setToExternalParty(external.get());
+//        payment.setToExternal(true);
+        payment.setToType(PaymentSourceType.EXTERNAL);
+    }
+
+//    public void toCheckAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
+//        CurrentAccountEntity account = currentAccountRepository
+//                .findByAccountNumberAndIsVisibleTrue(toAccountNumber).orElse(null);
+//        if (account == null) {
+//            errors.add(new ExceptionResponse(404, "Destination current account not found", LocalDateTime.now()));
+//            return;
+//        }
+//        if (account.getStatus() == CurrentAccountStatus.EXPIRED) {
+//            errors.add(new ExceptionResponse(403, "Destination current account is expired.", LocalDateTime.now()));
+//            return;
+//        }
+//        if (account.getStatus() == CurrentAccountStatus.CLOSED) {
+//            errors.add(new ExceptionResponse(403, "Destination current account is closed.", LocalDateTime.now()));
+//            return;
+//        }
+//        if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
+//            errors.add(new ExceptionResponse(403, "Destination current account is suspended due to suspicious activity.", LocalDateTime.now()));
+//            return;
+//        }
+//        payment.setToAccount(account);
+//    }
+
     public void toCheckAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
+        if (isInternalAccount(toAccountNumber)) {
+            resolveInternalAccount(payment, toAccountNumber, errors);
+        } else {
+            resolveExternalAccount(payment, toAccountNumber, errors);
+        }
+    }
+
+    private boolean isInternalAccount(String accountNumber) {
+        return accountNumber != null && accountNumber.startsWith("2211");
+    }
+
+    private void resolveInternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
         CurrentAccountEntity account = currentAccountRepository
                 .findByAccountNumberAndIsVisibleTrue(toAccountNumber).orElse(null);
         if (account == null) {
@@ -197,22 +276,34 @@ public class PaymentSourceResolver {
             return;
         }
         payment.setToAccount(account);
+        payment.setToExternal(false);
     }
 
-    public void toCheckExternal(PaymentEntity payment, String toNumber,
-                                String type, List<ExceptionResponse> errors) {
-        Optional<ExternalPartyEntity> external = type.equals("CARD")
-                ? externalPartyService.findByCardNumber(toNumber)
-                : externalPartyService.findByAccountNumber(toNumber);
-
+    private void resolveExternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
+        Optional<ExternalPartyEntity> external = externalPartyService.findByAccountNumber(toAccountNumber);
         if (external.isEmpty()) {
-            errors.add(new ExceptionResponse(404, "Destination not found in external bank", LocalDateTime.now()));
+            errors.add(new ExceptionResponse(404, "Destination account not found", LocalDateTime.now()));
             return;
         }
-
         payment.setToExternalParty(external.get());
-        payment.setToExternal(true);
+//        payment.setToExternal(true);
+        payment.setToType(PaymentSourceType.EXTERNAL);
     }
+
+//    public void toCheckExternal(PaymentEntity payment, String toNumber,
+//                                String type, List<ExceptionResponse> errors) {
+//        Optional<ExternalPartyEntity> external = type.equals("CARD")
+//                ? externalPartyService.findByCardNumber(toNumber)
+//                : externalPartyService.findByAccountNumber(toNumber);
+//
+//        if (external.isEmpty()) {
+//            errors.add(new ExceptionResponse(404, "Destination not found in external bank", LocalDateTime.now()));
+//            return;
+//        }
+//
+//        payment.setToExternalParty(external.get());
+//        payment.setToExternal(true);
+//    }
 
 
 
