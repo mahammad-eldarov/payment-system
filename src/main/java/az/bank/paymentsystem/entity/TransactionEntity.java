@@ -102,6 +102,10 @@ public class TransactionEntity extends  BaseEntity {
     @Column(name = "description", nullable = false, length = 500)
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "to_external_party_id")
+    private ExternalPartyEntity toExternalParty;
+
 
 
 

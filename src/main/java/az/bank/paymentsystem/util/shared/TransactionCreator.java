@@ -20,8 +20,9 @@ public class TransactionCreator {
     private final TransactionRepository transactionRepository;
 
     public void create(PaymentEntity payment, TransactionStatus status) {
-        transactionRepository.save(buildTransaction(payment, status, TransactionType.CREDIT));
         transactionRepository.save(buildTransaction(payment, status, TransactionType.DEBIT));
+        transactionRepository.save(buildTransaction(payment, status, TransactionType.CREDIT));
+
     }
 
     private TransactionEntity buildTransaction(PaymentEntity payment, TransactionStatus status, TransactionType type) {
@@ -40,11 +41,34 @@ public class TransactionCreator {
         } else {
             transaction.setToCard(payment.getToCard());
             transaction.setToAccount(payment.getToAccount());
+            transaction.setToExternalParty(payment.getToExternalParty());
         }
 
         transaction.setCreatedAt(Instant.now());
         return transaction;
     }
+
+//    private TransactionEntity buildTransaction(PaymentEntity payment, TransactionStatus status, TransactionType type) {
+//        TransactionEntity transaction = new TransactionEntity();
+//        transaction.setPayment(payment);
+//        transaction.setCustomer(payment.getCustomer());
+//        transaction.setAmount(payment.getAmount());
+//        transaction.setCurrency(payment.getCurrency());
+//        transaction.setStatus(status);
+//        transaction.setTransactionType(type);
+//        transaction.setDescription(buildDescription(payment));
+//
+//        if (type == TransactionType.CREDIT) {
+//            transaction.setFromCard(payment.getFromCard());
+//            transaction.setFromAccount(payment.getFromAccount());
+//        } else {
+//            transaction.setToCard(payment.getToCard());
+//            transaction.setToAccount(payment.getToAccount());
+//        }
+//
+//        transaction.setCreatedAt(Instant.now());
+//        return transaction;
+//    }
 
     private String buildDescription(PaymentEntity payment) {
         return "Transfer of " + payment.getAmount() + " " + payment.getCurrency() +

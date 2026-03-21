@@ -19,4 +19,5 @@ public class ExternalPartyService {
     public Optional<ExternalPartyEntity> findByAccountNumber(String accountNumber) {
         return externalPartyRepository.findByAccountNumber(accountNumber);
     }
+
 }
