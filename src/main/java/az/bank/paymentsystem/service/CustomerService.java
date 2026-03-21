@@ -53,9 +53,9 @@ public class CustomerService {
             return customerMapper.toShortResponse(activeCustomer.get());
         }
         if (customerRepository.findByIdAndIsVisibleFalse(id).isPresent()) {
-            throw new CustomerDeletedException("This customer has been deleted.");
+            throw new CustomerDeletedException("customerService.getCustomerById.customerDeleted");
         }
-        throw new CustomerNotFoundException("Customer not found");
+        throw new CustomerNotFoundException("customerService.getCustomerById.customerNotFound");
     }
 
     public List<CustomerShortResponse> getCustomersByStatus(CustomerStatus status) {
@@ -65,13 +65,13 @@ public class CustomerService {
             return activeCustomers.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
         }
         if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
-            throw new CustomerDeletedException("Customers with this status have been deleted.");
+            throw new CustomerDeletedException("customerService.getCustomersByStatus.customerDeletedStatus");
         }
-        throw new CustomerNotFoundException("No customers found with this status");
+        throw new CustomerNotFoundException("customerService.getCustomersByStatus.customerNotFoundStatus");
     }
 
     public CustomerResponse getDeletedCustomerById(Integer id) {
-        CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException("customerService.getDeletedCustomerById.customerNotFound"));
         CustomerResponse response = customerMapper.toResponse(customer);
         customerResponseBuilder.setCardsAndAccounts(response, id);
         return response;
@@ -81,7 +81,7 @@ public class CustomerService {
         List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
 
         if (activeCustomer.isEmpty()) {
-            throw new EmptyListException("List is Empty.");
+            throw new EmptyListException("customerService.getAllCustomers.listEmpty");
         }
 
         return activeCustomer.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
@@ -134,7 +134,7 @@ public class CustomerService {
         customer.setStatus(status);
         customer.setUpdatedAt(Instant.now());
         customerRepository.save(customer);
-        return new MessageResponse("Status updated successfully");
+        return new MessageResponse("customerService.updateCustomerStatus.statusUpdated");
     }
 
     public MessageResponse updateCustomer(Integer id, UpdateCustomerRequest request) {
@@ -157,7 +157,7 @@ public class CustomerService {
 
         customerRepository.save(customer);
 
-        return new MessageResponse("Customer information updated successfully.");
+        return new MessageResponse("customerService.updateCustomer.statusUpdatedSuccessfully");
     }
 
     // DELETE
@@ -167,14 +167,14 @@ public class CustomerService {
         customer.setIsVisible(false);
         customer.setStatus(CustomerStatus.CLOSED);
         customerRepository.save(customer);
-        return new MessageResponse("Customer information has been deleted successfully.");
+        return new MessageResponse("customerService.deleteCustomer.customerDeleted");
     }
 
 
     // Auxiliary method
     public CustomerEntity findActiveCustomer(Integer id) {
         return customerRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+                .orElseThrow(() -> new CustomerNotFoundException("customerService.findActiveCustomer.customerNotFound"));
     }
 
 

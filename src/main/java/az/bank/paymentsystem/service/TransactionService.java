@@ -33,40 +33,40 @@ public class TransactionService {
 
     public Page<TransactionResponse> getTransactionsByCardId(Integer cardId, int page) {
         cardRepository.findByIdAndIsVisibleTrue(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+                .orElseThrow(() -> new CardNotFoundException("transactionService.getTransactionsByCardId.cardNotFound"));
 
         Pageable pageable = buildPageable(page);
         Page<TransactionEntity> transactions = transactionRepository
                 .findByFromCardIdOrToCardId(cardId, cardId, pageable);
 
-        if (transactions.isEmpty()) throw new EmptyListException("No transactions found for this card.");
+        if (transactions.isEmpty()) throw new EmptyListException("transactionService.getTransactionsByCardId.cardNoTransaction");
         return transactions.map(transactionMapper::toResponse);
     }
 
     public Page<TransactionResponse> getTransactionsByAccountId(Integer accountId, int page) {
         currentAccountRepository.findByIdAndIsVisibleTrue(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("transactionService.getTransactionsByAccountId.currentAccountNotFound"));
         Pageable pageable = buildPageable(page);
         Page<TransactionEntity> transactions = transactionRepository
                 .findByFromAccountIdOrToAccountId(accountId, accountId, pageable);
 
-        if (transactions.isEmpty()) throw new EmptyListException("No transactions found for this account.");
+        if (transactions.isEmpty()) throw new EmptyListException("transactionService.getTransactionsByAccountId.accountNoTransaction");
         return transactions.map(transactionMapper::toResponse);
     }
 
     public Page<TransactionResponse> getTransactionsByPaymentId(Integer paymentId, int page) {
         paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+                .orElseThrow(() -> new PaymentNotFoundException("transactionService.getTransactionsByPaymentId.paymentNotFound"));
         Pageable pageable = buildPageable(page);
         Page<TransactionEntity> transactions = transactionRepository
                 .findAllByPaymentId(paymentId, pageable);
 
-        if (transactions.isEmpty()) throw new EmptyListException("No transactions found for this payment.");
+        if (transactions.isEmpty()) throw new EmptyListException("transactionService.getTransactionsByPaymentId.paymentNoTransaction");
         return transactions.map(transactionMapper::toResponse);
     }
 
     private Pageable buildPageable(int page) {
-        if (page < 1) throw new PageRequestException("Page number must be at least 1");
+        if (page < 1) throw new PageRequestException("transactionService.buildPageable.pageNumber");
         return PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
     }
 

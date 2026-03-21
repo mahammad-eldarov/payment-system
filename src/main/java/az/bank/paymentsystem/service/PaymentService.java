@@ -149,7 +149,7 @@ public class PaymentService {
 
     public PaymentEntity findPaymentById(Integer paymentId) {
         return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+                .orElseThrow(() -> new PaymentNotFoundException("paymentService.findPaymentById.paymentNotFound"));
     }
 
 
