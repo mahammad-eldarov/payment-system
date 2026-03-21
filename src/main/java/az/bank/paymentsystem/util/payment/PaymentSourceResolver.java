@@ -208,7 +208,7 @@ public class PaymentSourceResolver {
             return;
         }
         payment.setToCard(card);
-        payment.setToExternal(false);
+//        payment.setToExternal(false);
     }
 
     private void resolveExternalCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
@@ -276,7 +276,7 @@ public class PaymentSourceResolver {
             return;
         }
         payment.setToAccount(account);
-        payment.setToExternal(false);
+//        payment.setToExternal(false);
     }
 
     private void resolveExternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {

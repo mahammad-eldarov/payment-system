@@ -1,5 +1,7 @@
 package az.bank.paymentsystem.controller;
 
+import az.bank.paymentsystem.dto.response.CardForCustomerResponse;
+import az.bank.paymentsystem.dto.response.TransactionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import az.bank.paymentsystem.dto.request.CreateCustomerRequest;
 import az.bank.paymentsystem.dto.request.UpdateCustomerRequest;
 import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.service.CustomerService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -121,16 +124,39 @@ public class CustomerV1Controller {
 //        return ResponseEntity.ok(customerService.getCustomerWithCardTransactions(customerId));
 //    }
 
-    @GetMapping("/{customerId}/cards-with-transactions")
-    public ResponseEntity<CustomerResponse> getCustomerWithCardTransactions(
-            @PathVariable Integer customerId) {
-        return ResponseEntity.ok(customerService.getCustomerWithCardTransactions(customerId));
+//    @GetMapping("/{customerId}/cards-with-transactions")
+//    public ResponseEntity<CustomerResponse> getCustomerWithCardTransactions(
+//            @PathVariable Integer customerId) {
+//        return ResponseEntity.ok(customerService.getCustomerWithCardTransactions(customerId));
+//    }
+
+    // Controller
+//    @GetMapping("/{customerId}/cards")
+//    public ResponseEntity<List<CardForCustomerResponse>> getCustomerCards(
+//            @PathVariable Integer customerId) {
+//        return ResponseEntity.ok(customerService.getCustomerCards(customerId));
+//    }
+    @GetMapping("/{customerId}/cards/{pan}/transactions")
+    @Operation(summary = "Get card transactions by PAN.", description = "Returns paginated transactions for a specific card.")
+    public ResponseEntity<List<TransactionResponse>> getCardTransactions(
+            @PathVariable Integer customerId,
+            @PathVariable String pan,
+            @RequestParam(required = false, defaultValue = "1") int page) {
+        return ResponseEntity.ok(customerService.getCardTransactions(customerId, pan, page).getContent());
     }
 
-    @GetMapping("/{customerId}/accounts-with-transactions")
-    public ResponseEntity<CustomerResponse> getCustomerWithAccountTransactions(
-            @PathVariable Integer customerId) {
-        return ResponseEntity.ok(customerService.getCustomerWithAccountTransactions(customerId));
+    //    @GetMapping("/{customerId}/accounts-with-transactions")
+//    public ResponseEntity<CustomerResponse> getCustomerWithAccountTransactions(
+//            @PathVariable Integer customerId) {
+//        return ResponseEntity.ok(customerService.getCustomerWithAccountTransactions(customerId));
+//    }
+    @GetMapping("/{customerId}/accounts/{accountNumber}/transactions")
+    @Operation(summary = "Get account transactions.", description = "Returns paginated transactions for a specific account.")
+    public ResponseEntity<List<TransactionResponse>> getAccountTransactions(
+            @PathVariable Integer customerId,
+            @PathVariable String accountNumber,
+            @RequestParam(required = false, defaultValue = "1") int page) {
+        return ResponseEntity.ok(customerService.getAccountTransactions(customerId, accountNumber, page).getContent());
     }
 
 

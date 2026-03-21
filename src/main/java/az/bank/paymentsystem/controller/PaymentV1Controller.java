@@ -1,7 +1,5 @@
 package az.bank.paymentsystem.controller;
 
-import az.bank.paymentsystem.dto.request.CardToExternalRequest;
-import az.bank.paymentsystem.dto.request.CurrentAccountToExternalRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

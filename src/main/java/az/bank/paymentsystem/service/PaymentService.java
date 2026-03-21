@@ -1,7 +1,6 @@
 package az.bank.paymentsystem.service;
 
-import az.bank.paymentsystem.dto.request.CardToExternalRequest;
-import az.bank.paymentsystem.dto.request.CurrentAccountToExternalRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

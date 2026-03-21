@@ -1,5 +1,12 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.dto.response.CardForCustomerResponse;
+import az.bank.paymentsystem.dto.response.CurrentAccountForCustomerResponse;
+import az.bank.paymentsystem.dto.response.TransactionResponse;
+import az.bank.paymentsystem.entity.CardEntity;
+import az.bank.paymentsystem.entity.TransactionEntity;
+import az.bank.paymentsystem.exception.CardNotFoundException;
+import az.bank.paymentsystem.exception.base.ForbiddenException;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import java.time.Instant;
 import java.util.List;
@@ -18,6 +25,10 @@ import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.mapper.CustomerMapper;
 import az.bank.paymentsystem.util.customer.CustomerCreator;
 import az.bank.paymentsystem.util.customer.CustomerResponseBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,6 +39,8 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
     private final CustomerResponseBuilder customerResponseBuilder;
     private final CustomerCreator customerCreator;
+
+
     //Create
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
         CustomerEntity customer = customerCreator.createCustomer(request);
@@ -87,18 +100,38 @@ public class CustomerService {
         return response;
     }
 
+    // CustomerService
+//    public List<CardForCustomerResponse> getCustomerCards(Integer customerId) {
+//        findActiveCustomer(customerId);
+//        return customerResponseBuilder.buildCardSummaries(customerId);
+//    }
+
     // Müştərinin kartlarını tranzaksiyalarla birlikdə gətirir
-    public CustomerResponse getCustomerWithCardTransactions(Integer customerId) {
-        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
-        customerResponseBuilder.setCardTransactions(response, customerId);
-        return response;
+    public Page<TransactionResponse> getCardTransactions(Integer customerId, String pan, int page) {
+        findActiveCustomer(customerId);
+        return customerResponseBuilder.buildCardTransactions(customerId, pan, page);
     }
 
+//    public CustomerResponse getCustomerWithCardTransactions(Integer customerId) {
+//        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
+//        customerResponseBuilder.setCardTransactions(response, customerId);
+//        return response;
+//    }
+
     // Müştərinin cari hesablarını tranzaksiyalarla birlikdə gətirir
-    public CustomerResponse getCustomerWithAccountTransactions(Integer customerId) {
-        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
-        customerResponseBuilder.setAccountTransactions(response, customerId);
-        return response;
+//    public CustomerResponse getCustomerWithAccountTransactions(Integer customerId) {
+//        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
+//        customerResponseBuilder.setAccountTransactions(response, customerId);
+//        return response;
+//    }
+//    public List<CurrentAccountForCustomerResponse> getCustomerAccounts(Integer customerId) {
+//        findActiveCustomer(customerId);
+//        return customerResponseBuilder.buildAccountSummaries(customerId);
+//    }
+
+    public Page<TransactionResponse> getAccountTransactions(Integer customerId, String accountNumber, int page) {
+        findActiveCustomer(customerId);
+        return customerResponseBuilder.buildAccountTransactions(customerId, accountNumber, page);
     }
 
     // UPDATE
