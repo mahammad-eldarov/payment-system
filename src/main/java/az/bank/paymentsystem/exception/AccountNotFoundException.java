@@ -7,17 +7,4 @@ public class AccountNotFoundException extends NotFoundException {
 }
 
 
-//package org.example.exampletask.exception;
-//
-//public class AccountNotFoundException extends BaseException {
-//    public AccountNotFoundException(Integer id) {
-//        super(
-//                "Cari hesab tapılmadı. ID: " + id,
-//                "ACCOUNT_NOT_FOUND",
-//                404
-//        );
-//    }
-//}
-
-
 

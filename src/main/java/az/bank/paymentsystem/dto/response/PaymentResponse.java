@@ -16,18 +16,8 @@ import az.bank.paymentsystem.enums.PaymentStatus;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentResponse {
-
     private BigDecimal amount;
     private Currency currency;
     private PaymentStatus status;
     private LocalDate scheduledDate;
-//    private Instant processedAt;
-//    private String failureReason;
-//    private PaymentSourceType fromType;
-//    private Integer fromCardId;
-//    private Integer fromAccountId;
-//    private PaymentSourceType toType;
-//    private Integer toCardId;
-//    private Integer toAccountId;
-
 }

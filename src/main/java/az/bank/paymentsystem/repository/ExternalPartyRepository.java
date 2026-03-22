@@ -10,5 +10,4 @@ public interface ExternalPartyRepository extends JpaRepository<ExternalPartyEnti
 
     Optional<ExternalPartyEntity> findByAccountNumber(String accountNumber);
 
-//    Optional<ExternalPartyEntity> findByCardNumberOrAccountNumber(String cardNumber);
 }

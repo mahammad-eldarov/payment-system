@@ -26,10 +26,6 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "order_rate_limit")
 public class OrderRateLimitEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
 
     @Column(name = "order_type", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
@@ -41,12 +37,6 @@ public class OrderRateLimitEntity extends BaseEntity {
 
     @Column(name = "cooldown_until")
     private Instant cooldownUntil;
-
-//    @Column(name = "created_at")
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")

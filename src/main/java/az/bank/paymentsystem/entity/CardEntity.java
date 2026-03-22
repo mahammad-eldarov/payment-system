@@ -33,18 +33,6 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "card")
 public class CardEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
-//
-//    //    @NotNull
-//    @ColumnDefault("now()")
-//    @Column(name = "created_at", nullable = false)
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
     @NotNull
     @Column(name = "card_holder_name", nullable = false, length = Integer.MAX_VALUE)
@@ -76,7 +64,6 @@ public class CardEntity extends BaseEntity {
     @Column(name = "balance", nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 
-//    @Size(max = 3)
     @NotNull(message = "Currency cannot be null")
     @Column(name = "currency", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
@@ -98,7 +85,6 @@ public class CardEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CardType cardType;
 
-
     @NotNull
     @Column(name = "activation_date", nullable = false)
     private LocalDate activationDate;
@@ -107,9 +93,6 @@ public class CardEntity extends BaseEntity {
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
 
-
-
-//    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     @JsonIgnore

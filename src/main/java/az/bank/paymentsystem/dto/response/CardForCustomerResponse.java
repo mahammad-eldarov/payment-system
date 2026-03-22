@@ -17,17 +17,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardForCustomerResponse {
-//    private Integer id;
     private String cardholderName;
     private CardName cardName;
     private String pan;
     private String cvv;
-//    private String password;
     private CardBrand cardBrand;
     private CardType cardType;
     private BigDecimal balance;
     private Currency currency;
     private CardStatus status;
-//    private LocalDate activationDate;
     private LocalDate expiryDate;
 }

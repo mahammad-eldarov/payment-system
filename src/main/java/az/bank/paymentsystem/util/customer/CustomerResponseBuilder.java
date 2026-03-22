@@ -61,39 +61,13 @@ public class CustomerResponseBuilder {
         response.setAccountMessage(accountMessage(accountResponses));
     }
 
-//    public void setCardTransactions(CustomerResponse response, Integer customerId) {
-//        List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
-//                .stream().map(card -> {
-//                    CardResponse cardResponse = cardMapper.toResponse(card);
-//                    cardResponse.setTransactions(transactionService.getTransactionsByCardId(card.getId(), 1).getContent());
-//                    return cardResponse;
-//                }).collect(Collectors.toList());
-//
-//        response.setCardResponse(cardResponses);
-//        response.setCardMessage(cardMessage(cardResponses));
-//    }
-//
-//    public void setAccountTransactions(CustomerResponse response, Integer customerId) {
-//        List<CurrentAccountResponse> accountResponses = currentAccountRepository
-//                .findCurrentAccountByCustomerId(customerId)
-//                .stream().map(account -> {
-//                    CurrentAccountResponse accountResponse = currentAccountMapper.toResponse(account);
-//                    accountResponse.setTransactions(transactionService.getTransactionsByAccountId(account.getId(),1).getContent());
-//                    return accountResponse;
-//                }).collect(Collectors.toList());
-//
-//        response.setCurrentAccountResponse(accountResponses);
-//        response.setAccountMessage(accountMessage(accountResponses));
-//    }
+
 
     private String cardMessage(List<CardResponse> cards) {
         Locale locale = LocaleContextHolder.getLocale();
         return cards.isEmpty()
                 ? messageSource.getMessage("customerResponseBuilder.cardMessage.cardsEmpty", null, locale)
                 : messageSource.getMessage("customerResponseBuilder.cardMessage.cardsFound", new Object[]{cards.size()}, locale);
-//        return cards.isEmpty()
-//                ? "This customer does not have a card."
-//                : "The customer has " + cards.size() + " card(s).";
     }
 
     private String accountMessage(List<CurrentAccountResponse> accounts) {
@@ -101,17 +75,7 @@ public class CustomerResponseBuilder {
         return accounts.isEmpty()
                 ? messageSource.getMessage("customerResponseBuilder.accountMessage.accountsEmpty", null, locale)
                 : messageSource.getMessage("customerResponseBuilder.accountMessage.accountsFound", new Object[]{accounts.size()}, locale);
-//        return accounts.isEmpty()
-//                ? "This customer does not have a current account."
-//                : "The customer has " + accounts.size() + " current account(s).";
     }
-
-
-//    public List<CardForCustomerResponse> buildCardSummaries(Integer customerId) {
-//        List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
-//        if (cards.isEmpty()) throw new EmptyListException("No cards found.");
-//        return cards.stream().map(cardMapper::toSummary).toList();
-//    }
 
     public Page<TransactionResponse> buildCardTransactions(Integer customerId, String pan, int page) {
         Locale locale = LocaleContextHolder.getLocale();
@@ -124,13 +88,6 @@ public class CustomerResponseBuilder {
 
         return transactionService.getTransactionsByCardId(card.getId(), page);
     }
-
-//    public List<CurrentAccountForCustomerResponse> buildAccountSummaries(Integer customerId) {
-//        List<CurrentAccountEntity> accounts = currentAccountRepository
-//                .findByCustomerIdAndIsVisibleTrue(customerId);
-//        if (accounts.isEmpty()) throw new EmptyListException("No accounts found.");
-//        return accounts.stream().map(currentAccountMapper::toSummary).toList();
-//    }
 
     public Page<TransactionResponse> buildAccountTransactions(Integer customerId, String accountNumber, int page) {
         Locale locale = LocaleContextHolder.getLocale();

@@ -52,33 +52,10 @@ public class TransactionCreator {
         return transaction;
     }
 
-//    private TransactionEntity buildTransaction(PaymentEntity payment, TransactionStatus status, TransactionType type) {
-//        TransactionEntity transaction = new TransactionEntity();
-//        transaction.setPayment(payment);
-//        transaction.setCustomer(payment.getCustomer());
-//        transaction.setAmount(payment.getAmount());
-//        transaction.setCurrency(payment.getCurrency());
-//        transaction.setStatus(status);
-//        transaction.setTransactionType(type);
-//        transaction.setDescription(buildDescription(payment));
-//
-//        if (type == TransactionType.CREDIT) {
-//            transaction.setFromCard(payment.getFromCard());
-//            transaction.setFromAccount(payment.getFromAccount());
-//        } else {
-//            transaction.setToCard(payment.getToCard());
-//            transaction.setToAccount(payment.getToAccount());
-//        }
-//
-//        transaction.setCreatedAt(Instant.now());
-//        return transaction;
-//    }
-
     private String buildDescription(PaymentEntity payment) {
         Locale locale = LocaleContextHolder.getLocale();
         return messageSource.getMessage("transactionCreator.buildDescription",new Object[]{payment.getAmount(), payment.getCurrency(), payment.getFromType(), payment.getToType()}, locale);
     }
-
 
     public void createBalanceTransfer(CardEntity fromCard, CardEntity toCard,
                                       BigDecimal amount, String debitDescription, String creditDescription) {

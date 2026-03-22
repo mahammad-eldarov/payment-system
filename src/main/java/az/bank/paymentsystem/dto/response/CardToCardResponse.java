@@ -20,13 +20,6 @@ public class CardToCardResponse {
     private Currency currency;
     private PaymentStatus status;
     private LocalDate scheduledDate;
-//    private Instant processedAt;
-//    private String failureReason;
-//    private PaymentSourceType fromType;
-//    private Integer fromCardId;
-//    private Integer fromAccountId;
-//    private PaymentSourceType toType;
-//    private Integer toCardId;
-//    private Integer toAccountId;
+
 
 }

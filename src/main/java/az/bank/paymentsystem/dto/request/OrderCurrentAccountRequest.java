@@ -12,9 +12,6 @@ import az.bank.paymentsystem.enums.Currency;
 @AllArgsConstructor
 public class OrderCurrentAccountRequest {
 
-//    @NotNull(message = "Customer ID cannot be empty.")
-//    private Integer customerId;
-
     @NotNull(message = "notNull.currency")
     private Currency currency;
 

@@ -28,18 +28,6 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "current_account")
 public class CurrentAccountEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
-//
-//    //    @NotNull
-//    @ColumnDefault("now()")
-//    @Column(name = "created_at", nullable = false)
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
     @Size(max = 18)
     @NotNull
@@ -55,7 +43,6 @@ public class CurrentAccountEntity extends BaseEntity {
     @Column(name = "balance", nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 
-//    @Size(max = 3)
     @NotNull
     @Column(name = "currency", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
@@ -74,8 +61,6 @@ public class CurrentAccountEntity extends BaseEntity {
     @NotNull
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
-
-
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

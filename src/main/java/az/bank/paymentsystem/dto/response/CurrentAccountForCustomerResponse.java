@@ -14,7 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CurrentAccountForCustomerResponse {
-//    private Integer id;
     private String accountNumber;
     private String currentAccountHolderName;
     private BigDecimal balance;

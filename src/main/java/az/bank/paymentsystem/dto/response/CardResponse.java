@@ -34,8 +34,7 @@ public class CardResponse {
     private CardStatus status;
     private LocalDate activationDate;
     private LocalDate expiryDate;
-//    private Instant createdAt;
-//    private Integer customerId;
+
 
     private List<TransactionResponse> transactions;
 

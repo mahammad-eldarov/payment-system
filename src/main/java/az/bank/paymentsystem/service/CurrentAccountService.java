@@ -39,7 +39,6 @@ public class CurrentAccountService {
     private final StatusAuditLogger statusAuditLogger;
     private final MessageSource messageSource;
 
-    //GET
     public List<CurrentAccountResponse> getAccountsByCustomerId(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
         findActiveCustomer(id);
@@ -98,7 +97,6 @@ public class CurrentAccountService {
         currentAccountRepository.saveAll(expiredAccounts);
     }
 
-    // DELETE
     public MessageResponse deleteCurrentAccount(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
 

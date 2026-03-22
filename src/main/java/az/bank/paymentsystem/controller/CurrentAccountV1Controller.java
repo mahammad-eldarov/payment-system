@@ -30,15 +30,6 @@ public class CurrentAccountV1Controller {
 
     private final CurrentAccountService currentAccountService;
 
-    // POST /api/current-accounts/order/{customerId}
-//    @PostMapping("/order/{customerId}")
-//    @Operation(summary = "Create a current account.", description = "Creates a new current account for a customer.")
-//    public ResponseEntity<CurrentAccountResponse> orderCurrentAccount(
-//            @PathVariable Integer customerId,
-//            @Valid @RequestBody OrderCurrentAccountRequest request) {
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(currentAccountService.orderCurrentAccount(customerId, request));
-//    }
 
     @PatchMapping("/{currentAccountId}/status")
     @Operation(summary = "Update current account status using ID.",
@@ -50,7 +41,6 @@ public class CurrentAccountV1Controller {
         return ResponseEntity.ok(currentAccountService.updateCurrentAccountStatus(currentAccountId, status));
     }
 
-    // GET /api/current-accounts/customer/{customerId}
     @GetMapping("/customer/{customerId}")
     @Operation(summary = "Get accounts by customer ID.", description = "Retrieves all current accounts for a customer.")
     public ResponseEntity<List<CurrentAccountResponse>> getCurrentAccountsByCustomerId(
@@ -58,7 +48,6 @@ public class CurrentAccountV1Controller {
         return ResponseEntity.ok(currentAccountService.getAccountsByCustomerId(customerId));
     }
 
-    // GET /api/current-accounts/{accountNumber}
     @GetMapping("/{accountNumber}")
     @Operation(summary = "Get account by account number.", description = "Retrieves a current account by its account number.")
     public ResponseEntity<CurrentAccountResponse> getCurrentAccountByAccountNumber(
@@ -74,7 +63,6 @@ public class CurrentAccountV1Controller {
         return ResponseEntity.ok(currentAccountService.getCurrentAccountByStatus(status));
     }
 
-    // DELETE /api/current-accounts/{id}/delete
     @DeleteMapping("/{currentAccountId}/delete")
     @Operation(summary = "Delete a current account.", description = "Soft-deletes a current account using its ID.")
     public ResponseEntity<MessageResponse> deleteCurrentAccount(@PathVariable Integer currentAccountId) {

@@ -25,18 +25,6 @@ import az.bank.paymentsystem.enums.TransactionType;
 @Entity
 @Table(name = "transaction")
 public class TransactionEntity extends  BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
-//
-//    @ColumnDefault("now()")
-//    @Column(name = "created_at", nullable = false)
-//    private Instant createdAt;
-
-//    @NotNull
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "payment_id", nullable = false)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
@@ -51,30 +39,18 @@ public class TransactionEntity extends  BaseEntity {
     @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-//    @Size(max = 3)
     @NotNull
     @Column(name = "currency", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-//    @Size(max = 10)
-//    @NotNull
     @Column(name = "transaction_type", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
-//    @NotNull
     @Column(name = "status", nullable = false, length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
-
-//    @NotNull
-//    @Column(name = "from_type", nullable = false, length = Integer.MAX_VALUE)
-//    @Enumerated(EnumType.STRING)
-//    private PaymentSourceType fromType;
-
-//    @Column(name = "scheduled_date", nullable = false)
-//    private LocalDateTime scheduledDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_card_id")
@@ -84,11 +60,6 @@ public class TransactionEntity extends  BaseEntity {
     @JoinColumn(name = "from_account_id")
     private CurrentAccountEntity fromAccount;
 
-//    @NotNull
-//    @Column(name = "to_type", nullable = false, length = Integer.MAX_VALUE)
-//    @Enumerated(EnumType.STRING)
-//    private PaymentSourceType toType;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_card_id")
     private CardEntity toCard;
@@ -97,8 +68,6 @@ public class TransactionEntity extends  BaseEntity {
     @JoinColumn(name = "to_account_id")
     private CurrentAccountEntity toAccount;
 
-//    @Size(max = 500)
-//    @NotNull
     @Column(name = "description", nullable = false, length = 500)
     private String description;
 
@@ -106,12 +75,5 @@ public class TransactionEntity extends  BaseEntity {
     @JoinColumn(name = "to_external_party_id")
     private ExternalPartyEntity toExternalParty;
 
-
-
-
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "customer_id", nullable = false)
-//    @JsonIgnore
-//    private CustomerEntity customer;
 
 }

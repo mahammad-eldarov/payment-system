@@ -18,8 +18,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CurrentAccountBalanceTransfer {
-    private final CurrentAccountRepository currentAccountRepository;
-    private final TransactionCreator transactionCreator;
     private final NotificationService notificationService;
     private final MessageSource messageSource;
 
@@ -52,20 +50,5 @@ public class CurrentAccountBalanceTransfer {
             default -> messageSource.getMessage("currentAccountBalanceTransfer.getStatusReason.deactivated",null,locale);
         };
     }
-
-//    public String transfer(CurrentAccountEntity account) {
-//        BigDecimal balance = account.getBalance();
-//
-//        if (balance.compareTo(BigDecimal.ZERO) <= 0) {
-//            return "Current account was successfully expired.";
-//        }
-//        if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
-//            return "Your balance of " + balance + " " + account.getCurrency()
-//                    + " has been frozen due to suspicious activity on your account.";
-//        }
-//
-//        return "Your remaining balance of " + balance + " " + account.getCurrency()
-//                + " can be collected by visiting your nearest branch.";
-//    }
 
 }

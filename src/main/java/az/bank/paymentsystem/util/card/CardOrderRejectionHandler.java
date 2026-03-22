@@ -41,18 +41,4 @@ public class CardOrderRejectionHandler {
                 messageSource.getMessage("cardOrderRejectionHandler.handleRejection.reason",null,locale) + reason);
     }
 
-//    public void handleRejection(CardOrderEntity orderEntity,
-//                                CustomerEntity customer,
-//                                MultiValidationException ex) {
-//        orderEntity.setStatus(OrderStatus.REJECTED);
-//        orderEntity.setRejectionReason(
-//                ex.getErrors().stream()
-//                        .map(ExceptionResponse::getMessage)
-//                        .collect(Collectors.joining(", "))
-//        );
-//        orderRateLimitService.handleRejection(customer, OrderType.CARD);
-//        cardOrderRepository.save(orderEntity);
-//        notificationService.send(customer,
-//                "Your card order request has been rejected. Reason: " + reason);
-//    }
 }

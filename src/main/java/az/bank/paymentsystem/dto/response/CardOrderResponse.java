@@ -22,19 +22,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CardOrderResponse {
-//    private Integer id;
-//    private OrderStatus status;
-//    private String rejectionReason;
-//    private String cardHolderName;
-//    private CardName cardName;
-//    private CardBrand cardBrand;
-//    private CardType cardType;
-//    private Currency currency;
-//    private Instant processedAt;
-//    private Instant createdAt;
-//    private String password;
-//    //    private CustomerEntity customer;
-//    private Integer customerId;
     private Integer id;
     private String cardholderName;
     private String cardName;

@@ -34,8 +34,4 @@ public class CurrentAccountOrderV1Controller {
                 .body(currentAccountOrderRequestService.orderCurrentAccount(customerId, request));
     }
 
-    @GetMapping("/test")
-    public String test() {
-        throw new IllegalArgumentException("Test error");
-    }
 }

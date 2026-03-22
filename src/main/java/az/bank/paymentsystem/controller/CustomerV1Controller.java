@@ -33,7 +33,6 @@ public class CustomerV1Controller {
 
     private final CustomerService customerService;
 
-    // POST /api/customers
     @PostMapping
     @Operation(summary = "Create a customer.",
             description = "Creates a new customer.")
@@ -42,7 +41,6 @@ public class CustomerV1Controller {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // GET /api/customers/{id}
     @GetMapping("/{customerId}")
     @Operation(summary = "Search customer using ID.",
             description = "Search a customer.")
@@ -51,7 +49,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(response);
     }
 
-    // GET /api/customers/deleted/{id}
     @GetMapping("/deleted/{customerId}")
     @Operation(summary = "Search deleted customer using ID.",
             description = "Search a deleted customer.")
@@ -69,7 +66,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.getCustomersByStatus(status));
     }
 
-    // GET /api/customers
     @GetMapping
     @Operation(summary = "Get all customers.",
             description = "Get all customers.")
@@ -77,7 +73,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
-    // GET /api/customers/{id}/details
     @GetMapping("/{customerId}/details")
     @Operation(summary = "Search detailed information about customer using ID.",
             description = "Search an detailed information.")
@@ -86,7 +81,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(response);
     }
 
-    // PATCH /api/customers/{id}/status
     @PatchMapping("/{customerId}/status")
     @Operation(summary = "Update customer status using ID.",
             description = "Update customer status.")
@@ -97,7 +91,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.updateCustomerStatus(customerId, status));
     }
 
-    // PATCH /api/customers/{id}
     @PatchMapping("/{customerId}")
     @Operation(summary = "Update all information of a customer using ID.",
             description = "Update all information of a customer.")
@@ -108,7 +101,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.updateCustomer(customerId, request));
     }
 
-    // DELETE /api/customers/{id}
     @DeleteMapping("/{customerId}")
     @Operation(summary = "Delete a customer using ID.",
             description = "This method makes the customer's data invisible.")
@@ -117,24 +109,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.deleteCustomer(customerId));
     }
 
-//    @GetMapping("/{customerId}/cards-with-transactions")
-//    public ResponseEntity<CardTransactionResponse> getCustomerWithCardTransactions(
-//            @PathVariable Integer customerId) {
-//        return ResponseEntity.ok(customerService.getCustomerWithCardTransactions(customerId));
-//    }
-
-//    @GetMapping("/{customerId}/cards-with-transactions")
-//    public ResponseEntity<CustomerResponse> getCustomerWithCardTransactions(
-//            @PathVariable Integer customerId) {
-//        return ResponseEntity.ok(customerService.getCustomerWithCardTransactions(customerId));
-//    }
-
-    // Controller
-//    @GetMapping("/{customerId}/cards")
-//    public ResponseEntity<List<CardForCustomerResponse>> getCustomerCards(
-//            @PathVariable Integer customerId) {
-//        return ResponseEntity.ok(customerService.getCustomerCards(customerId));
-//    }
     @GetMapping("/{customerId}/cards/{pan}/transactions")
     @Operation(summary = "Get card transactions by PAN.", description = "Returns paginated transactions for a specific card.")
     public ResponseEntity<List<TransactionResponse>> getCardTransactions(
@@ -144,11 +118,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.getCardTransactions(customerId, pan, page).getContent());
     }
 
-    //    @GetMapping("/{customerId}/accounts-with-transactions")
-//    public ResponseEntity<CustomerResponse> getCustomerWithAccountTransactions(
-//            @PathVariable Integer customerId) {
-//        return ResponseEntity.ok(customerService.getCustomerWithAccountTransactions(customerId));
-//    }
     @GetMapping("/{customerId}/accounts/{accountNumber}/transactions")
     @Operation(summary = "Get account transactions.", description = "Returns paginated transactions for a specific account.")
     public ResponseEntity<List<TransactionResponse>> getAccountTransactions(

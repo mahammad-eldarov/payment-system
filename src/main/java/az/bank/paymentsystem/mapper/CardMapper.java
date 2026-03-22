@@ -18,5 +18,4 @@ public interface CardMapper {
 
     CardOrderResponse toOrderResponse(CardEntity card);
 
-    CardForCustomerResponse toSummary(CardEntity card);
 }

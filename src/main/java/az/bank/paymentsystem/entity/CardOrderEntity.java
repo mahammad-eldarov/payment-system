@@ -32,10 +32,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "card_order")
 public class CardOrderEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
 
     @Column(name = "status", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
@@ -65,16 +61,9 @@ public class CardOrderEntity extends BaseEntity {
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customer;
 
-//    @NotNull
     @Column(name = "card_type", nullable = false, length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
     private CardType cardType;
-
-//    @Column(name = "created_at")
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
     @Size(min = 4, max = 4)
     @Pattern(regexp = "^[0-9]{4}$")

@@ -74,8 +74,6 @@ public class PaymentProcessor {
         notificationService.send(payment.getCustomer(),
                 messageSource.getMessage("paymentProcessor.markSuccess",
                         new Object[]{payment.getAmount(), payment.getCurrency()}, locale));
-//        notificationService.send(payment.getCustomer(),
-//                "Your payment of " + payment.getAmount() + " " + payment.getCurrency() + " was successful.");
     }
 
     private void markFailed(PaymentEntity payment, String reason) {
@@ -87,8 +85,5 @@ public class PaymentProcessor {
         notificationService.send(payment.getCustomer(),
                 messageSource.getMessage("paymentProcessor.markFailed",new Object[]{payment.getAmount(), payment.getCurrency()}, locale)
                         + reason);
-//        notificationService.send(payment.getCustomer(),
-//                "Your payment of " + payment.getAmount() + " " + payment.getCurrency()
-//                        + " failed. Reason: " + reason);
     }
 }

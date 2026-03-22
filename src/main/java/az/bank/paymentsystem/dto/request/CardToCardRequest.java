@@ -15,14 +15,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CardToCardRequest {
 
-//    private PaymentSystem type;
-
     @NotNull(message = "notNull.bigDecimal")
-//    @DecimalMin(value = "0.01", message = "Amount must be greater than 0.")
     private BigDecimal amount;
-
-//    @NotNull(message = "Currency cannot be null.")
-//    private Currency currency;
 
     @NotBlank(message = "notBlank.fromPan")
     private String fromPan;

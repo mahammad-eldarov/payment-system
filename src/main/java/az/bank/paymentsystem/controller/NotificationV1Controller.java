@@ -32,31 +32,5 @@ public class NotificationV1Controller {
         return ResponseEntity.ok(notificationService.getNotifications(customerId, page).getContent());
     }
 
-//    @GetMapping("/customer/{customerId}/unread-count")
-//    @Operation(summary = "Get unread count", description = "Returns unread notification count for a customer")
-//    public ResponseEntity<Long> getUnreadCount(@PathVariable Integer customerId) {
-//        return ResponseEntity.ok(notificationService.getUnreadCount(customerId));
-//    }
-//
-//    @PatchMapping("/{notificationId}/read")
-//    @Operation(summary = "Mark as read", description = "Marks a notification as read")
-//    public ResponseEntity<MessageResponse> markAsRead(@PathVariable Integer notificationId) {
-//        return ResponseEntity.ok(notificationService.markAsRead(notificationId));
-//    }
-//
-//    @PatchMapping("/customer/{customerId}/read-all")
-//    @Operation(summary = "Mark all as read", description = "Marks all notifications as read for a customer")
-//    public ResponseEntity<MessageResponse> markAllAsRead(@PathVariable Integer customerId) {
-//        return ResponseEntity.ok(notificationService.markAllAsRead(customerId));
-//    }
 }
 
-
-//@GetMapping("/card/{cardId}")
-//@Operation(summary = "Get last 100 transactions by card ID.",
-//        description = "Returns transactions where card is sender or receiver.")
-//public ResponseEntity<List<TransactionResponse>> getByCardId(
-//        @PathVariable Integer cardId,
-//        @RequestParam(required = false, defaultValue = "0") int page) {
-//    return ResponseEntity.ok(transactionService.getTransactionsByCardId(cardId, page).getContent());
-//}

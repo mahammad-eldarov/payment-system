@@ -42,18 +42,5 @@ public class CurrentAccountOrderRejectionHandler {
                 messageSource.getMessage("currentAccountOrderRejectionHandler.handleRejection.reason", null, locale) + reason);
     }
 
-//    public void handleRejection(CurrentAccountOrderEntity orderEntity,
-//                                CustomerEntity customer,
-//                                MultiValidationException ex) {
-//        orderEntity.setStatus(OrderStatus.REJECTED);
-//        orderEntity.setRejectionReason(
-//                ex.getErrors().stream()
-//                        .map(ExceptionResponse::getMessage)
-//                        .collect(Collectors.joining(", "))
-//        );
-//        orderRateLimitService.handleRejection(customer, OrderType.CURRENT_ACCOUNT);
-//        currentAccountOrderRepository.save(orderEntity);
-//    }
-
 
 }

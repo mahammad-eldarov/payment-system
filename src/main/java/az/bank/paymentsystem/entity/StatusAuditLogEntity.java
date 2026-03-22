@@ -15,10 +15,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "status_audit_log")
 public class StatusAuditLogEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
 
     @Column(name = "entity_type", length = Integer.MAX_VALUE)
     private String entityType;
@@ -34,12 +30,6 @@ public class StatusAuditLogEntity extends BaseEntity {
 
     @Column(name = "reason", length = Integer.MAX_VALUE)
     private String reason;
-
-//    @Column(name = "created_at")
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
 
 }

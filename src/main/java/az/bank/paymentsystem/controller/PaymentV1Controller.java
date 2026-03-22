@@ -26,7 +26,6 @@ public class PaymentV1Controller {
 
     private final PaymentService paymentService;
 
-    // POST /api/payments/customer/{customerId}/card-to-card
     @PostMapping("/{customerId}/card-to-card")
     @Operation(summary = "Card → Card payment.", description = "Transfer from a card PAN to another card PAN.")
     public ResponseEntity<PaymentResponse> cardToCard(
@@ -36,7 +35,6 @@ public class PaymentV1Controller {
                 .body(paymentService.cardToCard(customerId, request));
     }
 
-    // POST /api/payments/customer/{customerId}/card-to-account
     @PostMapping("/{customerId}/card-to-account")
     @Operation(summary = "Card → Account payment.", description = "Transfer from a card PAN to a current account number.")
     public ResponseEntity<PaymentResponse> cardToAccount(
@@ -46,7 +44,6 @@ public class PaymentV1Controller {
                 .body(paymentService.cardToAccount(customerId, request));
     }
 
-    // POST /api/payments/customer/{customerId}/account-to-card
     @PostMapping("/{customerId}/account-to-card")
     @Operation(summary = "Account → Card payment.", description = "Transfer from a current account number to a card PAN.")
     public ResponseEntity<PaymentResponse> accountToCard(
@@ -56,7 +53,6 @@ public class PaymentV1Controller {
                 .body(paymentService.accountToCard(customerId, request));
     }
 
-    // POST /api/payments/customer/{customerId}/account-to-account
     @PostMapping("/{customerId}/account-to-account")
     @Operation(summary = "Account → Account payment.", description = "Transfer from a current account number to another account number.")
     public ResponseEntity<PaymentResponse> accountToAccount(
@@ -66,26 +62,6 @@ public class PaymentV1Controller {
                 .body(paymentService.accountToAccount(customerId, request));
     }
 
-//    @PostMapping("/{customerId}/card-to-external")
-//    @Operation(summary = "Card → External Party payment.")
-//    public ResponseEntity<PaymentResponse> cardToExternal(
-//            @PathVariable Integer customerId,
-//            @RequestBody CardToExternalRequest request) {
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(paymentService.cardToExternal(customerId, request));
-//    }
-//
-//    @PostMapping("/{customerId}/account-to-external")
-//    @Operation(summary = "Account → External Party payment.")
-//    public ResponseEntity<PaymentResponse> accountToExternal(
-//            @PathVariable Integer customerId,
-//            @RequestBody CurrentAccountToExternalRequest request) {
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(paymentService.accountToExternal(customerId, request));
-//    }
-
-
-    // GET /api/payments/{paymentId}
     @GetMapping("/{paymentId}")
     @Operation(summary = "Get payment by ID.", description = "Returns payment details.")
     public ResponseEntity<PaymentResponse> getPaymentById(@PathVariable Integer paymentId) {

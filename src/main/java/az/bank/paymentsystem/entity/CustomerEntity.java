@@ -23,19 +23,6 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "customer")
 public class CustomerEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
-//
-//    @NotNull
-//    @ColumnDefault("now()")
-//    @Column(name = "created_at", nullable = false)
-//    private Instant createdAt;
-//
-//    //    @NotNull
-//    @Column(name = "updated_at", nullable = false)
-//    private Instant updatedAt;
 
     @NotNull
     @Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
@@ -63,23 +50,17 @@ public class CustomerEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CustomerStatus status;
 
-
-
-//    @NotNull
     @ColumnDefault("true")
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-//    @JsonIgnore
     private List<CardEntity> cardEntity;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-//    @JsonIgnore
     private List<CurrentAccountEntity> currentAccountEntity;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-//    @JsonIgnore
     private List<TransactionEntity> transactionEntity;
 
 

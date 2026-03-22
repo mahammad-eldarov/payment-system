@@ -40,31 +40,9 @@ public class CurrentAccountValidator {
 
     private final CustomerRepository customerRepository;
     private final CurrentAccountRepository currentAccountRepository;
-//    private final EntityFinderService entityFinderService;
-    private final CurrentAccountCreator currentAccountCreator;
     private final CustomerSuspiciousValidator suspiciousValidator;
-//    private final EnumParser enumParser;
     private final MessageSource messageSource;
 
-//    public void validateRequestFields(OrderCurrentAccountRequest request) {
-//        List<ExceptionResponse> errors = new ArrayList<>();
-//
-////        tryParse(() -> enumParser.parse(CardBrand.class, request.getCardBrand(), "cardBrand"), errors);
-////        tryParse(() -> enumParser.parse(CardType.class, request.getCardType(), "cardType"), errors);
-//        tryParse(() -> enumParser.parse(Currency.class, request.getCurrency(), "currency"), errors);
-//
-//        if (!errors.isEmpty()) {
-//            throw new MultiValidationException(errors);
-//        }
-//    }
-//
-//    private void tryParse(Runnable parser, List<ExceptionResponse> errors) {
-//        try {
-//            parser.run();
-//        } catch (IllegalArgumentException ex) {
-//            errors.add(new ExceptionResponse(ex.getMessage()));
-//        }
-//    }
 
     public void validateCurrentAccountOrder(Integer customerId) {
         Locale locale =  LocaleContextHolder.getLocale();
@@ -87,63 +65,6 @@ public class CurrentAccountValidator {
             throw new MultiValidationException(errors);
         }
     }
-
-//    public void process(CurrentAccountOrderEntity request) {
-//        CustomerEntity customer = request.getCustomer();
-//        List<ExceptionResponse> errors = new ArrayList<>();
-//
-//        suspiciousValidator.validate(customer, errors);
-//
-//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-//            errors.add(new ExceptionResponse(
-//                    403,
-//                    "All your operations have been suspended due to suspicious activity.",
-//                    LocalDateTime.now()
-//            ));
-//        }
-//        if (currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 3) {
-//            errors.add(new ExceptionResponse(
-//                    422,
-//                    "The customer already has 3 current accounts. A new account cannot be ordered.",
-//                    LocalDateTime.now()
-//            ));
-//        }
-//
-//        if (!errors.isEmpty()) {
-//            request.setStatus(OrderStatus.REJECTED);
-//            request.setRejectionReason(
-//                    errors.stream().map(ExceptionResponse::getMessage).collect(Collectors.joining(", "))
-//            );
-//            throw new MultiValidationException(errors);
-//        }
-//
-//        CurrentAccountEntity account = currentAccountCreator.createOrderAccount(request);
-//        currentAccountRepository.save(account);
-//        request.setStatus(OrderStatus.APPROVED);
-//        request.setUpdatedAt(Instant.now());
-//    }
-
-//    public void process(CurrentAccountOrderEntity request) {
-//        List<String> reasons = new ArrayList<>();
-//        CustomerEntity customer = request.getCustomer();
-//
-//        if (customer.getStatus() == CustomerStatus.SUSPICIOUS) {
-//            reasons.add("Customer is suspended due to suspicious activity.");
-//        }
-//        if (currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 3) {
-//            reasons.add("Current account limit exceeded.");
-//        }
-//
-//        if (!reasons.isEmpty()) {
-//            request.setStatus(OrderStatus.REJECTED);
-//            request.setRejectionReason(String.join(", ", reasons));
-//        } else {
-//            CurrentAccountEntity account = currentAccountCreator.createOrderAccount(request);
-//            currentAccountRepository.save(account);
-//            request.setStatus(OrderStatus.APPROVED);
-//            request.setUpdatedAt(Instant.now());
-//        }
-//    }
 
     public void validateDeletion(CurrentAccountEntity account) {
         Locale locale =  LocaleContextHolder.getLocale();

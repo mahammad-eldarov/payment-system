@@ -17,10 +17,6 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "fraud_blacklist")
 public class FraudBlacklistEntity extends BaseEntity{
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
 
     @NotNull
     @Column(name = "pin", nullable = false, length = Integer.MAX_VALUE)
@@ -40,13 +36,6 @@ public class FraudBlacklistEntity extends BaseEntity{
     @ColumnDefault("now()")
     @Column(name = "blacklisted_at", nullable = false)
     private Instant blacklistedAt;
-
-//    @ColumnDefault("now()")
-//    @Column(name = "created_at")
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
 
 }

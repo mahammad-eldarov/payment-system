@@ -19,18 +19,11 @@ import az.bank.paymentsystem.enums.Currency;
 @AllArgsConstructor
 public class OrderCardRequest {
 
-//    @NotNull(message = "Customer ID cannot be empty.")
-//    private Integer customerId;
-
     @NotNull(message = "notNull.cardHolderName")
     private String cardHolderName;
 
     @NotNull(message = "notNull.cardName")
     private CardName cardName;
-
-//    private OrderStatus status;
-//
-//    private String rejectionReason;
 
     @NotNull(message = "notNull.password")
     @Pattern(regexp = "^[0-9]{4}$", message = "pattern.password")
@@ -44,10 +37,6 @@ public class OrderCardRequest {
 
     @NotNull(message = "notNull.cardType")
     private CardType cardType;
-
-//    private Instant updatedAt;
-//
-//    private CustomerEntity customer;
 
 
 }

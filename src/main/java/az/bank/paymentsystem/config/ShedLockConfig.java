@@ -24,8 +24,5 @@ public class ShedLockConfig {
         );
     }
 
-//    @Bean
-//    public LockProvider lockProvider(DataSource dataSource) {
-//        return new JdbcTemplateLockProvider(dataSource);
-//    }
+
 }

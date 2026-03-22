@@ -3,6 +3,7 @@ package az.bank.paymentsystem.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Locale;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,9 +37,9 @@ public class LocaleConfig implements WebMvcConfigurer {
     public HandlerInterceptor localeHandlerInterceptor() {
         return new HandlerInterceptor() {
             @Override
-            public boolean preHandle(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     Object handler) {
+            public boolean preHandle(@NonNull HttpServletRequest request,
+                                     @NonNull HttpServletResponse response,
+                                     @NonNull Object handler) {
                 String language = request.getHeader("language");
                 if (language != null && !language.isBlank()) {
                     Locale locale = Locale.forLanguageTag(language);

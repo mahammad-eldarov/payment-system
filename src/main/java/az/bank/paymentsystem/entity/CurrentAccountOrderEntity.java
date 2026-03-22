@@ -27,10 +27,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "current_account_order")
 public class CurrentAccountOrderEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
 
     @Column(name = "status", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
@@ -45,12 +41,6 @@ public class CurrentAccountOrderEntity extends BaseEntity {
     @Column(name = "currency", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
     private Currency currency;
-
-//    @Column(name = "created_at")
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")

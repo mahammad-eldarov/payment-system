@@ -33,33 +33,11 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
     })
     List<PaymentEntity> findAllByStatus(PaymentStatus status);
 
-    Boolean existsByCustomerIdAndScheduledDateAndFromTypeIn(
-            Integer customerId,
-            LocalDate scheduledDate,
-            List<PaymentSourceType> fromTypes
-    );
 
     Boolean existsByCustomerIdAndScheduledDateAndStatus(
             Integer customerId,
             LocalDate scheduledDate,
             PaymentStatus status
     );
-
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM TransactionEntity t " +
-            "WHERE t.customer.id = :customerId " +
-            "AND t.status = az.bank.paymentsystem.enums.TransactionStatus.SUCCESS " +
-            "AND t.createdAt >= :startOfMonth " +
-            "AND t.createdAt <= :endOfMonth")
-    BigDecimal sumSuccessfulTransactionsByCustomerAndMonth(
-            @Param("customerId") Integer customerId,
-            @Param("startOfMonth") Instant startOfMonth,
-            @Param("endOfMonth") Instant endOfMonth
-    );
-
-
-
-
-
-
 
 }

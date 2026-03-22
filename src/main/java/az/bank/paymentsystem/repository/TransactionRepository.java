@@ -44,26 +44,5 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     })
     Page<TransactionEntity> findAllByPaymentId(Integer paymentId, Pageable pageable);
 
-//    Page<TransactionEntity> findAllByPaymentId(Integer paymentId, Pageable pageable);
-
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM TransactionEntity t " +
-            "WHERE t.customer.id = :customerId " +
-            "AND t.status = az.bank.paymentsystem.enums.TransactionStatus.SUCCESS " +
-            "AND t.createdAt >= :startOfMonth " +
-            "AND t.createdAt <= :endOfMonth")
-
-    BigDecimal sumByCustomerAndMonth(
-            @Param("customerId") Integer customerId,
-            @Param("startOfMonth") Instant startOfMonth,
-            @Param("endOfMonth") Instant endOfMonth
-    );
-
-//    List<TransactionEntity> findAllByPaymentId(Integer paymentId);
-
-//    List<TransactionEntity> findByFromCardId(Integer fromCardId);
-//
-//    List<TransactionEntity> findByFromAccountId(Integer fromAccountId);
 
 }
-//findByIdAndIsVisibleTrue
-//(Integer customerId);

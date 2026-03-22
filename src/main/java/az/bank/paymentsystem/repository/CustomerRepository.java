@@ -18,16 +18,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Intege
 
     Optional<CustomerEntity> findByIdAndIsVisibleFalse(Integer id);
 
-    Optional<CustomerEntity> findByEmailAndIsVisibleTrue(String email);
-
-    Optional<CustomerEntity> findByPhoneNumberAndIsVisibleTrue(String phoneNumber);
-
-    Boolean existsByEmail(String email);
-
-    Boolean existsByPhoneNumber(String phoneNumber);
-
-    Boolean existsByPin(String pin);
-
     Boolean existsByPinAndIsVisibleTrue(String pin);
 
     List<CustomerEntity> findByStatusAndIsVisibleTrue(CustomerStatus status);

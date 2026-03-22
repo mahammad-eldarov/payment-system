@@ -29,23 +29,11 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "payment")
 public class PaymentEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
-//
-//    @ColumnDefault("now()")
-//    @Column(name = "created_at", nullable = false)
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
     @NotNull
     @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-//    @Size(max = 3)
     @NotNull
     @Column(name = "currency", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
@@ -74,11 +62,11 @@ public class PaymentEntity extends BaseEntity {
     private PaymentSourceType fromType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_card_id", nullable = true)
+    @JoinColumn(name = "from_card_id")
     private CardEntity fromCard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_account_id", nullable = true)
+    @JoinColumn(name = "from_account_id")
     private CurrentAccountEntity fromAccount;
 
     @NotNull
@@ -87,26 +75,20 @@ public class PaymentEntity extends BaseEntity {
     private PaymentSourceType toType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_card_id", nullable = true)
+    @JoinColumn(name = "to_card_id")
     private CardEntity toCard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_account_id", nullable = true)
+    @JoinColumn(name = "to_account_id")
     private CurrentAccountEntity toAccount;
 
-
-
-//    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
-
     @ManyToOne
     @JoinColumn(name = "to_external_party_id")
     private ExternalPartyEntity toExternalParty;
-
-//    private boolean toExternal = false;
 
 
 }

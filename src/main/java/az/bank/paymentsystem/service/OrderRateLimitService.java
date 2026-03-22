@@ -46,7 +46,6 @@ public class OrderRateLimitService {
 
         if (newCount >= 3) {
             limit.setCooldownUntil(Instant.now().plus(Duration.ofHours(1)));
-//            limit.setCooldownUntil(Instant.now().plus(Duration.ofSeconds(10)));
         }
 
         orderRateLimitRepository.save(limit);

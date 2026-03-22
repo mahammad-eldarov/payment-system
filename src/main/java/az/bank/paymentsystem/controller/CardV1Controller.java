@@ -31,18 +31,6 @@ public class CardV1Controller {
 
     private final CardService cardService;
 
-    // POST /api/cards/order/{customerId}
-//    @PostMapping("/order/{customerId}")
-//    @Operation(summary = "Create a card.", description = "Creates a new card.")
-//    public ResponseEntity<CardResponse> orderCard(
-//            @PathVariable Integer customerId,
-//            @Valid @RequestBody OrderCardRequest request) {
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(cardService.orderCard(customerId, request));
-//    }
-
-
-    // PATCH /api/cards/{id}/status
     @PatchMapping("/{cardId}/status")
     @Operation(summary = "Update card status using ID.",
             description = "Update card status.")
@@ -64,7 +52,6 @@ public class CardV1Controller {
 
     }
 
-    // DELETE /api/cards/{id}/cancel
     @DeleteMapping("/{cardId}/delete")
     @Operation(summary = "Delete a card.",
             description = "Delete a card using card id.")
@@ -73,7 +60,6 @@ public class CardV1Controller {
         return ResponseEntity.ok(cardService.deleteCard(cardId));
     }
 
-    // GET /api/cards/customer/{customerId}
     @GetMapping("/customer/{customerId}")
     @Operation(summary = "Search card using ID.",
             description = "Search a card.")
@@ -82,7 +68,6 @@ public class CardV1Controller {
         return ResponseEntity.ok(cardService.getCardsByCustomerId(customerId));
     }
 
-    // GET /api/cards/{pan}
     @GetMapping("/{pan}")
     @Operation(summary = "Search card using PAN.",
             description = "Search a card pan.")

@@ -40,7 +40,6 @@ public class CardService {
     private final StatusAuditLogger statusAuditLogger;
     private final MessageSource messageSource;
 
-    // DELETE
     public MessageResponse deleteCard(Integer cardId) {
         Locale locale =  LocaleContextHolder.getLocale();
         CardEntity card = findActiveCard(cardId);
@@ -55,8 +54,6 @@ public class CardService {
         cardRepository.save(card);
         return new MessageResponse("cardService.deleteCard.cardClosedSuccessfully");
     }
-
-    // UPDATE
 
     @Transactional
     public void updateExpiredCards() {
@@ -93,7 +90,6 @@ public class CardService {
         return new MessageResponse(messageSource.getMessage("cardService.updateCardPassword.updateResponse",null,locale));
     }
 
-    // GET
     public List<CardResponse> getCardsByCustomerId(Integer customerId) {
         Locale locale = LocaleContextHolder.getLocale();
         findActiveCustomer(customerId);
@@ -119,7 +115,6 @@ public class CardService {
         return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
     }
 
-    // AUXILIARY METHODS
     public CardEntity findActiveCard(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
         return cardRepository.findByIdAndIsVisibleTrue(id)

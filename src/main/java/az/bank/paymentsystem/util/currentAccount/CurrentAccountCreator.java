@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 public class CurrentAccountCreator {
 
     private final AccountNumberGenerator accountNumberGenerator;
-//    private final EnumParser enumParser;
 
     public CurrentAccountEntity createOrderAccount(OrderCurrentAccountRequest request,
                                               CustomerEntity customer) {
@@ -31,9 +30,6 @@ public class CurrentAccountCreator {
         account.setCurrentAccountHolderName(request.getCurrentAccountHolderName());
         account.setBalance(BigDecimal.ZERO);
         account.setCurrency(request.getCurrency());
-//        account.setCurrency(Currency.valueOf(request.getCurrency().trim().toUpperCase()));
-//        account.setCurrency(Currency.valueOf(request.getCurrency().toUpperCase()));
-//        account.setCurrency(enumParser.parse(Currency.class, request.getCurrency(), "currency"));
         account.setStatus(CurrentAccountStatus.ACTIVE);
         account.setActivationDate(LocalDate.now());
         account.setExpiryDate(LocalDate.now().plusYears(5));
@@ -49,24 +45,8 @@ public class CurrentAccountCreator {
         entity.setCustomer(customer);
         entity.setStatus(OrderStatus.PENDING);
         entity.setCurrency(request.getCurrency());
-//        entity.setCurrency(Currency.valueOf(request.getCurrency().trim().toUpperCase()));
-//        entity.setCurrency(Currency.valueOf(request.getCurrency().toUpperCase()));
-//        entity.setCurrency(enumParser.parse(Currency.class, request.getCurrency(), "currency"));
         entity.setCreatedAt(Instant.now());
         return entity;
     }
-
-//    private <T extends Enum<T>> T parseEnum(Class<T> enumClass, String value, String fieldName) {
-//        try {
-//            return Enum.valueOf(enumClass, value.trim().toUpperCase());
-//        } catch (IllegalArgumentException ex) {
-//            String allowed = Arrays.stream(enumClass.getEnumConstants())
-//                    .map(Enum::name)
-//                    .collect(Collectors.joining(", "));
-//            throw new IllegalArgumentException(
-//                    "Invalid " + fieldName + ": '" + value + "'. Allowed values: " + allowed
-//            );
-//        }
-//    }
 
 }

@@ -22,8 +22,6 @@ public class CustomerResponse {
     private String email;
     private String phoneNumber;
     private CustomerStatus status;
-//    private Instant createdAt;
-//    private Instant updatedAt;
 
     private String cardMessage;
     private String accountMessage;

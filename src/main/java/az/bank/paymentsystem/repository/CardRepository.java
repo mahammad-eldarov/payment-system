@@ -13,17 +13,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface CardRepository extends JpaRepository<CardEntity, Integer> {
 
-    //    @Query("SELECT c FROM CardEntity c WHERE c.customer.id = :customerId")
     List<CardEntity> findCardsByCustomerId(Integer customerId);
-
-    //    List<CardEntity> findByCustomerForCard(@Param("customerId") Integer customerId);
-    List<CardEntity> findCardsByCustomerIdAndIsVisibleTrue(Integer customerId);
 
     @EntityGraph(attributePaths = {"customer"})
     Optional<CardEntity> findByIdAndIsVisibleTrue(Integer id);
 
-    @EntityGraph(attributePaths = {"customer"})
-    List<CardEntity> findAllByCustomerIdAndIsVisibleTrue(Integer customerId);
 
     Integer countByCustomerIdAndIsVisibleTrue(Integer customerId);
 
@@ -38,8 +32,6 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
     List<CardEntity> findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate date, CardStatus status);
 
     List<CardEntity> findByStatusAndIsVisibleTrue(CardStatus status);
-
-    List<CardEntity> findByStatusAndIsVisibleFalse(CardStatus status);
 
     @Query("SELECT c FROM CardEntity c WHERE c.customer.id = :customerId AND c.isVisible = true AND c.balance >= :amount ORDER BY c.balance ASC LIMIT 1")
     Optional<CardEntity> findSufficientCard(@Param("customerId") Integer customerId, @Param("amount") BigDecimal amount);

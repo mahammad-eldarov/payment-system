@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StatusAuditLogRepository extends JpaRepository <StatusAuditLogEntity, Integer> {
-//    List<StatusAuditLogEntity> findByEntityTypeAndEntityIdOrderByCreatedAtDesc(String entityType, Integer entityId);
     Page<StatusAuditLogEntity> findByEntityTypeAndEntityIdOrderByCreatedAtDesc(
             String entityType, Integer entityId, Pageable pageable);
 

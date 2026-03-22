@@ -17,27 +17,14 @@ import az.bank.paymentsystem.enums.TransactionStatus;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionResponse {
 
-//    private Integer paymentId;
-//    private Integer customerId;
-//    private BigDecimal amount;
-//    private Currency currency;
-//    private TransactionType transactionType;
-//    private TransactionStatus status;
-////    private PaymentSourceType fromType;
-//    private Integer fromCardId;
-//    private Integer fromAccountId;
-////    private PaymentSourceType toType;
-//    private Integer toCardId;
-//    private Integer toAccountId;
-//    private String description;
     private Integer paymentId;
     private String customerName;
     private BigDecimal amount;
     private Currency currency;
     private TransactionType transactionType;
     private TransactionStatus status;
-    private String paidBy;    // pan və ya accountNumber
-    private String enrollTo;  // pan və ya accountNumber
+    private String paidBy;
+    private String enrollTo;
     private String description;
 
 }

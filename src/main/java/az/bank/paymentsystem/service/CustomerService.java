@@ -36,8 +36,6 @@ public class CustomerService {
     private final CustomerCreator customerCreator;
     private final MessageSource messageSource;
 
-
-    //Create
     public CustomerShortResponse createCustomer(CreateCustomerRequest request) {
         CustomerEntity customer = customerCreator.createCustomer(request);
         customerRepository.save(customer);
@@ -47,8 +45,6 @@ public class CustomerService {
         response.setPin(request.getPin());
         return response;
     }
-
-    // GET
 
     public CustomerShortResponse getCustomerById(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
@@ -102,41 +98,16 @@ public class CustomerService {
         return response;
     }
 
-    // CustomerService
-//    public List<CardForCustomerResponse> getCustomerCards(Integer customerId) {
-//        findActiveCustomer(customerId);
-//        return customerResponseBuilder.buildCardSummaries(customerId);
-//    }
-
-    // Müştərinin kartlarını tranzaksiyalarla birlikdə gətirir
     public Page<TransactionResponse> getCardTransactions(Integer customerId, String pan, int page) {
         findActiveCustomer(customerId);
         return customerResponseBuilder.buildCardTransactions(customerId, pan, page);
     }
 
-//    public CustomerResponse getCustomerWithCardTransactions(Integer customerId) {
-//        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
-//        customerResponseBuilder.setCardTransactions(response, customerId);
-//        return response;
-//    }
-
-    // Müştərinin cari hesablarını tranzaksiyalarla birlikdə gətirir
-//    public CustomerResponse getCustomerWithAccountTransactions(Integer customerId) {
-//        CustomerResponse response = customerMapper.toResponse(findActiveCustomer(customerId));
-//        customerResponseBuilder.setAccountTransactions(response, customerId);
-//        return response;
-//    }
-//    public List<CurrentAccountForCustomerResponse> getCustomerAccounts(Integer customerId) {
-//        findActiveCustomer(customerId);
-//        return customerResponseBuilder.buildAccountSummaries(customerId);
-//    }
 
     public Page<TransactionResponse> getAccountTransactions(Integer customerId, String accountNumber, int page) {
         findActiveCustomer(customerId);
         return customerResponseBuilder.buildAccountTransactions(customerId, accountNumber, page);
     }
-
-    // UPDATE
 
     public MessageResponse updateCustomerStatus(Integer id, CustomerStatus status) {
         Locale locale = LocaleContextHolder.getLocale();
@@ -173,8 +144,6 @@ public class CustomerService {
         return new MessageResponse(messageSource.getMessage("customerService.updateCustomer.statusUpdatedSuccessfully", null, locale));
     }
 
-    // DELETE
-
     public MessageResponse deleteCustomer(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -185,8 +154,6 @@ public class CustomerService {
         return new MessageResponse(messageSource.getMessage("customerService.deleteCustomer.customerDeleted", null, locale));
     }
 
-
-    // Auxiliary method
     public CustomerEntity findActiveCustomer(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
 

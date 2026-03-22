@@ -22,10 +22,6 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "external_party")
 public class ExternalPartyEntity extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
 
     @Size(max = 10)
     @NotNull
@@ -66,13 +62,6 @@ public class ExternalPartyEntity extends BaseEntity {
     @NotNull
     @Column(name = "source_type", nullable = false, length = 20)
     private String sourceType;
-
-//    @ColumnDefault("now()")
-//    @Column(name = "created_at")
-//    private Instant createdAt;
-//
-//    @Column(name = "updated_at")
-//    private Instant updatedAt;
 
 
 }

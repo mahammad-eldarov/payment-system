@@ -15,5 +15,4 @@ public interface CurrentAccountMapper {
 
     CurrentAccountOrderResponse toOrderResponse(CurrentAccountEntity account);
 
-    CurrentAccountForCustomerResponse toSummary (CurrentAccountEntity account);
 }

@@ -3,6 +3,7 @@ package az.bank.paymentsystem.exception;
 import az.bank.paymentsystem.exception.base.ForbiddenException;
 import az.bank.paymentsystem.exception.base.TooManyRequestsException;
 import az.bank.paymentsystem.exception.base.UnprocessableContentException;
+import jakarta.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import az.bank.paymentsystem.exception.base.BadRequestException;
@@ -33,39 +34,22 @@ public class GlobalExceptionHandler {
         this.messageSource = messageSource;
     }
 
-//    // Exception 204
-//    @ExceptionHandler(EmptyListException.class)
-//    public ResponseEntity<Void> handleEmptyList(EmptyListException ex) {
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-//                .body(new ExceptionResponse(204, ex.getMessage(), LocalDateTime.now()));
-//
-//    }
-
-
-    // Exception 400
-
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequest(BadRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ExceptionResponse(400, ex.getMessage(), LocalDateTime.now()));
     }
-
-    // Exception 403
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequest(ForbiddenException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ExceptionResponse(403, ex.getMessage(), LocalDateTime.now()));
     }
 
-    // Exception 404
-
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleNotFound(NotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ExceptionResponse(404, ex.getMessage(), LocalDateTime.now()));
     }
-
-    // Exception 405
 
     @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ExceptionResponse> handleMethodNotSupported(org.springframework.web.HttpRequestMethodNotSupportedException ex) {
@@ -77,15 +61,11 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(405, message, LocalDateTime.now()));
     }
 
-    // Exception 409
-
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ExceptionResponse> handleConflict(ConflictException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ExceptionResponse(409, ex.getMessage(), LocalDateTime.now()));
     }
-
-    // Exception 410
 
     @ExceptionHandler(GoneException.class)
     public ResponseEntity<ExceptionResponse> handleGone(GoneException ex) {
@@ -93,15 +73,11 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(410, ex.getMessage(), LocalDateTime.now()));
     }
 
-    // Exception 422
-
     @ExceptionHandler(UnprocessableContentException.class)
     public ResponseEntity<ExceptionResponse> handleUnprocessableEntity(UnprocessableContentException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
                 .body(new ExceptionResponse(422, ex.getMessage(), LocalDateTime.now()));
     }
-
-    // Exception 429
 
     @ExceptionHandler(TooManyRequestsException.class)
     public ResponseEntity<ExceptionResponse> handleTooManyRequest(TooManyRequestsException ex) {
@@ -109,27 +85,10 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(429, ex.getMessage(), LocalDateTime.now()));
     }
 
-    // MultiValidation
-
     @ExceptionHandler(MultiValidationException.class)
     public ResponseEntity<List<ExceptionResponse>> handleMultiValidation(MultiValidationException ex) {
         return ResponseEntity.unprocessableContent().body(ex.getErrors());
     }
-
-//    @ExceptionHandler(IllegalArgumentException.class)
-//    public ResponseEntity<ExceptionResponse> handleIllegalArgument(IllegalArgumentException ex) {
-//        return ResponseEntity.badRequest()
-//                .body(new ExceptionResponse(ex.getMessage()));
-//    }
-
-//    @ExceptionHandler(IllegalArgumentException.class)
-//    public ResponseEntity<ExceptionResponse> handleValidationException(IllegalArgumentException ex) {
-//        return ResponseEntity
-//                .badRequest()
-//                .body(new ExceptionResponse(400, ex.getMessage(), LocalDateTime.now()));
-//    }
-
-    // JSON formatını və ya enumları səhv yazsan bu exception həmin xətanı tutacaq.
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
@@ -156,8 +115,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(new ExceptionResponse(400, message, LocalDateTime.now()));
     }
-
-    // Customer status update edərkən Statusundakı xətaları tutur.
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentTypeMismatch(
@@ -196,50 +153,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exceptionResponse,HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "An unexpected error occurred: ",
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+    }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ExceptionResponse> handleValidationException(MethodArgumentNotValidException ex) {
-//        String message = ex.getBindingResult().getFieldErrors().stream()
-//                .map(FieldError::getDefaultMessage)
-//                .collect(Collectors.joining(", "));
-//
-//        return ResponseEntity.badRequest().body(new ExceptionResponse(400, message, LocalDateTime.now()));
-//    }
-
-    // Exception 500 and Custom other exceptions
-
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex) {
-//        ExceptionResponse exceptionResponse = new ExceptionResponse(
-//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                "An unexpected error occurred: ",
-//                LocalDateTime.now()
-//        );
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
-//    }
-
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ExceptionResponse> handleException(MethodArgumentNotValidException methodArgumentNotValidException) {
-//        ExceptionResponse exceptionResponse = new ExceptionResponse();
-//        exceptionResponse.setMessage(methodArgumentNotValidException.getMessage());
-//        exceptionResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-//        exceptionResponse.setTimestamp(LocalDateTime.now());
-//        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
-//    }
-
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ExceptionResponse> handleValidationException(MethodArgumentNotValidException ex) {
-//        return ResponseEntity
-//                .badRequest()
-//                .body(new ExceptionResponse(400, ex.getMessage(), LocalDateTime.now()));
-//    }
-
-
-//    @ExceptionHandler(ValidationException.class)
-//    public ResponseEntity<ExceptionResponse> handleValidationException(ValidationException validationException) {
-//        return ResponseEntity
-//                .badRequest()
-//                .body(new ExceptionResponse(400, validationException.getMessage(), LocalDateTime.now()));
-//    }
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationException(ValidationException validationException) {
+        return ResponseEntity
+                .badRequest()
+                .body(new ExceptionResponse(400, validationException.getMessage(), LocalDateTime.now()));
+    }
 
 }
