@@ -11,9 +11,9 @@ import az.bank.paymentsystem.exception.base.ConflictException;
 import az.bank.paymentsystem.exception.base.GoneException;
 import az.bank.paymentsystem.exception.base.NotFoundException;
 import java.util.Locale;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -27,12 +27,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
     private final MessageSource messageSource;
-
-    public GlobalExceptionHandler(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequest(BadRequestException ex) {
@@ -92,7 +89,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
-        String message = "Invalid JSON format - check syntax";
+        Locale locale = LocaleContextHolder.getLocale();
+        String message = messageSource.getMessage("globalExceptionHandler.handleHttpMessageNotReadable.invalidJson", null, locale);
 
         Throwable cause = ex.getCause();
         while (cause != null && !(cause instanceof InvalidFormatException)) {
@@ -100,16 +98,21 @@ public class GlobalExceptionHandler {
         }
 
         if (cause instanceof InvalidFormatException invalidFormatException) {
-            String field = invalidFormatException.getPath().isEmpty() ? "unknown" : invalidFormatException.getPath().get(invalidFormatException.getPath().size() - 1).getPropertyName();
+            String field = invalidFormatException.getPath().isEmpty()
+                    ? messageSource.getMessage("globalExceptionHandler.handleHttpMessageNotReadable.unknownField", null, locale)
+                    : invalidFormatException.getPath().get(invalidFormatException.getPath().size() - 1).getPropertyName();
             String value = String.valueOf(invalidFormatException.getValue());
 
             if (invalidFormatException.getTargetType().isEnum()) {
                 String allowed = Arrays.stream(invalidFormatException.getTargetType().getEnumConstants())
                         .map(Object::toString)
                         .collect(Collectors.joining(", "));
-                message = "Invalid value '%s' for field '%s'. Allowed values: %s".formatted(value, field, allowed);
+
+                String template = messageSource.getMessage("globalExceptionHandler.handleHttpMessageNotReadable.enumError", null, locale);
+                message = template.formatted(value, field, allowed);
             } else {
-                message = "Invalid value '%s' for field '%s'".formatted(value, field);
+                String template = messageSource.getMessage("globalExceptionHandler.handleHttpMessageNotReadable.generalError", null, locale);
+                message = template.formatted(value, field);
             }
         }
 
@@ -119,16 +122,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException ex) {
+        Locale locale = LocaleContextHolder.getLocale();
 
-        String message = String.format("Invalid value '%s' for parameter '%s'",
-                ex.getValue(), ex.getName());
+        String message = messageSource.getMessage("globalExceptionHandler.handleMethodArgumentTypeMismatch.error", null, locale)
+                .formatted(ex.getValue(), ex.getName());
 
         Class<?> requiredType = ex.getRequiredType();
         if (requiredType != null && requiredType.isEnum()) {
             String allowedValues = Arrays.stream(requiredType.getEnumConstants())
                     .map(Object::toString)
                     .collect(Collectors.joining(", "));
-            message += ". Allowed values: " + allowedValues;
+            message += messageSource.getMessage("globalExceptionHandler.handleMethodArgumentTypeMismatch.allowedValues", new Object[]{allowedValues}, locale);
         }
 
         return ResponseEntity.badRequest().body(
@@ -155,9 +159,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex) {
+        Locale locale  = LocaleContextHolder.getLocale();
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "An unexpected error occurred: ",
+                messageSource.getMessage("globalExceptionHandler.handleGenericException", null, locale),
                 LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);

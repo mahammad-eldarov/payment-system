@@ -7,7 +7,10 @@ import az.bank.paymentsystem.exception.CardOrderCooldownException;
 import az.bank.paymentsystem.repository.OrderRateLimitRepository;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,8 +18,10 @@ import org.springframework.stereotype.Service;
 public class OrderRateLimitService {
 
     private final OrderRateLimitRepository orderRateLimitRepository;
+    private final MessageSource messageSource;
 
     public void checkCooldown(CustomerEntity customer, OrderType orderType) {
+        Locale locale = LocaleContextHolder.getLocale();
         orderRateLimitRepository.findByCustomerIdAndOrderType(customer.getId(), orderType)
                 .ifPresent(limit -> {
                     if (limit.getCooldownUntil() != null &&
@@ -25,7 +30,7 @@ public class OrderRateLimitService {
                                 Instant.now(), limit.getCooldownUntil()
                         ).toMinutes();
                         throw new CardOrderCooldownException(
-                                "Too many rejected attempts. Please try again in " + minutesLeft + " minutes."
+                                messageSource.getMessage("orderRateLimitService.checkCooldown",new Object[]{minutesLeft},locale)
                         );
                     }
                     if (limit.getCooldownUntil() != null &&

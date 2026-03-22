@@ -38,7 +38,7 @@ public class CardOrderRejectionHandler {
         orderRateLimitService.handleRejection(customer, OrderType.CARD);
         cardOrderRepository.save(orderEntity);
         notificationService.send(customer,
-                messageSource.getMessage("cardOrderRejectionHandler.handleRejection.reason",null,locale) + reason);
+                messageSource.getMessage("cardOrderRejectionHandler.handleRejection.reason",new Object[]{reason},locale));
     }
 
 }

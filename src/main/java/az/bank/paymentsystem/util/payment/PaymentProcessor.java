@@ -48,7 +48,7 @@ public class PaymentProcessor {
                     .map(ExceptionResponse::getMessage).toList()));
             transactionCreator.create(payment, TransactionStatus.FAILED);
         } catch (Exception e) {
-            markFailed(payment, messageSource.getMessage("paymentProcessor.process.unexpectedError",null, locale) + e.getMessage());
+            markFailed(payment, messageSource.getMessage("paymentProcessor.process.unexpectedError",new Object[]{e.getMessage()}, locale));
             transactionCreator.create(payment, TransactionStatus.FAILED);
         }
         paymentRepository.save(payment);
