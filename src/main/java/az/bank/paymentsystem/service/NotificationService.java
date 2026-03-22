@@ -43,7 +43,7 @@ public class NotificationService {
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
         Page<NotificationEntity> notifications = notificationRepository
                 .findByCustomerIdOrderByCreatedAtDesc(customerId, pageable);
-        if (notifications.isEmpty()) throw new EmptyListException("No notifications found.");
+        if (notifications.isEmpty()) throw new EmptyListException("notificationService.getNotifications.notificationNotFound");
 
         List<NotificationEntity> unread = notifications.getContent().stream()
                 .filter(n -> !n.getIsRead()).toList();

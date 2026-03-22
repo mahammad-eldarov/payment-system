@@ -15,10 +15,10 @@ public class OrderCurrentAccountRequest {
 //    @NotNull(message = "Customer ID cannot be empty.")
 //    private Integer customerId;
 
-    @NotNull(message = "Currency cannot be empty.")
+    @NotNull(message = "notNull.currency")
     private Currency currency;
 
-    @NotNull(message = "Current account holder name cannot be empty.")
+    @NotNull(message = "notNull.currentAccountHolderName")
     private String currentAccountHolderName;
 
 

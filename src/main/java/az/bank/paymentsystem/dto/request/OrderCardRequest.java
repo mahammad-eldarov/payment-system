@@ -22,27 +22,27 @@ public class OrderCardRequest {
 //    @NotNull(message = "Customer ID cannot be empty.")
 //    private Integer customerId;
 
-    @NotNull(message = "Cardholder name cannot be empty.")
+    @NotNull(message = "notNull.cardHolderName")
     private String cardHolderName;
 
-    @NotNull(message = "Card name cannot be empty.")
+    @NotNull(message = "notNull.cardName")
     private CardName cardName;
 
 //    private OrderStatus status;
 //
 //    private String rejectionReason;
 
-    @NotNull(message = "Password cannot be empty.")
-    @Pattern(regexp = "^[0-9]{4}$", message = "Password must be exactly 4 digits")
+    @NotNull(message = "notNull.password")
+    @Pattern(regexp = "^[0-9]{4}$", message = "pattern.password")
     private String password;
 
-    @NotNull(message = "Currency cannot be empty.")
+    @NotNull(message = "notNull.currency")
     private Currency currency;
 
-    @NotNull(message = "Card brand cannot be empty.")
+    @NotNull(message = "notNull.cardBrand")
     private CardBrand cardBrand;
 
-    @NotNull(message = "Card type cannot be empty.")
+    @NotNull(message = "notNull.cardType")
     private CardType cardType;
 
 //    private Instant updatedAt;

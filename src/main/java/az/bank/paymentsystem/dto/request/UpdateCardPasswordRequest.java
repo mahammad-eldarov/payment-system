@@ -12,8 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateCardPasswordRequest {
-    @NotNull(message = "Password cannot be empty.")
-    @Pattern(regexp = "^[0-9]{4}$", message = "Password must be exactly 4 digits")
+    @NotNull(message = "notNull.password")
+    @Pattern(regexp = "^[0-9]{4}$", message = "pattern.password")
     private String password;
 
 }

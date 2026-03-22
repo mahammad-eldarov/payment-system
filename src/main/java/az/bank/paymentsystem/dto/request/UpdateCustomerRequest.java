@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.dto.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,13 +14,17 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateCustomerRequest {
 
+    @NotBlank(message = "notBlank.name")
     private String name;
 
+    @NotBlank(message = "notBlank.surname")
     private String surname;
 
-    @Email(message = "Email must be valid")
+    @NotBlank(message = "notBlank.email")
+    @Email(message = "The email format is incorrect.")
     private String email;
 
-    @Pattern(regexp = "^\\+994[0-9]{9}$", message = "The phone number format should be like this (+994XXXXXXXXX).")
+    @NotBlank(message = "notBlank.phoneNumber")
+    @Pattern(regexp = "^\\+994[0-9]{9}$", message = "pattern.phoneNumber")
     private String phoneNumber;
 }

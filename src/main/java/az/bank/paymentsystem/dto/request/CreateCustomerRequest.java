@@ -12,21 +12,21 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CreateCustomerRequest {
 
-    @NotBlank(message = "Name cannot be empty.")
+    @NotBlank(message = "notBlank.name")
     private String name;
 
-    @NotBlank(message = "Surname cannot be empty.")
+    @NotBlank(message = "notBlank.surname")
     private String surname;
 
-    @NotBlank(message = "Pin cannot be empty.")
+    @NotBlank(message = "notBlank.pin")
     private String pin;
 
-    @NotBlank(message = "Email cannot be empty.")
-    @Email(message = "The email format is incorrect.")
+    @NotBlank(message = "notBlank.email")
+    @Email(message = "email.message")
     private String email;
 
-    @NotBlank(message = "Phone number cannot be empty.")
-    @Pattern(regexp = "^\\+994[0-9]{9}$", message = "The phone number format should be like this (+994XXXXXXXXX).")
+    @NotBlank(message = "notBlank.phoneNumber")
+    @Pattern(regexp = "^\\+994[0-9]{9}$", message = "pattern.phoneNumber")
     private String phoneNumber;
 
 }

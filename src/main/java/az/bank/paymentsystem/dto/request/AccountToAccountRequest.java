@@ -17,17 +17,17 @@ public class AccountToAccountRequest {
 
 //    private PaymentSystem type;
 
-    @NotNull(message = "Amount cannot be null.")
+    @NotNull(message = "notNull.bigDecimal")
 //    @DecimalMin(value = "0.01", message = "Amount must be greater than 0.")
     private BigDecimal amount;
 
 //    @NotNull(message = "Currency cannot be null.")
 //    private Currency currency;
 
-    @NotBlank(message = "fromAccountNumber cannot be blank.")
+    @NotBlank(message = "notBlank.fromAccountNumber")
     private String fromAccountNumber;
 
-    @NotBlank(message = "toAccountNumber cannot be blank.")
+    @NotBlank(message = "notBlank.toAccountNumber")
     private String toAccountNumber;
 
 

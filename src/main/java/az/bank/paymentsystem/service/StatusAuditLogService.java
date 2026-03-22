@@ -37,7 +37,7 @@ public class StatusAuditLogService {
         Page<StatusAuditLogEntity> logs = statusAuditLogRepository
                 .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CARD", cardId, pageable);
 
-        if (logs.isEmpty()) throw new EmptyListException("No status changes found for this card.");
+        if (logs.isEmpty()) throw new EmptyListException("statusAuditLogService.getCardHistory.cardStatusChanged");
 
 
         return logs.map(statusAuditLogMapper::toResponse);
@@ -52,7 +52,7 @@ public class StatusAuditLogService {
         Page<StatusAuditLogEntity> logs = statusAuditLogRepository
                 .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("ACCOUNT", accountId, pageable);
 
-        if (logs.isEmpty()) throw new EmptyListException("No status changes found for this current account.");
+        if (logs.isEmpty()) throw new EmptyListException("statusAuditLogService.getAccountHistory.accountStatusChanged");
 
         return logs.map(statusAuditLogMapper::toResponse);
     }
@@ -65,29 +65,29 @@ public class StatusAuditLogService {
         Page<StatusAuditLogEntity> logs = statusAuditLogRepository
                 .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("CUSTOMER", customerId, pageable);
 
-        if (logs.isEmpty()) throw new EmptyListException("No status changes found for this customer.");
+        if (logs.isEmpty()) throw new EmptyListException("statusAuditLogService.getCustomerHistory.customerStatusChanged");
 
         return logs.map(statusAuditLogMapper::toResponse);
 
     }
 
     private Pageable buildPageable(int page) {
-        if (page < 1) throw new PageRequestException("Page number must be at least 1");
+        if (page < 1) throw new PageRequestException("statusAuditLogService.buildPageable.pageNumber");
         return PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
     }
 
     public void findActiveCard(Integer id) {
         cardRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+                .orElseThrow(() -> new CardNotFoundException("statusAuditLogService.findActiveCard.cardNotFound"));
     }
 
     public void findActiveCustomer(Integer id) {
         customerRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+                .orElseThrow(() -> new CustomerNotFoundException("statusAuditLogService.findActiveCustomer.customerNotFound"));
     }
 
     public void findActiveAccount(Integer id) {
         currentAccountRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new AccountNotFoundException("Current account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("statusAuditLogService.findActiveAccount.accountNotFound"));
     }
 }
