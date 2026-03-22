@@ -12,7 +12,10 @@ import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.repository.NotificationRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +29,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final CustomerService customerService;
+    private final MessageSource messageSource;
 
     public void send(CustomerEntity customer, String message) {
         NotificationEntity notification = new NotificationEntity();
@@ -37,13 +41,14 @@ public class NotificationService {
     }
 
     public Page<NotificationResponse> getNotifications(Integer customerId, int page) {
+        Locale locale = LocaleContextHolder.getLocale();
 //        customerRepository.findByIdAndIsVisibleTrue(customerId)
 //                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
         customerService.findActiveCustomer(customerId);
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
         Page<NotificationEntity> notifications = notificationRepository
                 .findByCustomerIdOrderByCreatedAtDesc(customerId, pageable);
-        if (notifications.isEmpty()) throw new EmptyListException("notificationService.getNotifications.notificationNotFound");
+        if (notifications.isEmpty()) throw new EmptyListException(messageSource.getMessage("notificationService.getNotifications.notificationNotFound", null, locale));
 
         List<NotificationEntity> unread = notifications.getContent().stream()
                 .filter(n -> !n.getIsRead()).toList();

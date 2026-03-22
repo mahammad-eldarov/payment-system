@@ -5,6 +5,7 @@ import az.bank.paymentsystem.dto.response.TransactionResponse;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.mapper.CustomerMapper;
 import az.bank.paymentsystem.util.customer.CustomerCreator;
 import az.bank.paymentsystem.util.customer.CustomerResponseBuilder;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,7 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
     private final CustomerResponseBuilder customerResponseBuilder;
     private final CustomerCreator customerCreator;
+    private final MessageSource messageSource;
 
 
     //Create
@@ -47,27 +51,30 @@ public class CustomerService {
     // GET
 
     public CustomerShortResponse getCustomerById(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
 
         Optional<CustomerEntity> activeCustomer = customerRepository.findByIdAndIsVisibleTrue(id);
         if (activeCustomer.isPresent()) {
             return customerMapper.toShortResponse(activeCustomer.get());
         }
         if (customerRepository.findByIdAndIsVisibleFalse(id).isPresent()) {
-            throw new CustomerDeletedException("customerService.getCustomerById.customerDeleted");
+            throw new CustomerDeletedException(messageSource.getMessage("customerService.getCustomerById.customerDeleted", null, locale));
         }
-        throw new CustomerNotFoundException("customerService.getCustomerById.customerNotFound");
+        throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomerById.customerNotFound",null, locale));
     }
 
     public List<CustomerShortResponse> getCustomersByStatus(CustomerStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
 
         if (!activeCustomers.isEmpty()) {
             return activeCustomers.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
         }
         if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
-            throw new CustomerDeletedException("customerService.getCustomersByStatus.customerDeletedStatus");
+            throw new CustomerDeletedException(messageSource.getMessage("customerService.getCustomersByStatus.customerDeletedStatus", null, locale));
         }
-        throw new CustomerNotFoundException("customerService.getCustomersByStatus.customerNotFoundStatus");
+        throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomersByStatus.customerNotFoundStatus", null, locale));
     }
 
     public CustomerResponse getDeletedCustomerById(Integer id) {
@@ -78,10 +85,12 @@ public class CustomerService {
     }
 
     public List<CustomerShortResponse> getAllCustomers() {
+        Locale locale = LocaleContextHolder.getLocale();
+
         List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
 
         if (activeCustomer.isEmpty()) {
-            throw new EmptyListException("customerService.getAllCustomers.listEmpty");
+            throw new EmptyListException(messageSource.getMessage("customerService.getAllCustomers.listEmpty", null, locale));
         }
 
         return activeCustomer.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
@@ -130,14 +139,18 @@ public class CustomerService {
     // UPDATE
 
     public MessageResponse updateCustomerStatus(Integer id, CustomerStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         CustomerEntity customer = findActiveCustomer(id);
         customer.setStatus(status);
         customer.setUpdatedAt(Instant.now());
         customerRepository.save(customer);
-        return new MessageResponse("customerService.updateCustomerStatus.statusUpdated");
+        return new MessageResponse(messageSource.getMessage("customerService.updateCustomerStatus.statusUpdated", null, locale));
     }
 
     public MessageResponse updateCustomer(Integer id, UpdateCustomerRequest request) {
+        Locale locale = LocaleContextHolder.getLocale();
+
 
         CustomerEntity customer = findActiveCustomer(id);
 
@@ -157,24 +170,28 @@ public class CustomerService {
 
         customerRepository.save(customer);
 
-        return new MessageResponse("customerService.updateCustomer.statusUpdatedSuccessfully");
+        return new MessageResponse(messageSource.getMessage("customerService.updateCustomer.statusUpdatedSuccessfully", null, locale));
     }
 
     // DELETE
 
     public MessageResponse deleteCustomer(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         CustomerEntity customer = findActiveCustomer(id);
         customer.setIsVisible(false);
         customer.setStatus(CustomerStatus.CLOSED);
         customerRepository.save(customer);
-        return new MessageResponse("customerService.deleteCustomer.customerDeleted");
+        return new MessageResponse(messageSource.getMessage("customerService.deleteCustomer.customerDeleted", null, locale));
     }
 
 
     // Auxiliary method
     public CustomerEntity findActiveCustomer(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         return customerRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CustomerNotFoundException("customerService.findActiveCustomer.customerNotFound"));
+                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("customerService.findActiveCustomer.customerNotFound", null, locale)));
     }
 
 

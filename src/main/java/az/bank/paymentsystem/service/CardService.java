@@ -6,6 +6,7 @@ import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.request.UpdateCardPasswordRequest;
@@ -22,6 +23,8 @@ import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.card.CardCreator;
 import az.bank.paymentsystem.util.card.CardValidator;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +38,14 @@ public class CardService {
     private final CardMapper cardMapper;
     private final CardBalanceTransfer cardBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
-    private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
     // DELETE
     public MessageResponse deleteCard(Integer cardId) {
+        Locale locale =  LocaleContextHolder.getLocale();
         CardEntity card = findActiveCard(cardId);
         cardValidator.validateCardDeletion(card);
-        statusAuditLogger.logCard(card, CardStatus.CLOSED.name(), "cardService.deleteCard.cardClosed");
+        statusAuditLogger.logCard(card, CardStatus.CLOSED.name(), messageSource.getMessage("cardService.deleteCard.cardClosed",null,locale));
 
         card.setStatus(CardStatus.CLOSED);
         card.setIsVisible(false);
@@ -49,9 +53,6 @@ public class CardService {
 
         cardBalanceTransfer.transfer(card);
         cardRepository.save(card);
-//        notificationService.send(card.getCustomer(),
-//                "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
-//                        + " has been successfully closed. " + message);
         return new MessageResponse("cardService.deleteCard.cardClosedSuccessfully");
     }
 
@@ -59,72 +60,76 @@ public class CardService {
 
     @Transactional
     public void updateExpiredCards() {
+        Locale locale = LocaleContextHolder.getLocale();
         List<CardEntity> expiredCards = cardRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
 
         expiredCards.forEach(card -> {
-            statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), "cardService.updateExpiredCards.cardExpiry");
+            statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), messageSource.getMessage("cardService.updateExpiredCards.cardExpiry",null,locale));
             card.setStatus(CardStatus.EXPIRED);
             card.setUpdatedAt(Instant.now());
             cardBalanceTransfer.transfer(card);
-//            String message = cardBalanceTransfer.transfer(card);
-//            notificationService.send(card.getCustomer(),
-//                    "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
-//                            + " has expired. " + message);
         });
 
         cardRepository.saveAll(expiredCards);
     }
 
     public MessageResponse updateCardStatus(Integer id, CardStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
         CardEntity card = findActiveCard(id);
-        statusAuditLogger.logCard(card, status.name(), "cardService.updateCardStatus.manualUpdate");
+        statusAuditLogger.logCard(card, status.name(), messageSource.getMessage("cardService.updateCardStatus.manualUpdate",null,locale));
         card.setStatus(status);
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
-        return new MessageResponse("cardService.updateCardStatus.manualUpdateSuccess");
+        return new MessageResponse(messageSource.getMessage("cardService.updateCardStatus.manualUpdateSuccess",null,locale));
     }
 
     public MessageResponse updateCardPassword(Integer id, UpdateCardPasswordRequest request) {
+        Locale locale = LocaleContextHolder.getLocale();
         CardEntity card = findActiveCard(id);
         card.setPassword(request.getPassword());
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
-        return new MessageResponse("cardService.updateCardPassword.updateResponse");
+        return new MessageResponse(messageSource.getMessage("cardService.updateCardPassword.updateResponse",null,locale));
     }
 
     // GET
     public List<CardResponse> getCardsByCustomerId(Integer customerId) {
+        Locale locale = LocaleContextHolder.getLocale();
         findActiveCustomer(customerId);
         List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
         if (cards.isEmpty()) {
-            throw new EmptyListException("cardService.getCardsByCustomerId.emptyListException");
+            throw new EmptyListException(messageSource.getMessage("cardService.getCardsByCustomerId.emptyListException",null,locale));
         }
         return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
     }
 
     public CardResponse getCardByPan(String pan) {
-        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(pan).orElseThrow(() -> new CardNotFoundException("cardService.getCardByPan.cardNotFound"));
+        Locale locale = LocaleContextHolder.getLocale();
+        CardEntity card = cardRepository.findByPanAndIsVisibleTrue(pan).orElseThrow(() -> new CardNotFoundException(messageSource.getMessage("cardService.getCardByPan.cardNotFound",null,locale)));
         return cardMapper.toResponse(card);
     }
 
     public List<CardResponse> getCardsByStatus(CardStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
         List<CardEntity> cards = cardRepository.findByStatusAndIsVisibleTrue(status);
         if (cards.isEmpty()) {
-            throw new CardNotFoundException("cardService.getCardsByStatus.cardNotFound");
+            throw new CardNotFoundException(messageSource.getMessage("cardService.getCardsByStatus.cardNotFound", null, locale));
         }
         return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
     }
 
     // AUXILIARY METHODS
     public CardEntity findActiveCard(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
         return cardRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CardNotFoundException("cardService.findActiveCard.cardNotFound"));
+                .orElseThrow(() -> new CardNotFoundException(messageSource.getMessage("cardService.findActiveCard.cardNotFound", null, locale)));
     }
 
     public CustomerEntity findActiveCustomer(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
         return customerRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CustomerNotFoundException("cardService.findActiveCustomer.customerNotFound"));
+                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("cardService.findActiveCustomer.customerNotFound", null, locale)));
     }
 
 

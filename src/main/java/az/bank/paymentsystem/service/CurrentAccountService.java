@@ -6,6 +6,7 @@ import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.response.MessageResponse;
@@ -22,6 +23,8 @@ import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.currentAccount.CurrentAccountCreator;
 import az.bank.paymentsystem.util.currentAccount.CurrentAccountValidator;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,57 +37,62 @@ public class CurrentAccountService {
     private final CurrentAccountValidator currentAccountValidator;
     private final CurrentAccountBalanceTransfer currentAccountBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
-    private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
     //GET
     public List<CurrentAccountResponse> getAccountsByCustomerId(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
         findActiveCustomer(id);
 
         List<CurrentAccountEntity> accounts = currentAccountRepository.findByCustomerIdAndIsVisibleTrue(id);
         if (accounts.isEmpty()) {
-            throw new EmptyListException("currentAccountService.getAccountsByCustomerId.customerNotHave");
+            throw new EmptyListException(messageSource.getMessage("currentAccountService.getAccountsByCustomerId.customerNotHave", null, locale));
         }
 
         return accounts.stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
     }
 
     public CurrentAccountResponse getAccountByAccountNumber(String accountNumber) {
+
         return currentAccountMapper.toResponse(findActiveAccountByNumber(accountNumber));
     }
 
     public List<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
+
 
         List<CurrentAccountEntity> accounts = currentAccountRepository.findByStatusAndIsVisibleTrue(status);
         if (accounts.isEmpty()) {
-            throw new AccountNotFoundException("currentAccountService.getCurrentAccountByStatus.currentAccountStatus");
+            throw new AccountNotFoundException(messageSource.getMessage("currentAccountService.getCurrentAccountByStatus.currentAccountStatus", null, locale));
         }
 
         return accounts.stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
     }
 
     public MessageResponse updateCurrentAccountStatus(Integer id, CurrentAccountStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         CurrentAccountEntity account = findActiveAccount(id);
-        statusAuditLogger.logAccount(account, status.name(), "currentAccountService.updateCurrentAccountStatus.manualUpdateStatus");
+        statusAuditLogger.logAccount(account, status.name(), messageSource.getMessage("currentAccountService.updateCurrentAccountStatus.manualUpdateStatus", null, locale));
         account.setStatus(status);
         account.setUpdatedAt(Instant.now());
         currentAccountRepository.save(account);
-        return new MessageResponse("currentAccountService.updateCurrentAccountStatus.updateResponse");
+        return new MessageResponse(messageSource.getMessage("currentAccountService.updateCurrentAccountStatus.updateResponse",null, locale));
     }
 
 
     public void updateExpiredCurrentAccounts() {
+        Locale locale = LocaleContextHolder.getLocale();
+
         List<CurrentAccountEntity> expiredAccounts = currentAccountRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CurrentAccountStatus.EXPIRED);
 
         expiredAccounts.forEach(account -> {
-            statusAuditLogger.logAccount(account, CurrentAccountStatus.EXPIRED.name(), "currentAccountService.updateExpiredCurrentAccounts.accountExpiry");
+            statusAuditLogger.logAccount(account, CurrentAccountStatus.EXPIRED.name(), messageSource.getMessage("currentAccountService.updateExpiredCurrentAccounts.accountExpiry", null, locale));
             account.setStatus(CurrentAccountStatus.EXPIRED);
             account.setUpdatedAt(Instant.now());
-//            String message = currentAccountBalanceTransfer.transfer(account);
             currentAccountBalanceTransfer.transfer(account);
 
-//            notificationService.send(account.getCustomer(),
-//                    "Your account " + account.getAccountNumber() + " has expired. " + message);
         });
 
         currentAccountRepository.saveAll(expiredAccounts);
@@ -92,32 +100,38 @@ public class CurrentAccountService {
 
     // DELETE
     public MessageResponse deleteCurrentAccount(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         CurrentAccountEntity account = findActiveAccount(id);
         currentAccountValidator.validateDeletion(account);
-        statusAuditLogger.logAccount(account, CurrentAccountStatus.CLOSED.name(), "currentAccountService.deleteCurrentAccount.accountClosed");
+        statusAuditLogger.logAccount(account, CurrentAccountStatus.CLOSED.name(), messageSource.getMessage("currentAccountService.deleteCurrentAccount.accountClosed", null, locale));
         account.setStatus(CurrentAccountStatus.CLOSED);
         account.setIsVisible(false);
         account.setUpdatedAt(Instant.now());
         currentAccountRepository.save(account);
-//        notificationService.send(account.getCustomer(),
-//                "Your account " + account.getAccountNumber() + " has been successfully closed.");
-        return new MessageResponse("currentAccountService.deleteCurrentAccount.accountClosedSuccessfully");
+        return new MessageResponse(messageSource.getMessage("currentAccountService.deleteCurrentAccount.accountClosedSuccessfully", null, locale));
     }
 
 
     public CurrentAccountEntity findActiveAccount(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         return currentAccountRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new AccountNotFoundException("currentAccountService.findActiveAccount.accountNotFound"));
+                .orElseThrow(() -> new AccountNotFoundException(messageSource.getMessage("currentAccountService.findActiveAccount.accountNotFound", null, locale)));
     }
 
     public CurrentAccountEntity findActiveAccountByNumber(String accountNumber) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         return currentAccountRepository.findByAccountNumberAndIsVisibleTrue(accountNumber)
-                .orElseThrow(() -> new AccountNotFoundException("currentAccountService.findActiveAccountByNumber.accountNotFound"));
+                .orElseThrow(() -> new AccountNotFoundException(messageSource.getMessage("currentAccountService.findActiveAccountByNumber.accountNotFound", null, locale)));
     }
 
     public CustomerEntity findActiveCustomer(Integer id) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         return customerRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CustomerNotFoundException("currentAccountService.findActiveCustomer.customerNotFound"));
+                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("currentAccountService.findActiveCustomer.customerNotFound",null, locale)));
     }
 
 }

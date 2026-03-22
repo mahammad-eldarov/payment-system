@@ -3,6 +3,7 @@ package az.bank.paymentsystem.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.request.AccountToAccountRequest;
 import az.bank.paymentsystem.dto.request.AccountToCardRequest;
@@ -21,6 +22,8 @@ import az.bank.paymentsystem.util.payment.PaymentCreator;
 import az.bank.paymentsystem.util.payment.PaymentProcessor;
 import az.bank.paymentsystem.util.payment.PaymentSourceResolver;
 import az.bank.paymentsystem.util.payment.PaymentValidator;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,7 @@ public class PaymentService {
     private final PaymentSourceResolver paymentSourceResolver;
     private final PaymentMapper paymentMapper;
     private final PaymentCreator paymentCreator;
+    private final MessageSource messageSource;
 
 
     @Transactional
@@ -148,8 +152,9 @@ public class PaymentService {
     }
 
     public PaymentEntity findPaymentById(Integer paymentId) {
+        Locale locale = LocaleContextHolder.getLocale();
         return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentNotFoundException("paymentService.findPaymentById.paymentNotFound"));
+                .orElseThrow(() -> new PaymentNotFoundException(messageSource.getMessage("paymentService.findPaymentById.paymentNotFound",null, locale)));
     }
 
 
