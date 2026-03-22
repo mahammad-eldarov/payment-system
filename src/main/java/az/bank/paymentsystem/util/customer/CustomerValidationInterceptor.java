@@ -1,11 +1,9 @@
 package az.bank.paymentsystem.util.customer;
 
-import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
@@ -25,7 +23,6 @@ public class CustomerValidationInterceptor implements HandlerInterceptor {
     private final CustomerRepository customerRepository;
     private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
-
     @Override
     @SuppressWarnings("unchecked")
     public boolean preHandle(HttpServletRequest request,

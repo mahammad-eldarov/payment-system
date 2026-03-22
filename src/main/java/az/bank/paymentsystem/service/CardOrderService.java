@@ -2,7 +2,6 @@ package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.dto.request.OrderCardRequest;
 import az.bank.paymentsystem.dto.response.CardOrderResponse;
-import az.bank.paymentsystem.dto.response.CardResponse;
 import az.bank.paymentsystem.entity.CardEntity;
 import az.bank.paymentsystem.entity.CardOrderEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;

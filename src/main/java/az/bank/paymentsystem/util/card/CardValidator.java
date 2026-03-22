@@ -1,24 +1,16 @@
 package az.bank.paymentsystem.util.card;
 
-import az.bank.paymentsystem.dto.request.OrderCardRequest;
 import az.bank.paymentsystem.entity.CustomerEntity;
-import az.bank.paymentsystem.enums.CustomerStatus;
-import az.bank.paymentsystem.enums.OrderStatus;
-import az.bank.paymentsystem.exception.CardLimitExceededException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
-import az.bank.paymentsystem.exception.CustomerSuspiciousException;
 import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.exception.MultiValidationException;
 import az.bank.paymentsystem.exception.OperationNotAllowedException;
 import az.bank.paymentsystem.repository.CustomerRepository;
-//import az.bank.paymentsystem.service.EntityFinderService;
 import az.bank.paymentsystem.util.shared.CustomerSuspiciousValidator;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.CardEntity;
 import az.bank.paymentsystem.enums.CardStatus;

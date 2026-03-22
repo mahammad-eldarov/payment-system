@@ -4,7 +4,6 @@ import az.bank.paymentsystem.entity.ExternalPartyEntity;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
-//import az.bank.paymentsystem.service.EntityFinderService;
 import az.bank.paymentsystem.service.ExternalPartyService;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
 import java.math.BigDecimal;
@@ -37,7 +36,6 @@ public class PaymentSourceResolver {
     private final MessageSource messageSource;
 
 
-    // FROM CHECKS
     public void fromCheckCard(PaymentEntity payment, Integer customerId,
                                String fromPan, List<ExceptionResponse> errors) {
         Locale locale = LocaleContextHolder.getLocale();

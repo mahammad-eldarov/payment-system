@@ -1,6 +1,5 @@
 package az.bank.paymentsystem.config;
 
-import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;

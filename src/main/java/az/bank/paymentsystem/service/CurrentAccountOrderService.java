@@ -2,25 +2,19 @@ package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.dto.request.OrderCurrentAccountRequest;
 import az.bank.paymentsystem.dto.response.CurrentAccountOrderResponse;
-import az.bank.paymentsystem.dto.response.CurrentAccountResponse;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.OrderStatus;
 import az.bank.paymentsystem.enums.OrderType;
-import az.bank.paymentsystem.exception.CustomerNotFoundException;
-import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.exception.MultiValidationException;
 import az.bank.paymentsystem.mapper.CurrentAccountMapper;
 import az.bank.paymentsystem.repository.CurrentAccountOrderRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
-import az.bank.paymentsystem.repository.CustomerRepository;
-//import az.bank.paymentsystem.util.currentAccount.CurrentAccountOrderProcessor;
 import az.bank.paymentsystem.util.currentAccount.CurrentAccountCreator;
 import az.bank.paymentsystem.util.currentAccount.CurrentAccountOrderRejectionHandler;
 import az.bank.paymentsystem.util.currentAccount.CurrentAccountValidator;
 import java.time.Instant;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

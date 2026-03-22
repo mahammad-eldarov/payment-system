@@ -2,10 +2,8 @@ package az.bank.paymentsystem.dto.response;
 
 import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
-import az.bank.paymentsystem.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

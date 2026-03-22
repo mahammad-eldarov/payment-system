@@ -1,6 +1,5 @@
 package az.bank.paymentsystem.service;
 
-import az.bank.paymentsystem.exception.OperationNotAllowedException;
 import az.bank.paymentsystem.util.shared.CurrentAccountBalanceTransfer;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
@@ -16,12 +15,10 @@ import az.bank.paymentsystem.exception.EmptyListException;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
-import az.bank.paymentsystem.dto.request.OrderCurrentAccountRequest;
 import az.bank.paymentsystem.dto.response.CurrentAccountResponse;
 import az.bank.paymentsystem.mapper.CurrentAccountMapper;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.util.currentAccount.CurrentAccountCreator;
 import az.bank.paymentsystem.util.currentAccount.CurrentAccountValidator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

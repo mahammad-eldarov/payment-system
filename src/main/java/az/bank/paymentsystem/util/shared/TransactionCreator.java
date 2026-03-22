@@ -1,7 +1,6 @@
 package az.bank.paymentsystem.util.shared;
 
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;

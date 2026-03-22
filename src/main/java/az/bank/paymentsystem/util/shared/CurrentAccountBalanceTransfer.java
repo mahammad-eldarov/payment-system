@@ -1,14 +1,9 @@
 package az.bank.paymentsystem.util.shared;
 
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
-import az.bank.paymentsystem.entity.TransactionEntity;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
-import az.bank.paymentsystem.enums.TransactionStatus;
-import az.bank.paymentsystem.enums.TransactionType;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.service.NotificationService;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;

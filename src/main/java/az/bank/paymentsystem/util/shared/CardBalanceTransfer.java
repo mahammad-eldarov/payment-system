@@ -1,10 +1,8 @@
 package az.bank.paymentsystem.util.shared;
 
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.repository.CardRepository;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.service.NotificationService;
 import java.math.BigDecimal;
 import java.util.Locale;

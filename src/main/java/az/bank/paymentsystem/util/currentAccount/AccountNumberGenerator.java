@@ -1,6 +1,5 @@
 package az.bank.paymentsystem.util.currentAccount;
 
-//import az.bank.paymentsystem.service.EntityFinderService;
 import jakarta.annotation.PostConstruct;
 import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;

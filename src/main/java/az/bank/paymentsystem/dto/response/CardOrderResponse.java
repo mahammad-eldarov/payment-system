@@ -1,15 +1,11 @@
 package az.bank.paymentsystem.dto.response;
 
-import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.CardBrand;
-import az.bank.paymentsystem.enums.CardName;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.enums.CardType;
 import az.bank.paymentsystem.enums.Currency;
-import az.bank.paymentsystem.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,14 +1,10 @@
 package az.bank.paymentsystem.service;
 
-import az.bank.paymentsystem.dto.response.MessageResponse;
 import az.bank.paymentsystem.dto.response.NotificationResponse;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.entity.NotificationEntity;
-import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.EmptyListException;
-import az.bank.paymentsystem.exception.NotificationNotFoundException;
 import az.bank.paymentsystem.mapper.NotificationMapper;
-import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.repository.NotificationRepository;
 import java.time.Instant;
 import java.util.List;

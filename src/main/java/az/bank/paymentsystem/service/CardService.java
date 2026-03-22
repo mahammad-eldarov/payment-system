@@ -1,6 +1,5 @@
 package az.bank.paymentsystem.service;
 
-import az.bank.paymentsystem.exception.OperationNotAllowedException;
 import az.bank.paymentsystem.util.shared.CardBalanceTransfer;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
@@ -21,7 +20,6 @@ import az.bank.paymentsystem.dto.response.CardResponse;
 import az.bank.paymentsystem.mapper.CardMapper;
 import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
-import az.bank.paymentsystem.util.card.CardCreator;
 import az.bank.paymentsystem.util.card.CardValidator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

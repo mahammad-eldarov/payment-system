@@ -1,9 +1,6 @@
 package az.bank.paymentsystem.util.shared;
 
-import az.bank.paymentsystem.dto.request.CreateCustomerRequest;
-import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.entity.CustomerEntity;
-import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.repository.StatusAuditLogRepository;
 import java.time.LocalDateTime;

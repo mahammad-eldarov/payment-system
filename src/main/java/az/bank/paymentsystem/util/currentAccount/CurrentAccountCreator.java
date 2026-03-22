@@ -1,20 +1,15 @@
 package az.bank.paymentsystem.util.currentAccount;
 
 import az.bank.paymentsystem.entity.CurrentAccountOrderEntity;
-import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.OrderStatus;
-//import az.bank.paymentsystem.util.shared.EnumParser;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.request.OrderCurrentAccountRequest;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import org.springframework.stereotype.Component;
 
 @Component

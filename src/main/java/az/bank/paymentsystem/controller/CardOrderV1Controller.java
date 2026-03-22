@@ -2,7 +2,6 @@ package az.bank.paymentsystem.controller;
 
 import az.bank.paymentsystem.dto.request.OrderCardRequest;
 import az.bank.paymentsystem.dto.response.CardOrderResponse;
-import az.bank.paymentsystem.dto.response.CardResponse;
 import az.bank.paymentsystem.service.CardOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

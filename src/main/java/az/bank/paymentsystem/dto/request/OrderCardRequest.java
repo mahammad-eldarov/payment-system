@@ -1,9 +1,6 @@
 package az.bank.paymentsystem.dto.request;
-import az.bank.paymentsystem.entity.CustomerEntity;
-import az.bank.paymentsystem.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
