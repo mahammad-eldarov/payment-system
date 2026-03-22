@@ -4,7 +4,7 @@ import az.bank.paymentsystem.entity.ExternalPartyEntity;
 import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
-import az.bank.paymentsystem.service.ExternalPartyService;
+import az.bank.paymentsystem.repository.ExternalPartyRepository;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ public class PaymentSourceResolver {
     private final CurrentAccountRepository currentAccountRepository;
     private final BankConfig bankConfig;
     private final CurrencyConverter currencyConverter;
-    private final ExternalPartyService externalPartyService;
+    private final ExternalPartyRepository externalPartyRepository;
     private final MessageSource messageSource;
 
 
@@ -201,7 +201,8 @@ public class PaymentSourceResolver {
     private void resolveExternalCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
         Locale locale = LocaleContextHolder.getLocale();
 
-        Optional<ExternalPartyEntity> external = externalPartyService.findByCardNumber(toPan);
+        Optional<ExternalPartyEntity> external = externalPartyRepository.findByCardNumber(toPan);
+
         if (external.isEmpty()) {
             errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.resolveExternalCard.cardNotFound",null,locale), LocalDateTime.now()));
             return;
@@ -249,7 +250,7 @@ public class PaymentSourceResolver {
     private void resolveExternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
         Locale locale = LocaleContextHolder.getLocale();
 
-        Optional<ExternalPartyEntity> external = externalPartyService.findByAccountNumber(toAccountNumber);
+        Optional<ExternalPartyEntity> external = externalPartyRepository.findByAccountNumber(toAccountNumber);
         if (external.isEmpty()) {
             errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.resolveExternalAccount.accountNotFound",null,locale), LocalDateTime.now()));
             return;
