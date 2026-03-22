@@ -197,14 +197,14 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationException(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining(", "));
-
-        return ResponseEntity.badRequest().body(new ExceptionResponse(400, message, LocalDateTime.now()));
-    }
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<ExceptionResponse> handleValidationException(MethodArgumentNotValidException ex) {
+//        String message = ex.getBindingResult().getFieldErrors().stream()
+//                .map(FieldError::getDefaultMessage)
+//                .collect(Collectors.joining(", "));
+//
+//        return ResponseEntity.badRequest().body(new ExceptionResponse(400, message, LocalDateTime.now()));
+//    }
 
     // Exception 500 and Custom other exceptions
 

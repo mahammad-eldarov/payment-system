@@ -66,11 +66,11 @@ bank:
 
 scheduler:
   payment:
-    cron: "50 58 00 * * *"
+    cron: "00 00 00 * * *"
   card:
-    cron: "10 33 16 * * *"
+    cron: "00 00 00 * * *"
   currentAccount:
-    cron: "14 50 1 * * *"
+    cron: "00 00 00 * * *"
 
 
 #  cron: "0 33 23 4 3 *"
