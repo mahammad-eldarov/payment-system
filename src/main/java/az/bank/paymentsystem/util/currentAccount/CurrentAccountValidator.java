@@ -27,8 +27,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -41,6 +44,7 @@ public class CurrentAccountValidator {
     private final CurrentAccountCreator currentAccountCreator;
     private final CustomerSuspiciousValidator suspiciousValidator;
 //    private final EnumParser enumParser;
+    private final MessageSource messageSource;
 
 //    public void validateRequestFields(OrderCurrentAccountRequest request) {
 //        List<ExceptionResponse> errors = new ArrayList<>();
@@ -63,8 +67,9 @@ public class CurrentAccountValidator {
 //    }
 
     public void validateCurrentAccountOrder(Integer customerId) {
+        Locale locale =  LocaleContextHolder.getLocale();
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("currentAccountValidator.validateCurrentAccountOrder.customerNotFound", null, locale)));
 
         List<ExceptionResponse> errors = new ArrayList<>();
 
@@ -73,7 +78,7 @@ public class CurrentAccountValidator {
         if (currentAccountRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 3) {
             errors.add(new ExceptionResponse(
                     422,
-                    "The customer already has 3 current accounts. A new account cannot be ordered.",
+                    messageSource.getMessage("currentAccountValidator.validateCurrentAccountOrder.hasThreeAccount", null, locale),
                     LocalDateTime.now()
             ));
         }
@@ -141,14 +146,16 @@ public class CurrentAccountValidator {
 //    }
 
     public void validateDeletion(CurrentAccountEntity account) {
+        Locale locale =  LocaleContextHolder.getLocale();
+
         if (account.getStatus() == CurrentAccountStatus.CLOSED) {
-            throw new AccountAlreadyCancelledException("The current account has already been canceled.");
+            throw new AccountAlreadyCancelledException(messageSource.getMessage("currentAccountValidator.validateDeletion.accountAlreadyCanceled", null, locale));
         }
         if (account.getStatus() == CurrentAccountStatus.EXPIRED) {
-            throw new AccountExpiredException("An expired current account cannot be canceled.");
+            throw new AccountExpiredException(messageSource.getMessage("currentAccountValidator.validateDeletion.expiryAccountCanceled", null, locale));
         }
         if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
-            throw new OperationNotAllowedException("Cannot delete a suspicious current account. Please contact support.");
+            throw new OperationNotAllowedException(messageSource.getMessage("currentAccountValidator.validateDeletion.suspiciousAccountCanNotDeleted", null, locale));
         }
 
     }

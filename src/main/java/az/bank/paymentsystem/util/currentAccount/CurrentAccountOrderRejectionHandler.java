@@ -9,8 +9,11 @@ import az.bank.paymentsystem.exception.MultiValidationException;
 import az.bank.paymentsystem.repository.CurrentAccountOrderRepository;
 import az.bank.paymentsystem.service.NotificationService;
 import az.bank.paymentsystem.service.OrderRateLimitService;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,11 +22,13 @@ public class CurrentAccountOrderRejectionHandler {
     private final OrderRateLimitService orderRateLimitService;
     private final CurrentAccountOrderRepository currentAccountOrderRepository;
     private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
 
     public void handleRejection(CurrentAccountOrderEntity orderEntity,
                                 CustomerEntity customer,
                                 MultiValidationException ex) {
+        Locale locale  = LocaleContextHolder.getLocale();
         orderEntity.setStatus(OrderStatus.REJECTED);
 
         String reason = ex.getErrors().stream()
@@ -34,7 +39,7 @@ public class CurrentAccountOrderRejectionHandler {
         orderRateLimitService.handleRejection(customer, OrderType.CURRENT_ACCOUNT);
         currentAccountOrderRepository.save(orderEntity);
         notificationService.send(customer,
-                "Your current account order request has been rejected. Reason: " + reason);
+                messageSource.getMessage("currentAccountOrderRejectionHandler.handleRejection.reason", null, locale) + reason);
     }
 
 //    public void handleRejection(CurrentAccountOrderEntity orderEntity,
