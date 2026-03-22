@@ -16,6 +16,7 @@ import az.bank.paymentsystem.mapper.CurrentAccountMapper;
 import az.bank.paymentsystem.mapper.TransactionMapper;
 import az.bank.paymentsystem.repository.TransactionRepository;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.response.CardResponse;
@@ -26,6 +27,8 @@ import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.service.CardService;
 import az.bank.paymentsystem.service.CurrentAccountService;
 import az.bank.paymentsystem.service.TransactionService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +44,7 @@ public class CustomerResponseBuilder {
     private final TransactionService transactionService;
     private final CardMapper cardMapper;
     private final CurrentAccountMapper currentAccountMapper;
+    private final MessageSource messageSource;
 
     public void setCardsAndAccounts(CustomerResponse response, Integer customerId) {
         List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
@@ -83,48 +87,58 @@ public class CustomerResponseBuilder {
 //    }
 
     private String cardMessage(List<CardResponse> cards) {
+        Locale locale = LocaleContextHolder.getLocale();
         return cards.isEmpty()
-                ? "This customer does not have a card."
-                : "The customer has " + cards.size() + " card(s).";
+                ? messageSource.getMessage("customerResponseBuilder.cardMessage.cardsEmpty", null, locale)
+                : messageSource.getMessage("customerResponseBuilder.cardMessage.cardsFound", new Object[]{cards.size()}, locale);
+//        return cards.isEmpty()
+//                ? "This customer does not have a card."
+//                : "The customer has " + cards.size() + " card(s).";
     }
 
     private String accountMessage(List<CurrentAccountResponse> accounts) {
+        Locale locale = LocaleContextHolder.getLocale();
         return accounts.isEmpty()
-                ? "This customer does not have a current account."
-                : "The customer has " + accounts.size() + " current account(s).";
+                ? messageSource.getMessage("customerResponseBuilder.accountMessage.accountsEmpty", null, locale)
+                : messageSource.getMessage("customerResponseBuilder.accountMessage.accountsFound", new Object[]{accounts.size()}, locale);
+//        return accounts.isEmpty()
+//                ? "This customer does not have a current account."
+//                : "The customer has " + accounts.size() + " current account(s).";
     }
 
 
-    public List<CardForCustomerResponse> buildCardSummaries(Integer customerId) {
-        List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
-        if (cards.isEmpty()) throw new EmptyListException("No cards found.");
-        return cards.stream().map(cardMapper::toSummary).toList();
-    }
+//    public List<CardForCustomerResponse> buildCardSummaries(Integer customerId) {
+//        List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
+//        if (cards.isEmpty()) throw new EmptyListException("No cards found.");
+//        return cards.stream().map(cardMapper::toSummary).toList();
+//    }
 
     public Page<TransactionResponse> buildCardTransactions(Integer customerId, String pan, int page) {
+        Locale locale = LocaleContextHolder.getLocale();
         CardEntity card = cardRepository.findByPanAndIsVisibleTrue(pan)
-                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+                .orElseThrow(() -> new CardNotFoundException(messageSource.getMessage("customerResponseBuilder.buildCardTransactions.cardNotFound", null, locale)));
 
         if (!card.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException("Card does not belong to this customer");
+            throw new ForbiddenException(messageSource.getMessage("customerResponseBuilder.buildCardTransactions.cardNotBelong", null, locale));
         }
 
         return transactionService.getTransactionsByCardId(card.getId(), page);
     }
 
-    public List<CurrentAccountForCustomerResponse> buildAccountSummaries(Integer customerId) {
-        List<CurrentAccountEntity> accounts = currentAccountRepository
-                .findByCustomerIdAndIsVisibleTrue(customerId);
-        if (accounts.isEmpty()) throw new EmptyListException("No accounts found.");
-        return accounts.stream().map(currentAccountMapper::toSummary).toList();
-    }
+//    public List<CurrentAccountForCustomerResponse> buildAccountSummaries(Integer customerId) {
+//        List<CurrentAccountEntity> accounts = currentAccountRepository
+//                .findByCustomerIdAndIsVisibleTrue(customerId);
+//        if (accounts.isEmpty()) throw new EmptyListException("No accounts found.");
+//        return accounts.stream().map(currentAccountMapper::toSummary).toList();
+//    }
 
     public Page<TransactionResponse> buildAccountTransactions(Integer customerId, String accountNumber, int page) {
+        Locale locale = LocaleContextHolder.getLocale();
         CurrentAccountEntity account = currentAccountRepository.findByAccountNumberAndIsVisibleTrue(accountNumber)
-                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException(messageSource.getMessage("customerResponseBuilder.buildAccountTransactions.accountNotFound",null, locale)));
 
         if (!account.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException("Account does not belong to this customer");
+            throw new ForbiddenException(messageSource.getMessage("customerResponseBuilder.buildAccountTransactions.accountNotBelong",null, locale));
         }
 
         return transactionService.getTransactionsByAccountId(account.getId(), page);
