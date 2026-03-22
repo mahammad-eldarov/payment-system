@@ -5,12 +5,15 @@ import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.PaymentEntity;
 import az.bank.paymentsystem.entity.TransactionEntity;
 import az.bank.paymentsystem.enums.TransactionStatus;
 import az.bank.paymentsystem.enums.TransactionType;
 import az.bank.paymentsystem.repository.TransactionRepository;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class TransactionCreator {
 
     private final TransactionRepository transactionRepository;
+    private final MessageSource messageSource;
 
     public void create(PaymentEntity payment, TransactionStatus status) {
         transactionRepository.save(buildTransaction(payment, status, TransactionType.DEBIT));
@@ -71,8 +75,8 @@ public class TransactionCreator {
 //    }
 
     private String buildDescription(PaymentEntity payment) {
-        return "Transfer of " + payment.getAmount() + " " + payment.getCurrency() +
-                " from " + payment.getFromType() + " to " + payment.getToType();
+        Locale locale = LocaleContextHolder.getLocale();
+        return messageSource.getMessage("transactionCreator.buildDescription",new Object[]{payment.getAmount(), payment.getCurrency(), payment.getFromType(), payment.getToType()}, locale);
     }
 
 

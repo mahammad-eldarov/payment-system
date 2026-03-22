@@ -4,6 +4,7 @@ import az.bank.paymentsystem.repository.StatusAuditLogRepository;
 import az.bank.paymentsystem.service.NotificationService;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.config.BankConfig;
 import az.bank.paymentsystem.entity.CardEntity;
@@ -16,6 +17,8 @@ import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,6 +32,7 @@ public class SuspiciousTransactionChecker {
     private final StatusAuditLogger statusAuditLogger;
     private final NotificationService notificationService;
     private final FraudBlacklistChecker fraudBlacklistChecker;
+    private final MessageSource messageSource;
 
     public void check(PaymentEntity payment) {
         if (isUnderThreshold(payment)) return;
@@ -53,33 +57,33 @@ public class SuspiciousTransactionChecker {
     }
 
     private void markSourceSuspicious(PaymentEntity payment) {
+        Locale locale = LocaleContextHolder.getLocale();
         if (payment.getFromCard() != null) {
             CardEntity card = payment.getFromCard();
-            statusAuditLogger.logCard(card, CardStatus.SUSPICIOUS.name(), "Suspicious transaction detected");
+            statusAuditLogger.logCard(card, CardStatus.SUSPICIOUS.name(), messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.suspiciousTransaction", null, locale));
             card.setStatus(CardStatus.SUSPICIOUS);
             cardRepository.save(card);
             notificationService.send(card.getCustomer(),
-                    "Your card ending in " + card.getPan().substring(card.getPan().length() - 4)
-                            + " has been suspended due to suspicious activity.");
+                    messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.cardSuspiciousActivity",new Object[]{card.getPan().substring(card.getPan().length() - 4)},locale));
         } else if (payment.getFromAccount() != null) {
             CurrentAccountEntity account = payment.getFromAccount();
-            statusAuditLogger.logAccount(account, CurrentAccountStatus.SUSPICIOUS.name(), "Suspicious transaction detected");
+            statusAuditLogger.logAccount(account, CurrentAccountStatus.SUSPICIOUS.name(), messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.suspiciousTransaction", null, locale));
             account.setStatus(CurrentAccountStatus.SUSPICIOUS);
             currentAccountRepository.save(account);
             notificationService.send(account.getCustomer(),
-                    "Your account " + account.getAccountNumber()
-                            + " has been suspended due to suspicious activity.");
+                    messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.accountSuspiciousActivity", new Object[]{account.getAccountNumber()},locale));
         }
     }
 
     private void markCustomerSuspicious(PaymentEntity payment) {
+        Locale locale = LocaleContextHolder.getLocale();
         CustomerEntity customer = payment.getCustomer();
-        statusAuditLogger.logCustomer(customer, CustomerStatus.SUSPICIOUS.name(), "Second suspicious transaction detected");
+        statusAuditLogger.logCustomer(customer, CustomerStatus.SUSPICIOUS.name(), messageSource.getMessage("suspiciousTransactionChecker.markCustomerSuspicious.secondSuspiciousTransaction",null, locale));
         customer.setStatus(CustomerStatus.SUSPICIOUS);
         customerRepository.save(customer);
-        fraudBlacklistChecker.addToBlacklist(customer, "Multiple suspicious transactions detected");
+        fraudBlacklistChecker.addToBlacklist(customer, messageSource.getMessage("suspiciousTransactionChecker.markCustomerSuspicious.multipleSuspiciousTransaction",null, locale));
         notificationService.send(customer,
-                "Your account has been suspended due to repeated suspicious activity.");
+                messageSource.getMessage("suspiciousTransactionChecker.markCustomerSuspicious.profileSuspiciousActivity",null, locale));
 
         if (payment.getFromCard() != null) {
             payment.getFromCard().setStatus(CardStatus.SUSPICIOUS);

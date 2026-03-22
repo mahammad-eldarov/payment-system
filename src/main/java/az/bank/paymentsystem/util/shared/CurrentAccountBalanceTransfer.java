@@ -9,7 +9,10 @@ import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.service.NotificationService;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,23 +21,22 @@ public class CurrentAccountBalanceTransfer {
     private final CurrentAccountRepository currentAccountRepository;
     private final TransactionCreator transactionCreator;
     private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
     public String transfer(CurrentAccountEntity account) {
+        Locale locale = LocaleContextHolder.getLocale();
         BigDecimal balance = account.getBalance();
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
-            return "Current account was successfully expired.";
+            return messageSource.getMessage("currentAccountBalanceTransfer.transfer.accountExpired",null,locale);
         }
         if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
-            return "Your balance of " + balance + " " + account.getCurrency()
-                    + " has been frozen due to suspicious activity on your account.";
+            return messageSource.getMessage("currentAccountBalanceTransfer.transfer.accountSuspiciousActivity",new Object[]{balance,account.getCurrency()},locale);
         }
 
         String reason = getStatusReason(account.getStatus());
 
-        String message = "Your current account has been " + reason
-                + ". Your remaining balance of " + balance + " " + account.getCurrency()
-                + " can be collected by visiting your nearest branch.";
+        String message = messageSource.getMessage("currentAccountBalanceTransfer.transfer.visitingBranch",new Object[]{reason,balance,account.getCurrency()},locale);
 
         notificationService.send(account.getCustomer(), message);
 
@@ -42,10 +44,12 @@ public class CurrentAccountBalanceTransfer {
     }
 
     private String getStatusReason(CurrentAccountStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         return switch (status) {
-            case EXPIRED -> "expired";
-            case CLOSED -> "closed";
-            default -> "deactivated";
+            case EXPIRED -> messageSource.getMessage("currentAccountBalanceTransfer.getStatusReason.expired",null,locale);
+            case CLOSED -> messageSource.getMessage("currentAccountBalanceTransfer.getStatusReason.closed",null,locale);
+            default -> messageSource.getMessage("currentAccountBalanceTransfer.getStatusReason.deactivated",null,locale);
         };
     }
 

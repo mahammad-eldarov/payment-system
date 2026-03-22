@@ -8,7 +8,10 @@ import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.repository.StatusAuditLogRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,8 +19,10 @@ import org.springframework.stereotype.Component;
 public class CustomerSuspiciousValidator {
 
     private final StatusAuditLogRepository statusAuditLogRepository;
+    private final MessageSource messageSource;
 
     public void validate(CustomerEntity customer, List<ExceptionResponse> errors) {
+        Locale locale = LocaleContextHolder.getLocale();
 
         int suspiciousCount = statusAuditLogRepository
                 .countByEntityTypeAndEntityIdAndNewStatus(
@@ -29,7 +34,7 @@ public class CustomerSuspiciousValidator {
         if (suspiciousCount >= 1) {
             errors.add(new ExceptionResponse(
                     403,
-                    "Your profile has been permanently blocked due to repeated suspicious activity.",
+                    messageSource.getMessage("customerSuspiciousValidator.validate.permanentlyBlocked",null,locale),
                     LocalDateTime.now()
             ));
         }

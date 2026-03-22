@@ -6,8 +6,11 @@ import az.bank.paymentsystem.exception.FraudDetectedException;
 import az.bank.paymentsystem.config.BankConfig;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,26 +19,29 @@ public class FraudDetectionChecker {
 
     private final CustomerRepository customerRepository;
     private final BankConfig bankConfig;
+    private final MessageSource messageSource;
 
     public void checkDeletedSuspiciousCustomer(String pin) {
+        Locale locale = LocaleContextHolder.getLocale();
         Optional<CustomerEntity> deletedCustomer = customerRepository
                 .findFirstByPinAndIsVisibleFalse(pin);
 
         if (deletedCustomer.isPresent()
                 && deletedCustomer.get().getStatus() == CustomerStatus.SUSPICIOUS) {
             throw new FraudDetectedException(
-                    "Profile creation denied. Previous profile with this PIN was flagged for suspicious activity. Please contact support!"
+                    messageSource.getMessage("fraudDetectionChecker.checkDeletedSuspiciousCustomer",null, locale)
             );
         }
     }
 
     public void checkAccountCreationFrequency(String pin) {
+        Locale locale = LocaleContextHolder.getLocale();
         List<CustomerEntity> deletedCustomers = customerRepository
                 .findAllByPinAndIsVisibleFalse(pin);
 
         if (deletedCustomers.size() >= bankConfig.getFraud().getMaxAccountCreations()) {
             throw new FraudDetectedException(
-                    "Profile creation denied. Too many profile created with this PIN. Please contact support!"
+                    messageSource.getMessage("fraudDetectionChecker.checkAccountCreationFrequency",null, locale)
             );
         }
     }

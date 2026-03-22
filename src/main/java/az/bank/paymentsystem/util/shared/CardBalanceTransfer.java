@@ -7,7 +7,10 @@ import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.service.NotificationService;
 import java.math.BigDecimal;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,16 +20,17 @@ public class CardBalanceTransfer {
     private final CardRepository cardRepository;
     private final TransactionCreator transactionCreator;
     private final NotificationService notificationService;
+    private final MessageSource messageSource;
 
     public String transfer(CardEntity card) {
+        Locale locale = LocaleContextHolder.getLocale();
         BigDecimal balance = card.getBalance();
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
-            return "Card was successfully deleted.";
+            return messageSource.getMessage("cardBalanceTransfer.transfer.cardDeleted", null, locale);
         }
         if (card.getStatus() == CardStatus.SUSPICIOUS) {
-            String message =  "Your balance of " + balance + " " + card.getCurrency()
-                    + " has been frozen due to suspicious activity on your card.";
+            String message = messageSource.getMessage("cardBalanceTransfer.transfer.cardSuspiciousActivity", new Object[]{balance, card.getCurrency()},locale);
             notificationService.send(card.getCustomer(), message);
             return message;
         }
@@ -35,31 +39,27 @@ public class CardBalanceTransfer {
         String lastFour = card.getPan().substring(card.getPan().length() - 4);
         String reason = getStatusReason(card.getStatus());
 
-//        Integer customerId = card.getCustomer().getId();
-
         CardEntity otherCard = cardRepository
                 .findFirstByCustomerIdAndIsVisibleTrueAndIdNot(customerId, card.getId()).orElse(null);
         if (otherCard != null && isTransferableCard(otherCard)) {
             return transferToCard(card, otherCard, balance, reason);
         }
-        String message = "Your card ending in " + lastFour
-                + " has been " + reason + ". Your remaining balance of "
-                + balance + " " + card.getCurrency()
-                + " can be collected by visiting your nearest branch.";
+        String message = messageSource.getMessage("cardBalanceTransfer.transfer.visitingBranch",new Object[]{lastFour, reason, balance, card.getCurrency()},locale);
         notificationService.send(card.getCustomer(), message);
         return message;
 
     }
 
     private String getStatusReason(CardStatus status) {
+        Locale locale = LocaleContextHolder.getLocale();
         return switch (status) {
-            case BLOCKED -> "blocked";
-            case EXPIRED -> "expired";
-            case CLOSED -> "closed";
-            case LOST -> "reported as lost";
-            case STOLEN -> "reported as stolen";
-            case SUSPICIOUS -> "suspicious";
-            default -> "deactivated";
+            case BLOCKED -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.blocked",null,locale);
+            case EXPIRED -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.expired",null,locale);
+            case CLOSED -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.closed",null,locale);
+            case LOST -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.lost",null,locale);
+            case STOLEN -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.stolen",null,locale);
+            case SUSPICIOUS -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.suspicious",null,locale);
+            default -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.deactivated",null,locale);
 
         };
     }
@@ -73,6 +73,7 @@ public class CardBalanceTransfer {
     }
 
     private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance, String reason) {
+        Locale locale = LocaleContextHolder.getLocale();
         otherCard.setBalance(otherCard.getBalance().add(balance));
         card.setBalance(BigDecimal.ZERO);
         cardRepository.save(otherCard);
@@ -80,18 +81,14 @@ public class CardBalanceTransfer {
         String lastFour = card.getPan().substring(card.getPan().length() - 4);
         String otherLastFour = otherCard.getPan().substring(otherCard.getPan().length() - 4);
 
-        String debitDescription = "Your card ending in " + lastFour
-                + " was " + reason + ". Balance of " + balance + " " + card.getCurrency()
-                + " has been transferred to your card ending in " + otherLastFour + ".";
+        String debitDescription = messageSource.getMessage("cardBalanceTransfer.transferToCard.balanceTransferred.regexp", new Object[]{lastFour, reason, balance, card.getCurrency(), otherLastFour},locale);
 
-        String creditDescription = "Balance transferred from card ending in "
-                + lastFour + " to card ending in " + otherLastFour;
+        String creditDescription = messageSource.getMessage("cardBalanceTransfer.transferToCard.balanceTransferred",new Object[]{lastFour, otherLastFour},locale);
 
         transactionCreator.createBalanceTransfer(card, otherCard, balance, debitDescription, creditDescription);
 
 
-        return "Your remaining balance of " + balance + " " + card.getCurrency()
-                + " has been transferred to your card ending in " + otherLastFour + ".";
+        return messageSource.getMessage("cardBalanceTransfer.transferToCard.remainingBalance.regexp", new Object[]{balance, card.getCurrency(), otherLastFour}, locale);
     }
 
 

@@ -7,13 +7,17 @@ import az.bank.paymentsystem.repository.FraudBlacklistRepository;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class FraudBlacklistChecker {
     private final FraudBlacklistRepository blacklistRepository;
+    private final MessageSource messageSource;
 
     public void addToBlacklist(CustomerEntity customer, String reason) {
         FraudBlacklistEntity entry = new FraudBlacklistEntity();
@@ -26,16 +30,17 @@ public class FraudBlacklistChecker {
     }
 
     public void checkBlacklist(String pin, String phone, String email) {
+        Locale locale = LocaleContextHolder.getLocale();
         List<String> reasons = new ArrayList<>();
 
         if (blacklistRepository.existsByPin(pin)) {
-            reasons.add("PIN is blacklisted due to previous fraudulent activity");
+            reasons.add(messageSource.getMessage("fraudBlacklistChecker.checkBlacklist.pin", null, locale));
         }
         if (blacklistRepository.existsByPhoneNumber(phone)) {
-            reasons.add("Phone number is associated with a previously flagged account");
+            reasons.add(messageSource.getMessage("fraudBlacklistChecker.checkBlacklist.phoneNumber", null, locale));
         }
         if (blacklistRepository.existsByEmail(email)) {
-            reasons.add("Email is associated with a previously flagged account");
+            reasons.add(messageSource.getMessage("fraudBlacklistChecker.checkBlacklist.email", null, locale));
         }
 
         if (!reasons.isEmpty()) {
