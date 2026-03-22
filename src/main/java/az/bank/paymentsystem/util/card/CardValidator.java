@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.CardEntity;
@@ -24,6 +25,8 @@ import az.bank.paymentsystem.enums.CardStatus;
 import az.bank.paymentsystem.exception.CardAlreadyCancelledException;
 import az.bank.paymentsystem.exception.CardExpiredException;
 import az.bank.paymentsystem.repository.CardRepository;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,10 +35,12 @@ public class CardValidator {
     private final CardRepository cardRepository;
     private final CustomerRepository customerRepository;
     private final CustomerSuspiciousValidator suspiciousValidator;
+    private final MessageSource messageSource;
 
     public void validateCardOrder(Integer customerId) {
+        Locale locale = LocaleContextHolder.getLocale();
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("cardValidator.validateCardOrder.customerNotFound",null,locale)));
 
         List<ExceptionResponse> errors = new ArrayList<>();
 
@@ -45,15 +50,14 @@ public class CardValidator {
                 List.of(CardStatus.SUSPICIOUS, CardStatus.LOST, CardStatus.STOLEN))) {
             errors.add(new ExceptionResponse(
                     403,
-                    "Cannot order a new card while having suspicious, lost or stolen card. " +
-                            "If you want to create a new card, you should close the cards that are in this status.",
+                    messageSource.getMessage("cardValidator.validateCardOrder.canNotOrder",null,locale),
                     LocalDateTime.now()
             ));
         }
         if (cardRepository.countByCustomerIdAndIsVisibleTrue(customer.getId()) >= 2) {
             errors.add(new ExceptionResponse(
                     422,
-                    "The customer already has 2 cards. A new card cannot be ordered.",
+                    messageSource.getMessage("cardValidator.validateCardOrder.hasTwoCard",null,locale),
                     LocalDateTime.now()
             ));
         }
@@ -65,14 +69,15 @@ public class CardValidator {
 
 
     public void validateCardDeletion(CardEntity card) {
+        Locale locale = LocaleContextHolder.getLocale();
         if (card.getStatus() == CardStatus.CLOSED) {
-            throw new CardAlreadyCancelledException("The card has already been canceled.");
+            throw new CardAlreadyCancelledException(messageSource.getMessage("cardValidator.validateCardDeletion.cardAlreadyCanceled", null, locale));
         }
         if (card.getStatus() == CardStatus.EXPIRED) {
-            throw new CardExpiredException("An expired card cannot be canceled.");
+            throw new CardExpiredException(messageSource.getMessage("cardValidator.validateCardDeletion.expiredCardCanceled", null, locale));
         }
         if (card.getStatus() == CardStatus.SUSPICIOUS) {
-            throw new OperationNotAllowedException("Cannot delete a suspicious card. Please contact support.");
+            throw new OperationNotAllowedException(messageSource.getMessage("cardValidator.validateCardDeletion.canNotDeleteSuspiciousCard", null, locale));
         }
     }
 
