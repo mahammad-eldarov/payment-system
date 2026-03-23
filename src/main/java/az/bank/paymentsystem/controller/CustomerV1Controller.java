@@ -33,57 +33,57 @@ public class CustomerV1Controller {
 
     private final CustomerService customerService;
 
-    @PostMapping
-    @Operation(summary = "Create a customer.",
-            description = "Creates a new customer.")
+    @PostMapping("/external/create")
+    @Operation(summary = "Create a new customer",
+            description = "Registers a new customer in the system with the provided details.")
     public ResponseEntity<CustomerShortResponse> createCustomer(@RequestBody @Valid CreateCustomerRequest request) {
         CustomerShortResponse response = customerService.createCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{customerId}")
-    @Operation(summary = "Search customer using ID.",
-            description = "Search a customer.")
+    @GetMapping("/external/{customerId}")
+    @Operation(summary = "Get customer by ID",
+            description = "Retrieves basic information about an active customer using their unique identifier.")
     public ResponseEntity<CustomerShortResponse> getCustomerById(@PathVariable Integer customerId) {
         CustomerShortResponse response = customerService.getCustomerById(customerId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/deleted/{customerId}")
-    @Operation(summary = "Search deleted customer using ID.",
-            description = "Search a deleted customer.")
+    @GetMapping("/internal/deleted/{customerId}")
+    @Operation(summary = "Get deleted customer by ID",
+            description = "Retrieves information about a soft-deleted customer using their unique identifier. Accessible for internal use only.")
     public ResponseEntity<CustomerResponse> getDeletedCustomerById(@PathVariable Integer customerId) {
         CustomerResponse response = customerService.getDeletedCustomerById(customerId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/status")
-    @Operation(summary = "Get a customer by status.",
-            description = "Get customer by status.")
+    @GetMapping("/internal/status")
+    @Operation(summary = "Get customers by status",
+            description = "Retrieves a list of customers filtered by the specified status (e.g. ACTIVE, BLOCKED, SUSPICIOUS, CLOSED). Accessible for internal use only.")
     public ResponseEntity<List<CustomerShortResponse>> getCustomersByStatus(
             @RequestParam CustomerStatus status) {
 
         return ResponseEntity.ok(customerService.getCustomersByStatus(status));
     }
 
-    @GetMapping
-    @Operation(summary = "Get all customers.",
-            description = "Get all customers.")
+    @GetMapping("/internal/allcustomers")
+    @Operation(summary = "Get all customers",
+            description = "Retrieves a list of all registered customers in the system. Accessible for internal use only.")
     public ResponseEntity<List<CustomerShortResponse>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
-    @GetMapping("/{customerId}/details")
-    @Operation(summary = "Search detailed information about customer using ID.",
-            description = "Search an detailed information.")
+    @GetMapping("/external/{customerId}/details")
+    @Operation(summary = "Get full customer details by ID",
+            description = "Retrieves detailed information about a customer including their cards and accounts using their unique identifier.")
     public ResponseEntity<CustomerResponse> getCustomersCardsAndAccounts(@PathVariable Integer customerId) {
         CustomerResponse response = customerService.getCustomersCardsAndAccounts(customerId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{customerId}/status")
-    @Operation(summary = "Update customer status using ID.",
-            description = "Update customer status.")
+    @PatchMapping("/internal/{customerId}/status")
+    @Operation(summary = "Update customer status",
+            description = "Updates the status of a customer (e.g. ACTIVE, BLOCKED, SUSPICIOUS, CLOSED) using their unique identifier. Accessible for internal use only.")
     public ResponseEntity<MessageResponse> updateCustomerStatus(
             @PathVariable Integer customerId,
             @RequestParam CustomerStatus status) {
@@ -91,9 +91,9 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.updateCustomerStatus(customerId, status));
     }
 
-    @PatchMapping("/{customerId}")
-    @Operation(summary = "Update all information of a customer using ID.",
-            description = "Update all information of a customer.")
+    @PatchMapping("/external/{customerId}")
+    @Operation(summary = "Update customer information",
+            description = "Updates the personal information of an existing customer using their unique identifier.")
     public ResponseEntity<MessageResponse> updateCustomer(
             @PathVariable Integer customerId,
             @RequestBody @Valid UpdateCustomerRequest request) {
@@ -101,15 +101,15 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.updateCustomer(customerId, request));
     }
 
-    @DeleteMapping("/{customerId}")
-    @Operation(summary = "Delete a customer using ID.",
-            description = "This method makes the customer's data invisible.")
+    @DeleteMapping("/external/{customerId}")
+    @Operation(summary = "Delete a customer",
+            description = "Soft-deletes a customer by marking their data as invisible. The customer's data is retained in the system but no longer accessible through standard queries.")
     public ResponseEntity<MessageResponse> deleteCustomer(@PathVariable Integer customerId) {
 
         return ResponseEntity.ok(customerService.deleteCustomer(customerId));
     }
 
-    @GetMapping("/{customerId}/cards/{pan}/transactions")
+    @GetMapping("/external/{customerId}/cards/{pan}/transactions")
     @Operation(summary = "Get card transactions by PAN.", description = "Returns paginated transactions for a specific card.")
     public ResponseEntity<List<TransactionResponse>> getCardTransactions(
             @PathVariable Integer customerId,
@@ -118,7 +118,7 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.getCardTransactions(customerId, pan, page).getContent());
     }
 
-    @GetMapping("/{customerId}/accounts/{accountNumber}/transactions")
+    @GetMapping("/external/{customerId}/accounts/{accountNumber}/transactions")
     @Operation(summary = "Get account transactions.", description = "Returns paginated transactions for a specific account.")
     public ResponseEntity<List<TransactionResponse>> getAccountTransactions(
             @PathVariable Integer customerId,
