@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-create-order-rate-limit-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: order_rate_limit
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: order_rate_limit_pk
+
+              - column:
+                  name: order_type
+                  type: varchar
+
+              - column:
+                  name: rejection_count
+                  type: integer
+                  defaultValueNumeric: 0
+
+              - column:
+                  name: cooldown_until
+                  type: timestamp
+
+              - column:
+                  name: created_at
+                  type: timestamp
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+
+              - column:
+                  name: customer_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: order_rate_limit_customer_id_fk
+                    references: customer(id)

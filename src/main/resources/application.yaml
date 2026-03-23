@@ -18,6 +18,12 @@ spring:
         format_sql: true
     open-in-view: true
 
+  liquibase:
+    default-schema: public
+    liquibase-schema: public
+    change-log: classpath:db.changelog/db.changelog-master.yaml
+    enabled: true
+
 
 bank:
   fraud:

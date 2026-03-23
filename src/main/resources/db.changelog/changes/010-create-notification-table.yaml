@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-create-notification-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: notification
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: notification_pk
+
+              - column:
+                  name: message
+                  type: varchar
+
+              - column:
+                  name: is_read
+                  type: boolean
+                  defaultValueBoolean: false
+
+              - column:
+                  name: created_at
+                  type: timestamp
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+
+              - column:
+                  name: customer_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: notification_customer_id_fk
+                    references: customer(id)

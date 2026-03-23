@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-create-status-audit-log-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: status_audit_log
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: status_audit_log_pk
+
+              - column:
+                  name: entity_type
+                  type: varchar
+
+              - column:
+                  name: entity_id
+                  type: integer
+
+              - column:
+                  name: previous_status
+                  type: varchar
+
+              - column:
+                  name: new_status
+                  type: varchar
+
+              - column:
+                  name: reason
+                  type: varchar
+
+              - column:
+                  name: created_at
+                  type: timestamp
+
+              - column:
+                  name: updated_at
+                  type: timestamp

@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-card-order-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: card_order
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: card_order_pk
+
+              - column:
+                  name: status
+                  type: varchar
+
+              - column:
+                  name: rejection_reason
+                  type: varchar
+
+              - column:
+                  name: card_holder_name
+                  type: varchar
+
+              - column:
+                  name: card_brand
+                  type: varchar
+
+              - column:
+                  name: card_name
+                  type: varchar
+
+              - column:
+                  name: currency
+                  type: varchar(3)
+
+              - column:
+                  name: customer_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: card_order_customer_id_fk
+                    references: customer(id)
+
+              - column:
+                  name: created_at
+                  type: timestamp
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+
+              - column:
+                  name: password
+                  type: varchar(4)
+
+              - column:
+                  name: card_type
+                  type: varchar

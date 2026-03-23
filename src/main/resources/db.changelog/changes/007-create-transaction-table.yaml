@@ -1,0 +1,117 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-transaction-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: transaction
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: transaction_pkey
+
+              - column:
+                  name: amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: currency
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: customer_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: transaction_customer_id_fk
+                    references: customer(id)
+
+              - column:
+                  name: from_account_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: transaction_from_account_id_fk
+                    references: current_account(id)
+
+              - column:
+                  name: from_card_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: transaction_from_card_id_fk
+                    references: card(id)
+
+              - column:
+                  name: payment_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: transaction_payment_id_fk
+                    references: payment(id)
+
+              - column:
+                  name: to_account_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: transaction_to_account_id_fk
+                    references: current_account(id)
+
+              - column:
+                  name: to_card_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: transaction_to_card_id_fk
+                    references: card(id)
+
+              - column:
+                  name: to_external_party_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: to_external_party_id
+                    references: external_party(id)
+
+              - column:
+                  name: created_at
+                  type: timestamp(6)
+                  defaultValueComputed: now()
+
+              - column:
+                  name: updated_at
+                  type: timestamp(6)
+
+              - column:
+                  name: description
+                  type: varchar(500)
+
+              - column:
+                  name: status
+                  type: text
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: transaction_type
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+
+        - sql:
+            comment: "transaction currency check constraint"
+            sql: >
+              ALTER TABLE transaction
+              ADD CONSTRAINT transaction_currency_check
+              CHECK (currency = ANY (ARRAY['AZN', 'USD', 'EUR']));
+
+        - sql:
+            comment: "transaction status check constraint"
+            sql: >
+              ALTER TABLE transaction
+              ADD CONSTRAINT transaction_status_check
+              CHECK (status = ANY (ARRAY['SUCCESS', 'PENDING', 'FAILED']));

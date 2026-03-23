@@ -1,0 +1,145 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-payment-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: payment
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: payment_pkey
+
+              - column:
+                  name: amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: currency
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: customer_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: payment_customer_id_fk
+                    references: customer(id)
+
+              - column:
+                  name: from_account_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: payment_from_account_id_fk
+                    references: current_account(id)
+
+              - column:
+                  name: from_card_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: payment_from_card_id_fk
+                    references: card(id)
+
+              - column:
+                  name: from_external_party_id
+                  type: integer
+
+              - column:
+                  name: to_account_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: payment_to_account_id_fk
+                    references: current_account(id)
+
+              - column:
+                  name: to_card_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: payment_to_card_id_fk
+                    references: card(id)
+
+              - column:
+                  name: to_external_party_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: payment_to_external_party_id_fk
+                    references: external_party(id)
+
+              - column:
+                  name: scheduled_date
+                  type: date
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: timestamp(6)
+                  defaultValueComputed: now()
+
+              - column:
+                  name: processed_at
+                  type: timestamp(6)
+
+              - column:
+                  name: updated_at
+                  type: timestamp(6)
+
+              - column:
+                  name: failure_reason
+                  type: varchar(500)
+
+              - column:
+                  name: from_type
+                  type: text
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: text
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: to_type
+                  type: text
+                  constraints:
+                    nullable: false
+
+        - sql:
+            comment: "payment currency check constraint"
+            sql: >
+              ALTER TABLE payment
+              ADD CONSTRAINT payment_currency_check
+              CHECK (currency = ANY (ARRAY['AZN', 'USD', 'EUR']));
+
+        - sql:
+            comment: "payment from_type check constraint"
+            sql: >
+              ALTER TABLE payment
+              ADD CONSTRAINT payment_from_type_check
+              CHECK (from_type = ANY (ARRAY['CARD', 'CURRENT_ACCOUNT', 'EXTERNAL_CARD', 'EXTERNAL_ACCOUNT']));
+
+        - sql:
+            comment: "payment status check constraint"
+            sql: >
+              ALTER TABLE payment
+              ADD CONSTRAINT payment_status_check
+              CHECK (status = ANY (ARRAY['PENDING', 'SUCCESS', 'FAILED', 'REJECTED']));
+
+        - sql:
+            comment: "payment to_type check constraint"
+            sql: >
+              ALTER TABLE payment
+              ADD CONSTRAINT payment_to_type_check
+              CHECK (to_type = ANY (ARRAY['CARD', 'CURRENT_ACCOUNT', 'EXTERNAL']));

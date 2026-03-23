@@ -1,0 +1,98 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-current-account-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: current_account
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: current_account_pkey
+
+              - column:
+                  name: activation_date
+                  type: date
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: balance
+                  type: DECIMAL(19,2)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: currency
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: customer_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: current_account_customer_id_fk
+                    references: customer(id)
+
+              - column:
+                  name: expiry_date
+                  type: date
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: is_visible
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: timestamp(6)
+                  defaultValueComputed: now()
+
+              - column:
+                  name: updated_at
+                  type: timestamp(6)
+
+              - column:
+                  name: account_number
+                  type: varchar(18)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: text
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: current_account_holder_name
+                  type: varchar
+                  constraints:
+                    nullable: false
+
+        - sql:
+            comment: "current_account currency check constraint"
+            sql: >
+              ALTER TABLE current_account
+              ADD CONSTRAINT current_account_currency_check
+              CHECK (currency = ANY (ARRAY['AZN', 'USD', 'EUR']));
+
+        - sql:
+            comment: "current_account status check constraint"
+            sql: >
+              ALTER TABLE current_account
+              ADD CONSTRAINT current_account_status_check
+              CHECK (status = ANY (ARRAY['ACTIVE', 'SUSPICIOUS', 'BLOCKED', 'CLOSED', 'EXPIRED']));

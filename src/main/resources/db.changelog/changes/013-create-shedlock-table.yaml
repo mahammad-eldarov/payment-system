@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-create-shedlock-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: shedlock
+            columns:
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: shedlock_pkey
+
+              - column:
+                  name: lock_until
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: locked_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: locked_by
+                  type: varchar(255)
+                  constraints:
+                    nullable: false

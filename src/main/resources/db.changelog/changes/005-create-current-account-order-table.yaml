@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-current-account-order-table
+      author: Admin
+      changes:
+        - createTable:
+            tableName: current_account_order
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: current_account_order_pk
+
+              - column:
+                  name: status
+                  type: varchar
+
+              - column:
+                  name: rejection_reason
+                  type: varchar
+
+              - column:
+                  name: account_holder_name
+                  type: varchar
+
+              - column:
+                  name: currency
+                  type: varchar
+
+              - column:
+                  name: created_at
+                  type: timestamp
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+
+              - column:
+                  name: customer_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: current_account_order_customer_id_fk
+                    references: customer(id)
