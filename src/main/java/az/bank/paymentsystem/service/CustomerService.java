@@ -74,7 +74,8 @@ public class CustomerService {
     }
 
     public CustomerResponse getDeletedCustomerById(Integer id) {
-        CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException("customerService.getDeletedCustomerById.customerNotFound"));
+        Locale locale = LocaleContextHolder.getLocale();
+        CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("customerService.getDeletedCustomerById.customerNotFound", null, locale)));
         CustomerResponse response = customerMapper.toResponse(customer);
         customerResponseBuilder.setCardsAndAccounts(response, id);
         return response;

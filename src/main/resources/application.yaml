@@ -18,6 +18,14 @@ spring:
         format_sql: true
     open-in-view: true
 
+  messages:
+    basename: message
+    fallback-to-system-locale: false
+    use-code-as-default-message: false
+  web:
+    locale: az
+    locale-resolver: fixed
+
   liquibase:
     default-schema: public
     liquibase-schema: public
