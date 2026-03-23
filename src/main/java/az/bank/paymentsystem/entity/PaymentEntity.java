@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.entity;
 
+import az.bank.paymentsystem.enums.Language;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -89,6 +90,9 @@ public class PaymentEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "to_external_party_id")
     private ExternalPartyEntity toExternalParty;
+
+    @Enumerated(EnumType.STRING)
+    private Language language;
 
 
 }

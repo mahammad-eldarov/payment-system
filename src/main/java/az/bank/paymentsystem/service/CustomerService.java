@@ -138,6 +138,10 @@ public class CustomerService {
         if (request.getPhoneNumber() != null) {
             customer.setPhoneNumber(request.getPhoneNumber());
         }
+        if (request.getLanguage() != null) {
+            customer.setLanguage(request.getLanguage());
+        }
+
         customer.setUpdatedAt(Instant.now());
 
         customerRepository.save(customer);

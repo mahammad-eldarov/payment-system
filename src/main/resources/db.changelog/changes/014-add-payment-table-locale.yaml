@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 014-add-payment-table-locale
+      author: Admin
+      changes:
+        - addColumn:
+            tableName: payment
+            columns:
+              - column:
+                  name: locale
+                  type: VARCHAR(10)

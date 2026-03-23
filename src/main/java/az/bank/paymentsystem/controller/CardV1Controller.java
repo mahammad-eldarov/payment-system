@@ -26,7 +26,7 @@ public class CardV1Controller {
 
     private final CardService cardService;
 
-    @PatchMapping("/{cardId}/status")
+    @PatchMapping("/internal/{cardId}/status")
     @Operation(summary = "Update card status using ID.",
             description = "Update card status.")
     public ResponseEntity<MessageResponse> updateCardStatus(
@@ -37,7 +37,7 @@ public class CardV1Controller {
 
     }
 
-    @PatchMapping("/password/card/{cardId}")
+    @PatchMapping("/external/password/card/{cardId}")
     @Operation(summary = "Update card password using card ID.",
             description = "Update card password.")
     public ResponseEntity<MessageResponse> updateCardPassword(
@@ -47,7 +47,7 @@ public class CardV1Controller {
 
     }
 
-    @DeleteMapping("/{cardId}/delete")
+    @DeleteMapping("/external/{cardId}/delete")
     @Operation(summary = "Delete a card.",
             description = "Delete a card using card id.")
     public ResponseEntity<MessageResponse> deleteCard(@PathVariable Integer cardId) {
@@ -55,7 +55,7 @@ public class CardV1Controller {
         return ResponseEntity.ok(cardService.deleteCard(cardId));
     }
 
-    @GetMapping("/customer/{customerId}")
+    @GetMapping("/external/customer/{customerId}")
     @Operation(summary = "Search card using ID.",
             description = "Search a card.")
     public ResponseEntity<List<CardResponse>> getCardsByCustomerId(
@@ -63,14 +63,14 @@ public class CardV1Controller {
         return ResponseEntity.ok(cardService.getCardsByCustomerId(customerId));
     }
 
-    @GetMapping("/{pan}")
+    @GetMapping("/external/{pan}")
     @Operation(summary = "Search card using PAN.",
             description = "Search a card pan.")
     public ResponseEntity<CardResponse> getCardByPan(@PathVariable String pan) {
         return ResponseEntity.ok(cardService.getCardByPan(pan));
     }
 
-    @GetMapping("/status")
+    @GetMapping("/internal/status")
     @Operation(summary = "Get card by status.",
             description = "Search a card status.")
     public ResponseEntity<List<CardResponse>> getCardsByStatus(

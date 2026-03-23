@@ -23,7 +23,7 @@ public class CardOrderV1Controller {
 
     private final CardOrderService cardOrderRequestService;
 
-    @PostMapping("/customer/{customerId}")
+    @PostMapping("/external/customer/{customerId}")
     @Operation(summary = "Order a card", description = "Creates a card order for a customer")
     public ResponseEntity<CardOrderResponse> orderCard(
             @PathVariable Integer customerId,

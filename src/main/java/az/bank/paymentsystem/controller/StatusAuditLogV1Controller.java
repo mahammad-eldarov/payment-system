@@ -21,7 +21,7 @@ public class StatusAuditLogV1Controller {
 
     private final StatusAuditLogService statusAuditLogService;
 
-    @GetMapping("/card/{cardId}")
+    @GetMapping("/internal/card/{cardId}")
     @Operation(summary = "Get card status history", description = "Returns status change history for a specific card")
     public ResponseEntity<List<StatusAuditLogResponse>> getCardHistory(@PathVariable Integer cardId,
                                                                        @RequestParam(required = false, defaultValue ="1")
@@ -29,7 +29,7 @@ public class StatusAuditLogV1Controller {
         return ResponseEntity.ok(statusAuditLogService.getCardHistory(cardId,page).getContent());
     }
 
-    @GetMapping("/account/{accountId}")
+    @GetMapping("/internal/account/{accountId}")
     @Operation(summary = "Get account status history", description = "Returns status change history for a specific current account")
     public ResponseEntity<List<StatusAuditLogResponse>> getAccountHistory(@PathVariable Integer accountId,
                                                                           @RequestParam(required = false, defaultValue ="1")
@@ -37,7 +37,7 @@ public class StatusAuditLogV1Controller {
         return ResponseEntity.ok(statusAuditLogService.getAccountHistory(accountId, page).getContent());
     }
 
-    @GetMapping("/customer/{customerId}")
+    @GetMapping("/internal/customer/{customerId}")
     @Operation(summary = "Get customer status history", description = "Returns status change history for a specific customer")
     public ResponseEntity<List<StatusAuditLogResponse>> getCustomerHistory(@PathVariable Integer customerId,
                                                                            @RequestParam(required = false, defaultValue ="1")

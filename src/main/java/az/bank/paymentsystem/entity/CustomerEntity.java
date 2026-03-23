@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.entity;
 
+import az.bank.paymentsystem.enums.Language;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -62,6 +63,9 @@ public class CustomerEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<TransactionEntity> transactionEntity;
+
+    @Enumerated(EnumType.STRING)
+    private Language language;
 
 
 

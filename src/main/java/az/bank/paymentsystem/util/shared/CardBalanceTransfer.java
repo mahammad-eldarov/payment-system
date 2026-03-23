@@ -20,8 +20,8 @@ public class CardBalanceTransfer {
     private final NotificationService notificationService;
     private final MessageSource messageSource;
 
-    public String transfer(CardEntity card) {
-        Locale locale = LocaleContextHolder.getLocale();
+    public String transfer(CardEntity card,Locale locale) {
+//        Language locale = LocaleContextHolder.getLanguage();
         BigDecimal balance = card.getBalance();
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
@@ -35,12 +35,12 @@ public class CardBalanceTransfer {
 
         Integer customerId = card.getCustomer().getId();
         String lastFour = card.getPan().substring(card.getPan().length() - 4);
-        String reason = getStatusReason(card.getStatus());
+        String reason = getStatusReason(card.getStatus(),locale);
 
         CardEntity otherCard = cardRepository
                 .findFirstByCustomerIdAndIsVisibleTrueAndIdNot(customerId, card.getId()).orElse(null);
         if (otherCard != null && isTransferableCard(otherCard)) {
-            return transferToCard(card, otherCard, balance, reason);
+            return transferToCard(card, otherCard, balance, reason, locale);
         }
         String message = messageSource.getMessage("cardBalanceTransfer.transfer.visitingBranch",new Object[]{lastFour, reason, balance, card.getCurrency()},locale);
         notificationService.send(card.getCustomer(), message);
@@ -48,8 +48,8 @@ public class CardBalanceTransfer {
 
     }
 
-    private String getStatusReason(CardStatus status) {
-        Locale locale = LocaleContextHolder.getLocale();
+    private String getStatusReason(CardStatus status, Locale locale) {
+//        Language locale = LocaleContextHolder.getLanguage();
         return switch (status) {
             case BLOCKED -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.blocked",null,locale);
             case EXPIRED -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.expired",null,locale);
@@ -70,8 +70,8 @@ public class CardBalanceTransfer {
                 && card.getStatus() != CardStatus.EXPIRED;
     }
 
-    private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance, String reason) {
-        Locale locale = LocaleContextHolder.getLocale();
+    private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance, String reason, Locale locale) {
+//        Language locale = LocaleContextHolder.getLanguage();
         otherCard.setBalance(otherCard.getBalance().add(balance));
         card.setBalance(BigDecimal.ZERO);
         cardRepository.save(otherCard);

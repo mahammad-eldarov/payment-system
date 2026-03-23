@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.enums.Language;
 import az.bank.paymentsystem.util.shared.CardBalanceTransfer;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
@@ -48,22 +49,28 @@ public class CardService {
         card.setIsVisible(false);
         card.setUpdatedAt(Instant.now());
 
-        cardBalanceTransfer.transfer(card);
+        cardBalanceTransfer.transfer(card,locale);
         cardRepository.save(card);
-        return new MessageResponse("cardService.deleteCard.cardClosedSuccessfully");
+        return new MessageResponse(messageSource.getMessage("cardService.deleteCard.cardClosedSuccessfully",null,locale));
     }
 
     @Transactional
     public void updateExpiredCards() {
-        Locale locale = LocaleContextHolder.getLocale();
+//        Language locale = LocaleContextHolder.getLanguage();
+//        Language locale = Language.forLanguageTag(card.getCustomer().getLanguage());
+
         List<CardEntity> expiredCards = cardRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
 
         expiredCards.forEach(card -> {
+            Locale locale = card.getCustomer() != null && card.getCustomer().getLanguage() != null
+                    ? card.getCustomer().getLanguage().toLocale()
+                    : Language.AZ.toLocale();
+
             statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), messageSource.getMessage("cardService.updateExpiredCards.cardExpiry",null,locale));
             card.setStatus(CardStatus.EXPIRED);
             card.setUpdatedAt(Instant.now());
-            cardBalanceTransfer.transfer(card);
+            cardBalanceTransfer.transfer(card,locale);
         });
 
         cardRepository.saveAll(expiredCards);

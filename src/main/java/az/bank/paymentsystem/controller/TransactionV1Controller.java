@@ -21,7 +21,7 @@ public class TransactionV1Controller {
 
     private final TransactionService transactionService;
 
-    @GetMapping("/card/{cardId}")
+    @GetMapping("/external/card/{cardId}")
     @Operation(summary = "Get last 100 transactions by card ID.",
             description = "Returns transactions where card is sender or receiver.")
     public ResponseEntity<List<TransactionResponse>> getByCardId(
@@ -30,7 +30,7 @@ public class TransactionV1Controller {
         return ResponseEntity.ok(transactionService.getTransactionsByCardId(cardId, page).getContent());
     }
 
-    @GetMapping("/account/{accountId}")
+    @GetMapping("/external/account/{accountId}")
     @Operation(summary = "Get last 100 transactions by account ID.",
             description = "Returns transactions where account is sender or receiver.")
     public ResponseEntity<List<TransactionResponse>> getByAccountId(
@@ -39,7 +39,7 @@ public class TransactionV1Controller {
         return ResponseEntity.ok(transactionService.getTransactionsByAccountId(accountId, page).getContent());
     }
 
-    @GetMapping("/payment/{paymentId}")
+    @GetMapping("external/payment/{paymentId}")
     @Operation(summary = "Get transactions by payment ID.",
             description = "Returns all transactions linked to a payment.")
     public ResponseEntity<List<TransactionResponse>> getByPaymentId(

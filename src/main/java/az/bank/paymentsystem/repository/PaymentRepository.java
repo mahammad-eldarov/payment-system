@@ -35,4 +35,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
             PaymentStatus status
     );
 
+    Optional<PaymentEntity> findByIdAndCustomerId(Integer id, Integer customerId);
+
 }

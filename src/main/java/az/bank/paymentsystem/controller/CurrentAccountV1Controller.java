@@ -26,7 +26,7 @@ public class CurrentAccountV1Controller {
     private final CurrentAccountService currentAccountService;
 
 
-    @PatchMapping("/{currentAccountId}/status")
+    @PatchMapping("/internal/{currentAccountId}/status")
     @Operation(summary = "Update current account status using ID.",
             description = "Update current account status.")
     public ResponseEntity<MessageResponse> updateCurrentAccountStatus(
@@ -36,21 +36,21 @@ public class CurrentAccountV1Controller {
         return ResponseEntity.ok(currentAccountService.updateCurrentAccountStatus(currentAccountId, status));
     }
 
-    @GetMapping("/customer/{customerId}")
+    @GetMapping("/external/customer/{customerId}")
     @Operation(summary = "Get accounts by customer ID.", description = "Retrieves all current accounts for a customer.")
     public ResponseEntity<List<CurrentAccountResponse>> getCurrentAccountsByCustomerId(
             @PathVariable Integer customerId) {
         return ResponseEntity.ok(currentAccountService.getAccountsByCustomerId(customerId));
     }
 
-    @GetMapping("/{accountNumber}")
+    @GetMapping("/external/{accountNumber}")
     @Operation(summary = "Get account by account number.", description = "Retrieves a current account by its account number.")
     public ResponseEntity<CurrentAccountResponse> getCurrentAccountByAccountNumber(
             @PathVariable String accountNumber) {
         return ResponseEntity.ok(currentAccountService.getAccountByAccountNumber(accountNumber));
     }
 
-    @GetMapping("/status")
+    @GetMapping("/internal/status")
     @Operation(summary = "Get a current account status.", description = "Get current account by status.")
     public ResponseEntity<List<CurrentAccountResponse>> getCurrentAccountByStatus(
             @RequestParam CurrentAccountStatus status) {
@@ -58,7 +58,7 @@ public class CurrentAccountV1Controller {
         return ResponseEntity.ok(currentAccountService.getCurrentAccountByStatus(status));
     }
 
-    @DeleteMapping("/{currentAccountId}/delete")
+    @DeleteMapping("/external/{currentAccountId}/delete")
     @Operation(summary = "Delete a current account.", description = "Soft-deletes a current account using its ID.")
     public ResponseEntity<MessageResponse> deleteCurrentAccount(@PathVariable Integer currentAccountId) {
 

@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.dto.response;
 
 import az.bank.paymentsystem.enums.CustomerStatus;
+import az.bank.paymentsystem.enums.Language;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,6 @@ public class CustomerShortResponse {
     private String email;
     private String phoneNumber;
     private CustomerStatus status;
+    private Language language;
 }
 

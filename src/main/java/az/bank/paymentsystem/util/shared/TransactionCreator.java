@@ -12,7 +12,6 @@ import az.bank.paymentsystem.enums.TransactionStatus;
 import az.bank.paymentsystem.enums.TransactionType;
 import az.bank.paymentsystem.repository.TransactionRepository;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -52,7 +51,9 @@ public class TransactionCreator {
     }
 
     private String buildDescription(PaymentEntity payment) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = payment.getLanguage() != null
+                ? Locale.forLanguageTag(String.valueOf(payment.getLanguage()))
+                : Locale.forLanguageTag("az");
         return messageSource.getMessage("transactionCreator.buildDescription",new Object[]{payment.getAmount(), payment.getCurrency(), payment.getFromType(), payment.getToType()}, locale);
     }
 

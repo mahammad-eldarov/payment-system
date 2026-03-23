@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.dto.request;
 
+import az.bank.paymentsystem.enums.Language;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -27,4 +28,6 @@ public class UpdateCustomerRequest {
     @NotBlank(message = "{notBlank.phoneNumber}")
     @Pattern(regexp = "^\\+994[0-9]{9}$", message = "{pattern.phoneNumber}")
     private String phoneNumber;
+
+    private Language language;
 }

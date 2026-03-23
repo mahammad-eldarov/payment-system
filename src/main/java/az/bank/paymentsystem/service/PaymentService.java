@@ -117,14 +117,22 @@ public class PaymentService {
         }
     }
 
-    public PaymentResponse getPaymentById(Integer paymentId) {
-        return paymentMapper.toResponse(findPaymentById(paymentId));
+//    public PaymentResponse getPaymentById(Integer paymentId) {
+//        return paymentMapper.toResponse(findPaymentById(paymentId));
+//    }
+
+    public PaymentResponse getPaymentById(Integer customerId, Integer paymentId) {
+        PaymentEntity payment = paymentRepository.findByIdAndCustomerId(paymentId, customerId)
+                .orElseThrow(() -> new PaymentNotFoundException(
+                        messageSource.getMessage("paymentService.findPaymentById.paymentNotFound", null, LocaleContextHolder.getLocale())
+                ));
+        return paymentMapper.toResponse(payment);
     }
 
-    public PaymentEntity findPaymentById(Integer paymentId) {
-        Locale locale = LocaleContextHolder.getLocale();
-        return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentNotFoundException(messageSource.getMessage("paymentService.findPaymentById.paymentNotFound",null, locale)));
-    }
+//    public PaymentEntity findPaymentById(Integer paymentId) {
+//        Language locale = LocaleContextHolder.getLanguage();
+//        return paymentRepository.findById(paymentId)
+//                .orElseThrow(() -> new PaymentNotFoundException(messageSource.getMessage("paymentService.findPaymentById.paymentNotFound",null, locale)));
+//    }
 
 }

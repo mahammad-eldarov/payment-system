@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.customer;
 
+import az.bank.paymentsystem.enums.Language;
 import az.bank.paymentsystem.util.shared.FraudBlacklistChecker;
 import az.bank.paymentsystem.util.shared.FraudDetectionChecker;
 import java.time.Instant;
@@ -41,6 +42,7 @@ public class CustomerCreator {
         customer.setPin(request.getPin());
         customer.setEmail(request.getEmail());
         customer.setPhoneNumber(request.getPhoneNumber());
+        customer.setLanguage(Language.valueOf(LocaleContextHolder.getLocale().getLanguage().toUpperCase()));
         customer.setStatus(CustomerStatus.ACTIVE);
         customer.setIsVisible(true);
         customer.setCreatedAt(Instant.now());

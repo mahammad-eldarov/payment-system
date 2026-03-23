@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.payment;
 
+import az.bank.paymentsystem.enums.Language;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -49,6 +50,7 @@ public class PaymentCreator {
         payment.setScheduledDate(LocalDate.now());
         payment.setFromType(fromType);
         payment.setToType(toType);
+        payment.setLanguage(Language.valueOf(LocaleContextHolder.getLocale().getLanguage().toUpperCase()));
         payment.setCustomer(customer);
         payment.setCreatedAt(Instant.now());
         return payment;

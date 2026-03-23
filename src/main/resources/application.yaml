@@ -22,9 +22,11 @@ spring:
     basename: message
     fallback-to-system-locale: false
     use-code-as-default-message: false
+    encoding: UTF-8
   web:
     locale: az
     locale-resolver: fixed
+
 
   liquibase:
     default-schema: public
@@ -54,9 +56,9 @@ bank:
 
 scheduler:
   payment:
-    cron: "00 00 00 * * *"
+    cron: "30 47 00 * * *"
   card:
-    cron: "00 00 00 * * *"
+    cron: "30 27 01 * * *"
   currentAccount:
     cron: "00 00 00 * * *"
 

@@ -21,7 +21,7 @@ public class NotificationV1Controller {
 
     private final NotificationService notificationService;
 
-    @GetMapping("/customer/{customerId}")
+    @GetMapping("/external/customer/{customerId}")
     @Operation(summary = "Get notifications", description = "Returns paginated notifications for a customer")
     public ResponseEntity<List<NotificationResponse>> getNotifications(
             @PathVariable Integer customerId,

@@ -23,7 +23,7 @@ public class CurrentAccountOrderV1Controller {
 
     private final CurrentAccountOrderService currentAccountOrderRequestService;
 
-    @PostMapping("/customer/{customerId}")
+    @PostMapping("/external/customer/{customerId}")
     @Operation(summary = "Order a current account", description = "Creates a current account order for a customer")
     public ResponseEntity<CurrentAccountOrderResponse> orderAccount(
             @PathVariable Integer customerId,
