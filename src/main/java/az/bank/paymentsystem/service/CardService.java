@@ -110,7 +110,7 @@ public class CardService {
     }
 
     public List<CardResponse> getCardsByStatus(CardStatus status) {
-        List<CardEntity> cards = cardRepository.findByStatusAndIsVisibleTrue(status);
+        List<CardEntity> cards = cardRepository.findByStatus(status);
         Locale locale = LocaleContextHolder.getLocale();
         if (cards.isEmpty()) {
             throw new CardNotFoundException(messageSource.getMessage("cardService.getCardsByStatus.cardNotFound", null, locale));

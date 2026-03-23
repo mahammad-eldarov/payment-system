@@ -31,7 +31,7 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
     @EntityGraph(attributePaths = {"customer"})
     List<CardEntity> findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate date, CardStatus status);
 
-    List<CardEntity> findByStatusAndIsVisibleTrue(CardStatus status);
+    List<CardEntity> findByStatus(CardStatus status);
 
     @Query("SELECT c FROM CardEntity c WHERE c.customer.id = :customerId AND c.isVisible = true AND c.balance >= :amount ORDER BY c.balance ASC LIMIT 1")
     Optional<CardEntity> findSufficientCard(@Param("customerId") Integer customerId, @Param("amount") BigDecimal amount);

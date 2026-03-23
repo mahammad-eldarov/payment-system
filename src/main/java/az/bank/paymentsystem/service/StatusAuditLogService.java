@@ -34,9 +34,8 @@ public class StatusAuditLogService {
     private final MessageSource messageSource;
 
     public Page<StatusAuditLogResponse> getCardHistory(Integer cardId, int page) {
+        findCard(cardId);
         Locale locale = LocaleContextHolder.getLocale();
-        findActiveCard(cardId);
-
         Pageable pageable = buildPageable(page);
 
         Page<StatusAuditLogEntity> logs = statusAuditLogRepository
@@ -44,15 +43,13 @@ public class StatusAuditLogService {
 
         if (logs.isEmpty()) throw new EmptyListException(messageSource.getMessage("statusAuditLogService.getCardHistory.cardStatusChanged",null,locale));
 
-
         return logs.map(statusAuditLogMapper::toResponse);
 
     }
 
     public Page<StatusAuditLogResponse> getAccountHistory(Integer accountId, int page) {
+        findAccount(accountId);
         Locale locale = LocaleContextHolder.getLocale();
-        findActiveAccount(accountId);
-
         Pageable pageable = buildPageable(page);
 
         Page<StatusAuditLogEntity> logs = statusAuditLogRepository
@@ -64,9 +61,8 @@ public class StatusAuditLogService {
     }
 
     public Page<StatusAuditLogResponse> getCustomerHistory(Integer customerId, int page) {
+        findCustomer(customerId);
         Locale locale = LocaleContextHolder.getLocale();
-        findActiveCustomer(customerId);
-
         Pageable pageable = buildPageable(page);
 
         Page<StatusAuditLogEntity> logs = statusAuditLogRepository
@@ -84,21 +80,24 @@ public class StatusAuditLogService {
         return PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
     }
 
-    public void findActiveCard(Integer id) {
+    public void findCard(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
-        cardRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CardNotFoundException(messageSource.getMessage("statusAuditLogService.findActiveCard.cardNotFound",null,locale)));
+        cardRepository.findById(id)
+                .orElseThrow(() -> new CardNotFoundException(
+                        messageSource.getMessage("statusAuditLogService.findActiveCard.cardNotFound", null, locale)));
     }
 
-    public void findActiveCustomer(Integer id) {
+    public void findCustomer(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
-        customerRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("statusAuditLogService.findActiveCustomer.customerNotFound",null,locale)));
+        customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(
+                        messageSource.getMessage("statusAuditLogService.findActiveCustomer.customerNotFound", null, locale)));
     }
 
-    public void findActiveAccount(Integer id) {
+    public void findAccount(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
-        currentAccountRepository.findByIdAndIsVisibleTrue(id)
-                .orElseThrow(() -> new AccountNotFoundException(messageSource.getMessage("statusAuditLogService.findActiveAccount.accountNotFound",null,locale)));
+        currentAccountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(
+                        messageSource.getMessage("statusAuditLogService.findActiveAccount.accountNotFound", null, locale)));
     }
 }
