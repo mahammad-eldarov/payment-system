@@ -14,13 +14,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CardToCardRequest {
 
-    @NotNull(message = "notNull.bigDecimal")
+    @NotNull(message = "{notNull.bigDecimal}")
     private BigDecimal amount;
 
-    @NotBlank(message = "notBlank.fromPan")
+    @NotBlank(message = "{notBlank.fromPan}")
     private String fromPan;
 
-    @NotBlank(message = "notBlank.toPan")
+    @NotBlank(message = "{notBlank.toPan}")
     private String toPan;
 
 }

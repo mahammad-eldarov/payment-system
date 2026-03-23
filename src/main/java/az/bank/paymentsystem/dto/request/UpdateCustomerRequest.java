@@ -14,17 +14,17 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateCustomerRequest {
 
-    @NotBlank(message = "notBlank.name")
+    @NotBlank(message = "{notBlank.name}")
     private String name;
 
-    @NotBlank(message = "notBlank.surname")
+    @NotBlank(message = "{notBlank.surname}")
     private String surname;
 
-    @NotBlank(message = "notBlank.email")
-    @Email(message = "The email format is incorrect.")
+    @NotBlank(message = "{notBlank.email}")
+    @Email(message = "{email.message}")
     private String email;
 
-    @NotBlank(message = "notBlank.phoneNumber")
-    @Pattern(regexp = "^\\+994[0-9]{9}$", message = "pattern.phoneNumber")
+    @NotBlank(message = "{notBlank.phoneNumber}")
+    @Pattern(regexp = "^\\+994[0-9]{9}$", message = "{pattern.phoneNumber}")
     private String phoneNumber;
 }

@@ -16,23 +16,23 @@ import az.bank.paymentsystem.enums.Currency;
 @AllArgsConstructor
 public class OrderCardRequest {
 
-    @NotNull(message = "notNull.cardHolderName")
+    @NotNull(message = "{notNull.cardHolderName}")
     private String cardHolderName;
 
-    @NotNull(message = "notNull.cardName")
+    @NotNull(message = "{notNull.cardName}")
     private CardName cardName;
 
-    @NotNull(message = "notNull.password")
-    @Pattern(regexp = "^[0-9]{4}$", message = "pattern.password")
+    @NotNull(message = "{notNull.password}")
+    @Pattern(regexp = "^[0-9]{4}$", message = "{pattern.password}")
     private String password;
 
-    @NotNull(message = "notNull.currency")
+    @NotNull(message = "{notNull.currency}")
     private Currency currency;
 
-    @NotNull(message = "notNull.cardBrand")
+    @NotNull(message = "{notNull.cardBrand}")
     private CardBrand cardBrand;
 
-    @NotNull(message = "notNull.cardType")
+    @NotNull(message = "{notNull.cardType}")
     private CardType cardType;
 
 

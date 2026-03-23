@@ -14,13 +14,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AccountToAccountRequest {
 
-    @NotNull(message = "notNull.bigDecimal")
+    @NotNull(message = "{notNull.bigDecimal}")
     private BigDecimal amount;
 
-    @NotBlank(message = "notBlank.fromAccountNumber")
+    @NotBlank(message = "{notBlank.fromAccountNumber}")
     private String fromAccountNumber;
 
-    @NotBlank(message = "notBlank.toAccountNumber")
+    @NotBlank(message = "{notBlank.toAccountNumber}")
     private String toAccountNumber;
 
 

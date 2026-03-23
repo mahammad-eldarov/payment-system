@@ -12,10 +12,10 @@ import az.bank.paymentsystem.enums.Currency;
 @AllArgsConstructor
 public class OrderCurrentAccountRequest {
 
-    @NotNull(message = "notNull.currency")
+    @NotNull(message = "{notNull.currency}")
     private Currency currency;
 
-    @NotNull(message = "notNull.currentAccountHolderName")
+    @NotNull(message = "{notNull.currentAccountHolderName}")
     private String currentAccountHolderName;
 
 
