@@ -15,7 +15,6 @@ import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,6 +29,7 @@ public class SuspiciousTransactionChecker {
     private final NotificationService notificationService;
     private final FraudBlacklistChecker fraudBlacklistChecker;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
     public void check(PaymentEntity payment) {
         if (isUnderThreshold(payment)) return;
@@ -54,7 +54,7 @@ public class SuspiciousTransactionChecker {
     }
 
     private void markSourceSuspicious(PaymentEntity payment) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
         if (payment.getFromCard() != null) {
             CardEntity card = payment.getFromCard();
             statusAuditLogger.logCard(card, CardStatus.SUSPICIOUS.name(), messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.suspiciousTransaction", null, locale));
@@ -73,7 +73,7 @@ public class SuspiciousTransactionChecker {
     }
 
     private void markCustomerSuspicious(PaymentEntity payment) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
         CustomerEntity customer = payment.getCustomer();
         statusAuditLogger.logCustomer(customer, CustomerStatus.SUSPICIOUS.name(), messageSource.getMessage("suspiciousTransactionChecker.markCustomerSuspicious.secondSuspiciousTransaction",null, locale));
         customer.setStatus(CustomerStatus.SUSPICIOUS);

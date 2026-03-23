@@ -1,6 +1,5 @@
 package az.bank.paymentsystem.util.payment;
 
-import az.bank.paymentsystem.enums.Language;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -30,16 +29,17 @@ public class PaymentCreator {
 
     public PaymentEntity buildPayment(Integer customerId, BigDecimal amount,
                                       PaymentSourceType fromType, PaymentSourceType toType) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale fallbackLocale = LocaleContextHolder.getLocale();
+
         if (paymentRepository.existsByCustomerIdAndScheduledDateAndStatus(
                 customerId, LocalDate.now(), PaymentStatus.PENDING)) {
             throw new MultiValidationException(List.of(
-                    new ExceptionResponse(400, messageSource.getMessage("paymentCreator.buildPayment.pendingPayment",null,locale), LocalDateTime.now())));
+                    new ExceptionResponse(400, messageSource.getMessage("paymentCreator.buildPayment.pendingPayment",null,fallbackLocale), LocalDateTime.now())));
         }
 
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
                 .orElseThrow(() -> new MultiValidationException(List.of(
-                        new ExceptionResponse(404, messageSource.getMessage("paymentCreator.buildPayment.customerNotFound",null,locale), LocalDateTime.now()))));
+                        new ExceptionResponse(404, messageSource.getMessage("paymentCreator.buildPayment.customerNotFound",null,fallbackLocale), LocalDateTime.now()))));
 
         BigDecimal safeAmount = (amount != null && amount.compareTo(BigDecimal.ZERO) > 0)
                 ? amount : BigDecimal.ZERO;
@@ -50,7 +50,7 @@ public class PaymentCreator {
         payment.setScheduledDate(LocalDate.now());
         payment.setFromType(fromType);
         payment.setToType(toType);
-        payment.setLanguage(Language.valueOf(LocaleContextHolder.getLocale().getLanguage().toUpperCase()));
+        payment.setLanguage(customer.getLanguage());
         payment.setCustomer(customer);
         payment.setCreatedAt(Instant.now());
         return payment;

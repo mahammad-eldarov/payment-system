@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.payment;
 
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class PaymentValidator {
 
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
     public void validate(PaymentEntity payment, List<ExceptionResponse> errors) {
         validateCard(payment, errors);
@@ -28,7 +30,7 @@ public class PaymentValidator {
     }
 
     private void validateCard(PaymentEntity payment, List<ExceptionResponse> errors) {
-        Locale locale =  LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
         if (payment.getFromCard() != null) {
             CardEntity fromCard = payment.getFromCard();
             if (fromCard.getStatus() != CardStatus.ACTIVE) {
@@ -46,7 +48,7 @@ public class PaymentValidator {
     }
 
     private void validateAccount(PaymentEntity payment, List<ExceptionResponse> errors) {
-        Locale locale =  LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
         if (payment.getFromAccount() != null) {
             CurrentAccountEntity fromAccount = payment.getFromAccount();
             if (fromAccount.getStatus() != CurrentAccountStatus.ACTIVE) {
@@ -64,7 +66,7 @@ public class PaymentValidator {
     }
 
     public void checkSelfTransfer(PaymentEntity payment, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
         if (payment.getFromCard() != null && payment.getToCard() != null &&
                 payment.getFromCard().getId().equals(payment.getToCard().getId())) {
             errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.checkSelfTransfer.sameCard",null,locale), LocalDateTime.now()));

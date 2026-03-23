@@ -6,6 +6,7 @@ import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.repository.ExternalPartyRepository;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,6 @@ import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.repository.CardRepository;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,11 +34,13 @@ public class PaymentSourceResolver {
     private final CurrencyConverter currencyConverter;
     private final ExternalPartyRepository externalPartyRepository;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
 
     public void fromCheckCard(PaymentEntity payment, Integer customerId,
                                String fromPan, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
         CardEntity card = cardRepository.findByPanAndIsVisibleTrue(fromPan).orElse(null);
         if (card == null) {
             errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.fromCheckCard.cardNotFound",null, locale), LocalDateTime.now()));
@@ -74,7 +76,8 @@ public class PaymentSourceResolver {
 
     public void fromCheckAccount(PaymentEntity payment, Integer customerId,
                                   String fromAccountNumber, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
 
         CurrentAccountEntity account = currentAccountRepository
                 .findByAccountNumberAndIsVisibleTrue(fromAccountNumber).orElse(null);
@@ -121,7 +124,8 @@ public class PaymentSourceResolver {
 
     private void fallbackToAccount(PaymentEntity payment, Integer customerId,
                                    Currency cardCurrency, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
 
         CurrentAccountEntity account = currentAccountRepository
                 .findSufficientAccount(customerId, payment.getAmount()).orElse(null);
@@ -151,7 +155,8 @@ public class PaymentSourceResolver {
 
     private void fallbackToCard(PaymentEntity payment, Integer customerId,
                                 List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
 
         CardEntity card = cardRepository.findSufficientCard(customerId, payment.getAmount()).orElse(null);
         if (card == null) {
@@ -176,7 +181,8 @@ public class PaymentSourceResolver {
     }
 
     private void resolveInternalCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
 
         CardEntity card = cardRepository.findByPanAndIsVisibleTrue(toPan).orElse(null);
         if (card == null) {
@@ -199,7 +205,8 @@ public class PaymentSourceResolver {
     }
 
     private void resolveExternalCard(PaymentEntity payment, String toPan, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
 
         Optional<ExternalPartyEntity> external = externalPartyRepository.findByCardNumber(toPan);
 
@@ -224,7 +231,8 @@ public class PaymentSourceResolver {
     }
 
     private void resolveInternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
 
         CurrentAccountEntity account = currentAccountRepository
                 .findByAccountNumberAndIsVisibleTrue(toAccountNumber).orElse(null);
@@ -248,8 +256,7 @@ public class PaymentSourceResolver {
     }
 
     private void resolveExternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
-        Locale locale = LocaleContextHolder.getLocale();
-
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
         Optional<ExternalPartyEntity> external = externalPartyRepository.findByAccountNumber(toAccountNumber);
         if (external.isEmpty()) {
             errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.resolveExternalAccount.accountNotFound",null,locale), LocalDateTime.now()));

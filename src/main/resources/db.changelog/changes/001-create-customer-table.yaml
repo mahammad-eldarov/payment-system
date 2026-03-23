@@ -68,6 +68,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
 
+              - column:
+                  name: language
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+
         - sql:
             comment: "customer status check constraint"
             sql: >

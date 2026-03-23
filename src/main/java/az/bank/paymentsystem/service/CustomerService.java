@@ -3,6 +3,7 @@ package az.bank.paymentsystem.service;
 import az.bank.paymentsystem.dto.response.CustomerShortResponse;
 import az.bank.paymentsystem.dto.response.TransactionResponse;
 import az.bank.paymentsystem.repository.CustomerRepository;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
@@ -35,11 +36,11 @@ public class CustomerService {
     private final CustomerResponseBuilder customerResponseBuilder;
     private final CustomerCreator customerCreator;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
     public CustomerShortResponse createCustomer(CreateCustomerRequest request) {
         CustomerEntity customer = customerCreator.createCustomer(request);
         customerRepository.save(customer);
-
 
         CustomerShortResponse response = customerMapper.toShortResponse(customer);
         response.setPin(request.getPin());
@@ -47,9 +48,8 @@ public class CustomerService {
     }
 
     public CustomerShortResponse getCustomerById(Integer id) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         Optional<CustomerEntity> activeCustomer = customerRepository.findByIdAndIsVisibleTrue(id);
+        Locale locale = LocaleContextHolder.getLocale();
         if (activeCustomer.isPresent()) {
             return customerMapper.toShortResponse(activeCustomer.get());
         }
@@ -60,9 +60,8 @@ public class CustomerService {
     }
 
     public List<CustomerShortResponse> getCustomersByStatus(CustomerStatus status) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
+        Locale locale = LocaleContextHolder.getLocale();
 
         if (!activeCustomers.isEmpty()) {
             return activeCustomers.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
@@ -77,15 +76,13 @@ public class CustomerService {
         Locale locale = LocaleContextHolder.getLocale();
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("customerService.getDeletedCustomerById.customerNotFound", null, locale)));
         CustomerResponse response = customerMapper.toResponse(customer);
-        customerResponseBuilder.setCardsAndAccounts(response, id);
+        customerResponseBuilder.setCardsAndAccounts(response, id,customer);
         return response;
     }
 
     public List<CustomerShortResponse> getAllCustomers() {
-        Locale locale = LocaleContextHolder.getLocale();
-
         List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
-
+        Locale locale = LocaleContextHolder.getLocale();
         if (activeCustomer.isEmpty()) {
             throw new EmptyListException(messageSource.getMessage("customerService.getAllCustomers.listEmpty", null, locale));
         }
@@ -94,8 +91,9 @@ public class CustomerService {
     }
 
     public CustomerResponse getCustomersCardsAndAccounts(Integer id) {
+        CustomerEntity customer = findActiveCustomer(id);
         CustomerResponse response = customerMapper.toResponse(findActiveCustomer(id));
-        customerResponseBuilder.setCardsAndAccounts(response, id);
+        customerResponseBuilder.setCardsAndAccounts(response, id,customer);
         return response;
     }
 
@@ -111,9 +109,8 @@ public class CustomerService {
     }
 
     public MessageResponse updateCustomerStatus(Integer id, CustomerStatus status) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         CustomerEntity customer = findActiveCustomer(id);
+        Locale locale = LocaleContextHolder.getLocale();
         customer.setStatus(status);
         customer.setUpdatedAt(Instant.now());
         customerRepository.save(customer);
@@ -121,9 +118,6 @@ public class CustomerService {
     }
 
     public MessageResponse updateCustomer(Integer id, UpdateCustomerRequest request) {
-        Locale locale = LocaleContextHolder.getLocale();
-
-
         CustomerEntity customer = findActiveCustomer(id);
 
         if (request.getName() != null) {
@@ -143,16 +137,15 @@ public class CustomerService {
         }
 
         customer.setUpdatedAt(Instant.now());
-
         customerRepository.save(customer);
+        Locale locale = messageUtil.resolveLocale(customer);
 
         return new MessageResponse(messageSource.getMessage("customerService.updateCustomer.statusUpdatedSuccessfully", null, locale));
     }
 
     public MessageResponse deleteCustomer(Integer id) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         CustomerEntity customer = findActiveCustomer(id);
+        Locale locale = messageUtil.resolveLocale(customer);
         customer.setIsVisible(false);
         customer.setStatus(CustomerStatus.CLOSED);
         customerRepository.save(customer);

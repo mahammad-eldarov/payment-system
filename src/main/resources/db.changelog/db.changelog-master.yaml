@@ -3,9 +3,6 @@ databaseChangeLog:
       file: changes/001-create-customer-table.yaml
       relativeToChangelogFile: true
   - include:
-      file: changes/015-add-customer-table-locale.yaml
-      relativeToChangelogFile: true
-  - include:
       file: changes/002-create-card-table.yaml
       relativeToChangelogFile: true
   - include:
@@ -22,9 +19,6 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: changes/006-create-payment-table.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: changes/014-add-payment-table-locale.yaml
       relativeToChangelogFile: true
   - include:
       file: changes/007-create-transaction-table.yaml

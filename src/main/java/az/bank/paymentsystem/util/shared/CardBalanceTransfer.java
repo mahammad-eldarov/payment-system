@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +20,6 @@ public class CardBalanceTransfer {
     private final MessageSource messageSource;
 
     public String transfer(CardEntity card,Locale locale) {
-//        Language locale = LocaleContextHolder.getLanguage();
         BigDecimal balance = card.getBalance();
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
@@ -49,7 +47,6 @@ public class CardBalanceTransfer {
     }
 
     private String getStatusReason(CardStatus status, Locale locale) {
-//        Language locale = LocaleContextHolder.getLanguage();
         return switch (status) {
             case BLOCKED -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.blocked",null,locale);
             case EXPIRED -> messageSource.getMessage("cardBalanceTransfer.getStatusReason.expired",null,locale);
@@ -71,7 +68,6 @@ public class CardBalanceTransfer {
     }
 
     private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance, String reason, Locale locale) {
-//        Language locale = LocaleContextHolder.getLanguage();
         otherCard.setBalance(otherCard.getBalance().add(balance));
         card.setBalance(BigDecimal.ZERO);
         cardRepository.save(otherCard);

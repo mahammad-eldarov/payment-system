@@ -5,12 +5,12 @@ import az.bank.paymentsystem.entity.OrderRateLimitEntity;
 import az.bank.paymentsystem.enums.OrderType;
 import az.bank.paymentsystem.exception.CardOrderCooldownException;
 import az.bank.paymentsystem.repository.OrderRateLimitRepository;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,9 +19,10 @@ public class OrderRateLimitService {
 
     private final OrderRateLimitRepository orderRateLimitRepository;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
     public void checkCooldown(CustomerEntity customer, OrderType orderType) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(customer);
         orderRateLimitRepository.findByCustomerIdAndOrderType(customer.getId(), orderType)
                 .ifPresent(limit -> {
                     if (limit.getCooldownUntil() != null &&

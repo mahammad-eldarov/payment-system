@@ -1,7 +1,7 @@
 package az.bank.paymentsystem.service;
 
-import az.bank.paymentsystem.enums.Language;
 import az.bank.paymentsystem.util.shared.CardBalanceTransfer;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -38,10 +38,12 @@ public class CardService {
     private final CardBalanceTransfer cardBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
     public MessageResponse deleteCard(Integer cardId) {
-        Locale locale =  LocaleContextHolder.getLocale();
         CardEntity card = findActiveCard(cardId);
+        Locale locale = messageUtil.resolveLocale(card.getCustomer());
+
         cardValidator.validateCardDeletion(card);
         statusAuditLogger.logCard(card, CardStatus.CLOSED.name(), messageSource.getMessage("cardService.deleteCard.cardClosed",null,locale));
 
@@ -56,16 +58,12 @@ public class CardService {
 
     @Transactional
     public void updateExpiredCards() {
-//        Language locale = LocaleContextHolder.getLanguage();
-//        Language locale = Language.forLanguageTag(card.getCustomer().getLanguage());
 
         List<CardEntity> expiredCards = cardRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CardStatus.EXPIRED);
 
         expiredCards.forEach(card -> {
-            Locale locale = card.getCustomer() != null && card.getCustomer().getLanguage() != null
-                    ? card.getCustomer().getLanguage().toLocale()
-                    : Language.AZ.toLocale();
+            Locale locale = messageUtil.resolveLocale(card.getCustomer());
 
             statusAuditLogger.logCard(card, CardStatus.EXPIRED.name(), messageSource.getMessage("cardService.updateExpiredCards.cardExpiry",null,locale));
             card.setStatus(CardStatus.EXPIRED);
@@ -77,8 +75,8 @@ public class CardService {
     }
 
     public MessageResponse updateCardStatus(Integer id, CardStatus status) {
-        Locale locale = LocaleContextHolder.getLocale();
         CardEntity card = findActiveCard(id);
+        Locale locale = LocaleContextHolder.getLocale();
         statusAuditLogger.logCard(card, status.name(), messageSource.getMessage("cardService.updateCardStatus.manualUpdate",null,locale));
         card.setStatus(status);
         card.setUpdatedAt(Instant.now());
@@ -87,8 +85,8 @@ public class CardService {
     }
 
     public MessageResponse updateCardPassword(Integer id, UpdateCardPasswordRequest request) {
-        Locale locale = LocaleContextHolder.getLocale();
         CardEntity card = findActiveCard(id);
+        Locale locale = LocaleContextHolder.getLocale();
         card.setPassword(request.getPassword());
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
@@ -96,8 +94,8 @@ public class CardService {
     }
 
     public List<CardResponse> getCardsByCustomerId(Integer customerId) {
-        Locale locale = LocaleContextHolder.getLocale();
         findActiveCustomer(customerId);
+        Locale locale = LocaleContextHolder.getLocale();
         List<CardEntity> cards = cardRepository.findCardsByCustomerId(customerId);
         if (cards.isEmpty()) {
             throw new EmptyListException(messageSource.getMessage("cardService.getCardsByCustomerId.emptyListException",null,locale));
@@ -112,8 +110,8 @@ public class CardService {
     }
 
     public List<CardResponse> getCardsByStatus(CardStatus status) {
-        Locale locale = LocaleContextHolder.getLocale();
         List<CardEntity> cards = cardRepository.findByStatusAndIsVisibleTrue(status);
+        Locale locale = LocaleContextHolder.getLocale();
         if (cards.isEmpty()) {
             throw new CardNotFoundException(messageSource.getMessage("cardService.getCardsByStatus.cardNotFound", null, locale));
         }

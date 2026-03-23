@@ -2,6 +2,7 @@ package az.bank.paymentsystem.util.payment;
 
 import az.bank.paymentsystem.service.NotificationService;
 import az.bank.paymentsystem.util.shared.BalanceUpdater;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import az.bank.paymentsystem.util.shared.SuspiciousTransactionChecker;
 import az.bank.paymentsystem.util.shared.TransactionCreator;
 import java.time.Instant;
@@ -33,22 +34,26 @@ public class PaymentProcessor {
     private final PaymentRepository paymentRepository;
     private final NotificationService notificationService;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(Integer paymentId) {
-        Locale locale = LocaleContextHolder.getLocale();
+        Locale fallbackLocale = LocaleContextHolder.getLocale();
+
         PaymentEntity payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentNotFoundException(messageSource.getMessage("paymentProcessor.process.paymentNotFound", null, locale)));
+                .orElseThrow(() -> new PaymentNotFoundException(messageSource.getMessage("paymentProcessor.process.paymentNotFound", null, fallbackLocale)));
+        Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+
         try {
             processPaymentLogic(payment);
-            markSuccess(payment);
+            markSuccess(payment,locale);
             transactionCreator.create(payment, TransactionStatus.SUCCESS);
         } catch (MultiValidationException e) {
             markFailed(payment, String.join(", ", e.getErrors().stream()
-                    .map(ExceptionResponse::getMessage).toList()));
+                    .map(ExceptionResponse::getMessage).toList()),locale);
             transactionCreator.create(payment, TransactionStatus.FAILED);
         } catch (Exception e) {
-            markFailed(payment, messageSource.getMessage("paymentProcessor.process.unexpectedError",new Object[]{e.getMessage()}, locale));
+            markFailed(payment, messageSource.getMessage("paymentProcessor.process.unexpectedError",new Object[]{e.getMessage()}, locale),locale);
             transactionCreator.create(payment, TransactionStatus.FAILED);
         }
         paymentRepository.save(payment);
@@ -64,8 +69,7 @@ public class PaymentProcessor {
         suspiciousTransactionChecker.check(payment);
     }
 
-    private void markSuccess(PaymentEntity payment) {
-        Locale locale = LocaleContextHolder.getLocale();
+    private void markSuccess(PaymentEntity payment, Locale locale) {
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setProcessedAt(Instant.now());
         payment.setUpdatedAt(Instant.now());
@@ -75,8 +79,7 @@ public class PaymentProcessor {
                         new Object[]{payment.getAmount(), payment.getCurrency()}, locale));
     }
 
-    private void markFailed(PaymentEntity payment, String reason) {
-        Locale locale = LocaleContextHolder.getLocale();
+    private void markFailed(PaymentEntity payment, String reason, Locale locale) {
         payment.setStatus(PaymentStatus.FAILED);
         payment.setFailureReason(reason);
         payment.setProcessedAt(Instant.now());

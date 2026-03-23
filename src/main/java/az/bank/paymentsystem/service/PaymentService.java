@@ -1,6 +1,8 @@
 package az.bank.paymentsystem.service;
 
 
+import az.bank.paymentsystem.entity.CustomerEntity;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,7 +25,6 @@ import az.bank.paymentsystem.util.payment.PaymentProcessor;
 import az.bank.paymentsystem.util.payment.PaymentSourceResolver;
 import az.bank.paymentsystem.util.payment.PaymentValidator;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,8 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
     private final PaymentCreator paymentCreator;
     private final MessageSource messageSource;
+    private final CustomerService customerService;
+    private final MessageUtil messageUtil;
 
 
     @Transactional
@@ -117,22 +120,14 @@ public class PaymentService {
         }
     }
 
-//    public PaymentResponse getPaymentById(Integer paymentId) {
-//        return paymentMapper.toResponse(findPaymentById(paymentId));
-//    }
-
     public PaymentResponse getPaymentById(Integer customerId, Integer paymentId) {
+        CustomerEntity customer = customerService.findActiveCustomer(customerId);
+        Locale locale = messageUtil.resolveLocale(customer);
         PaymentEntity payment = paymentRepository.findByIdAndCustomerId(paymentId, customerId)
                 .orElseThrow(() -> new PaymentNotFoundException(
-                        messageSource.getMessage("paymentService.findPaymentById.paymentNotFound", null, LocaleContextHolder.getLocale())
+                        messageSource.getMessage("paymentService.findPaymentById.paymentNotFound", null, locale)
                 ));
         return paymentMapper.toResponse(payment);
     }
-
-//    public PaymentEntity findPaymentById(Integer paymentId) {
-//        Language locale = LocaleContextHolder.getLanguage();
-//        return paymentRepository.findById(paymentId)
-//                .orElseThrow(() -> new PaymentNotFoundException(messageSource.getMessage("paymentService.findPaymentById.paymentNotFound",null, locale)));
-//    }
 
 }

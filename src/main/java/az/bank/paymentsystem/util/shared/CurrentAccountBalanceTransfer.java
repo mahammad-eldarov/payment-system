@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,8 +15,7 @@ public class CurrentAccountBalanceTransfer {
     private final NotificationService notificationService;
     private final MessageSource messageSource;
 
-    public String transfer(CurrentAccountEntity account) {
-        Locale locale = LocaleContextHolder.getLocale();
+    public String transfer(CurrentAccountEntity account, Locale locale) {
         BigDecimal balance = account.getBalance();
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
@@ -27,7 +25,7 @@ public class CurrentAccountBalanceTransfer {
             return messageSource.getMessage("currentAccountBalanceTransfer.transfer.accountSuspiciousActivity",new Object[]{balance,account.getCurrency()},locale);
         }
 
-        String reason = getStatusReason(account.getStatus());
+        String reason = getStatusReason(account.getStatus(),locale);
 
         String message = messageSource.getMessage("currentAccountBalanceTransfer.transfer.visitingBranch",new Object[]{reason,balance,account.getCurrency()},locale);
 
@@ -36,8 +34,7 @@ public class CurrentAccountBalanceTransfer {
         return message;
     }
 
-    private String getStatusReason(CurrentAccountStatus status) {
-        Locale locale = LocaleContextHolder.getLocale();
+    private String getStatusReason(CurrentAccountStatus status, Locale locale) {
 
         return switch (status) {
             case EXPIRED -> messageSource.getMessage("currentAccountBalanceTransfer.getStatusReason.expired",null,locale);

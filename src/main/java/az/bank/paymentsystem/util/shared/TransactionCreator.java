@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.util.shared;
 
 import az.bank.paymentsystem.entity.CardEntity;
+import az.bank.paymentsystem.enums.Language;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -52,8 +53,8 @@ public class TransactionCreator {
 
     private String buildDescription(PaymentEntity payment) {
         Locale locale = payment.getLanguage() != null
-                ? Locale.forLanguageTag(String.valueOf(payment.getLanguage()))
-                : Locale.forLanguageTag("az");
+                ? payment.getLanguage().toLocale()
+                : Language.AZ.toLocale();
         return messageSource.getMessage("transactionCreator.buildDescription",new Object[]{payment.getAmount(), payment.getCurrency(), payment.getFromType(), payment.getToType()}, locale);
     }
 

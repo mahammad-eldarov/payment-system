@@ -12,6 +12,7 @@ import az.bank.paymentsystem.exception.OperationNotAllowedException;
 import az.bank.paymentsystem.repository.CurrentAccountRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.shared.CustomerSuspiciousValidator;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +30,16 @@ public class CurrentAccountValidator {
     private final CurrentAccountRepository currentAccountRepository;
     private final CustomerSuspiciousValidator suspiciousValidator;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
 
     public void validateCurrentAccountOrder(Integer customerId) {
-        Locale locale =  LocaleContextHolder.getLocale();
+        Locale fallbackLocale = LocaleContextHolder.getLocale();
+
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("currentAccountValidator.validateCurrentAccountOrder.customerNotFound", null, locale)));
+                .orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("currentAccountValidator.validateCurrentAccountOrder.customerNotFound", null, fallbackLocale)));
+
+        Locale locale = messageUtil.resolveLocale(customer);
 
         List<ExceptionResponse> errors = new ArrayList<>();
 
@@ -54,7 +59,8 @@ public class CurrentAccountValidator {
     }
 
     public void validateDeletion(CurrentAccountEntity account) {
-        Locale locale =  LocaleContextHolder.getLocale();
+        Locale locale = messageUtil.resolveLocale(account.getCustomer());
+
 
         if (account.getStatus() == CurrentAccountStatus.CLOSED) {
             throw new AccountAlreadyCancelledException(messageSource.getMessage("currentAccountValidator.validateDeletion.accountAlreadyCanceled", null, locale));

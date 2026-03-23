@@ -1,6 +1,7 @@
 package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.util.shared.CurrentAccountBalanceTransfer;
+import az.bank.paymentsystem.util.shared.MessageUtil;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,10 +36,11 @@ public class CurrentAccountService {
     private final CurrentAccountBalanceTransfer currentAccountBalanceTransfer;
     private final StatusAuditLogger statusAuditLogger;
     private final MessageSource messageSource;
+    private final MessageUtil messageUtil;
 
     public List<CurrentAccountResponse> getAccountsByCustomerId(Integer id) {
-        Locale locale = LocaleContextHolder.getLocale();
         findActiveCustomer(id);
+        Locale locale = LocaleContextHolder.getLocale();
 
         List<CurrentAccountEntity> accounts = currentAccountRepository.findByCustomerIdAndIsVisibleTrue(id);
         if (accounts.isEmpty()) {
@@ -55,7 +57,6 @@ public class CurrentAccountService {
 
     public List<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status) {
         Locale locale = LocaleContextHolder.getLocale();
-
 
         List<CurrentAccountEntity> accounts = currentAccountRepository.findByStatusAndIsVisibleTrue(status);
         if (accounts.isEmpty()) {
@@ -78,16 +79,15 @@ public class CurrentAccountService {
 
 
     public void updateExpiredCurrentAccounts() {
-        Locale locale = LocaleContextHolder.getLocale();
-
         List<CurrentAccountEntity> expiredAccounts = currentAccountRepository
                 .findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate.now(), CurrentAccountStatus.EXPIRED);
 
         expiredAccounts.forEach(account -> {
+            Locale locale = messageUtil.resolveLocale(account.getCustomer());
             statusAuditLogger.logAccount(account, CurrentAccountStatus.EXPIRED.name(), messageSource.getMessage("currentAccountService.updateExpiredCurrentAccounts.accountExpiry", null, locale));
             account.setStatus(CurrentAccountStatus.EXPIRED);
             account.setUpdatedAt(Instant.now());
-            currentAccountBalanceTransfer.transfer(account);
+            currentAccountBalanceTransfer.transfer(account,locale);
 
         });
 
@@ -95,9 +95,8 @@ public class CurrentAccountService {
     }
 
     public MessageResponse deleteCurrentAccount(Integer id) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         CurrentAccountEntity account = findActiveAccount(id);
+        Locale locale = messageUtil.resolveLocale(account.getCustomer());
         currentAccountValidator.validateDeletion(account);
         statusAuditLogger.logAccount(account, CurrentAccountStatus.CLOSED.name(), messageSource.getMessage("currentAccountService.deleteCurrentAccount.accountClosed", null, locale));
         account.setStatus(CurrentAccountStatus.CLOSED);
