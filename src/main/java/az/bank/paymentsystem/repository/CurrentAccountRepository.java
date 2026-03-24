@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,7 +30,7 @@ public interface CurrentAccountRepository extends JpaRepository<CurrentAccountEn
     @EntityGraph(attributePaths = {"customer"})
     List<CurrentAccountEntity> findByCustomerIdAndIsVisibleTrue(Integer id);
 
-    List<CurrentAccountEntity> findByStatusAndIsVisibleTrue(CurrentAccountStatus status);
+    Page<CurrentAccountEntity> findByStatus(CurrentAccountStatus status, Pageable pageable);
 
     @EntityGraph(attributePaths = {"customer"})
     List<CurrentAccountEntity> findAllByExpiryDateLessThanEqualAndStatusNot(LocalDate date, CurrentAccountStatus status);

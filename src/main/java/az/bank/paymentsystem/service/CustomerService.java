@@ -2,6 +2,7 @@ package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.dto.response.CustomerShortResponse;
 import az.bank.paymentsystem.dto.response.TransactionResponse;
+import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.time.Instant;
@@ -25,6 +26,9 @@ import az.bank.paymentsystem.util.customer.CustomerResponseBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -59,17 +63,33 @@ public class CustomerService {
         throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomerById.customerNotFound",null, locale));
     }
 
-    public List<CustomerShortResponse> getCustomersByStatus(CustomerStatus status) {
-        List<CustomerEntity> activeCustomers = customerRepository.findByStatusAndIsVisibleTrue(status);
+    //pageable
+//    public List<CustomerShortResponse> getCustomersByStatus(CustomerStatus status) {
+//        List<CustomerEntity> activeCustomers = customerRepository.findByStatus(status);
+//        Locale locale = LocaleContextHolder.getLocale();
+//
+//        if (!activeCustomers.isEmpty()) {
+//            return activeCustomers.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
+//        }
+//        if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
+//            throw new CustomerDeletedException(messageSource.getMessage("customerService.getCustomersByStatus.customerDeletedStatus", null, locale));
+//        }
+//        throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomersByStatus.customerNotFoundStatus", null, locale));
+//    }
+    public Page<CustomerShortResponse> getCustomersByStatus(CustomerStatus status, int page) {
         Locale locale = LocaleContextHolder.getLocale();
 
-        if (!activeCustomers.isEmpty()) {
-            return activeCustomers.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
+        if (page < 1) throw new PageRequestException(messageSource.getMessage("statusAuditLogService.buildPageable.pageNumber", null, locale));
+
+        Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
+
+        Page<CustomerEntity> customers = customerRepository.findByStatus(status, pageable);
+
+        if (customers.isEmpty()) {
+            throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomersByStatus.customerNotFoundStatus", null, locale));
         }
-        if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
-            throw new CustomerDeletedException(messageSource.getMessage("customerService.getCustomersByStatus.customerDeletedStatus", null, locale));
-        }
-        throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomersByStatus.customerNotFoundStatus", null, locale));
+
+        return customers.map(customerMapper::toShortResponse);
     }
 
     public CustomerResponse getDeletedCustomerById(Integer id) {
@@ -80,14 +100,32 @@ public class CustomerService {
         return response;
     }
 
-    public List<CustomerShortResponse> getAllCustomers() {
-        List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
+    //pageable
+
+//    public List<CustomerShortResponse> getAllCustomers() {
+//        List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
+//        Locale locale = LocaleContextHolder.getLocale();
+//        if (activeCustomer.isEmpty()) {
+//            throw new EmptyListException(messageSource.getMessage("customerService.getAllCustomers.listEmpty", null, locale));
+//        }
+//
+//        return activeCustomer.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
+//    }
+
+    public Page<CustomerShortResponse> getAllCustomers(int page) {
         Locale locale = LocaleContextHolder.getLocale();
-        if (activeCustomer.isEmpty()) {
+
+        if (page < 1) throw new PageRequestException(messageSource.getMessage("statusAuditLogService.buildPageable.pageNumber", null, locale));
+
+        Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
+
+        Page<CustomerEntity> customers = customerRepository.findAllByIsVisibleTrue(pageable);
+
+        if (customers.isEmpty()) {
             throw new EmptyListException(messageSource.getMessage("customerService.getAllCustomers.listEmpty", null, locale));
         }
 
-        return activeCustomer.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
+        return customers.map(customerMapper::toShortResponse);
     }
 
     public CustomerResponse getCustomersCardsAndAccounts(Integer id) {

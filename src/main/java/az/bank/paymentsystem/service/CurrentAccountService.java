@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.util.shared.CurrentAccountBalanceTransfer;
 import az.bank.paymentsystem.util.shared.MessageUtil;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
@@ -23,6 +24,10 @@ import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.currentAccount.CurrentAccountValidator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,15 +60,33 @@ public class CurrentAccountService {
         return currentAccountMapper.toResponse(findActiveAccountByNumber(accountNumber));
     }
 
-    public List<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status) {
+    //pageable
+
+//    public List<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status) {
+//        Locale locale = LocaleContextHolder.getLocale();
+//
+//        List<CurrentAccountEntity> accounts = currentAccountRepository.findByStatus(status);
+//        if (accounts.isEmpty()) {
+//            throw new AccountNotFoundException(messageSource.getMessage("currentAccountService.getCurrentAccountByStatus.currentAccountStatus", null, locale));
+//        }
+//
+//        return accounts.stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
+//    }
+
+    public Page<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status, int page) {
         Locale locale = LocaleContextHolder.getLocale();
 
-        List<CurrentAccountEntity> accounts = currentAccountRepository.findByStatusAndIsVisibleTrue(status);
+        if (page < 1) throw new PageRequestException(messageSource.getMessage("statusAuditLogService.buildPageable.pageNumber", null, locale));
+
+        Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
+
+        Page<CurrentAccountEntity> accounts = currentAccountRepository.findByStatus(status, pageable);
+
         if (accounts.isEmpty()) {
             throw new AccountNotFoundException(messageSource.getMessage("currentAccountService.getCurrentAccountByStatus.currentAccountStatus", null, locale));
         }
 
-        return accounts.stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
+        return accounts.map(currentAccountMapper::toResponse);
     }
 
     public MessageResponse updateCurrentAccountStatus(Integer id, CurrentAccountStatus status) {

@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.service;
 
+import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.util.shared.CardBalanceTransfer;
 import az.bank.paymentsystem.util.shared.MessageUtil;
 import az.bank.paymentsystem.util.shared.StatusAuditLogger;
@@ -24,6 +25,10 @@ import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.card.CardValidator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,13 +114,30 @@ public class CardService {
         return cardMapper.toResponse(card);
     }
 
-    public List<CardResponse> getCardsByStatus(CardStatus status) {
-        List<CardEntity> cards = cardRepository.findByStatus(status);
+    //pageable
+//    public List<CardResponse> getCardsByStatus(CardStatus status) {
+//        List<CardEntity> cards = cardRepository.findByStatus(status);
+//        Locale locale = LocaleContextHolder.getLocale();
+//        if (cards.isEmpty()) {
+//            throw new CardNotFoundException(messageSource.getMessage("cardService.getCardsByStatus.cardNotFound", null, locale));
+//        }
+//        return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
+//    }
+
+    public Page<CardResponse> getCardsByStatus(CardStatus status, int page) {
         Locale locale = LocaleContextHolder.getLocale();
+
+        if (page < 1) throw new PageRequestException(messageSource.getMessage("statusAuditLogService.buildPageable.pageNumber", null, locale));
+
+        Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("createdAt").descending());
+
+        Page<CardEntity> cards = cardRepository.findByStatus(status, pageable);
+
         if (cards.isEmpty()) {
             throw new CardNotFoundException(messageSource.getMessage("cardService.getCardsByStatus.cardNotFound", null, locale));
         }
-        return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
+
+        return cards.map(cardMapper::toResponse);
     }
 
     public CardEntity findActiveCard(Integer id) {
