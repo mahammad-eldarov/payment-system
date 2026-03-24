@@ -158,7 +158,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex) {
+    public ResponseEntity<ExceptionResponse> handleGenericException() {
         Locale locale  = LocaleContextHolder.getLocale();
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
