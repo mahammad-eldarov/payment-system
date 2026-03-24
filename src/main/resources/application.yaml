@@ -11,12 +11,12 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    open-in-view: true
+    open-in-view: false
 
   messages:
     basename: message
@@ -56,11 +56,11 @@ bank:
 
 scheduler:
   payment:
-    cron: "30 47 00 * * *"
+    cron: "0 0 0 * * *"
   card:
-    cron: "30 27 01 * * *"
+    cron: "0 5 0 * * *"
   currentAccount:
-    cron: "00 00 00 * * *"
+    cron: "0 5 0 * * *"
 
 
 
