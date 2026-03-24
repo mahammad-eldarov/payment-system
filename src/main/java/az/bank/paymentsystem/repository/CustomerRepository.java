@@ -24,8 +24,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Intege
 
     Page<CustomerEntity> findByStatus(CustomerStatus status, Pageable pageable);
 
-    List<CustomerEntity> findByStatusAndIsVisibleFalse(CustomerStatus status);
-
     Optional<CustomerEntity> findFirstByPinAndIsVisibleFalse(String pin);
 
     List<CustomerEntity> findAllByPinAndIsVisibleFalse(String pin);

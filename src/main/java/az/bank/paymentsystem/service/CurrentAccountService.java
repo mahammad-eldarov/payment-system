@@ -60,18 +60,6 @@ public class CurrentAccountService {
         return currentAccountMapper.toResponse(findActiveAccountByNumber(accountNumber));
     }
 
-    //pageable
-
-//    public List<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status) {
-//        Locale locale = LocaleContextHolder.getLocale();
-//
-//        List<CurrentAccountEntity> accounts = currentAccountRepository.findByStatus(status);
-//        if (accounts.isEmpty()) {
-//            throw new AccountNotFoundException(messageSource.getMessage("currentAccountService.getCurrentAccountByStatus.currentAccountStatus", null, locale));
-//        }
-//
-//        return accounts.stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
-//    }
 
     public Page<CurrentAccountResponse> getCurrentAccountByStatus(CurrentAccountStatus status, int page) {
         Locale locale = LocaleContextHolder.getLocale();

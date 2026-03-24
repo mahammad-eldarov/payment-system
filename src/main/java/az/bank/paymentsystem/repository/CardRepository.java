@@ -20,7 +20,6 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
     @EntityGraph(attributePaths = {"customer"})
     Optional<CardEntity> findByIdAndIsVisibleTrue(Integer id);
 
-
     Integer countByCustomerIdAndIsVisibleTrue(Integer customerId);
 
     Boolean existsByCustomerIdAndStatusIn(Integer customerId, List<CardStatus> statuses);

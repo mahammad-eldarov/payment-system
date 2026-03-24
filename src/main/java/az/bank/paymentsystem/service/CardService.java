@@ -114,16 +114,6 @@ public class CardService {
         return cardMapper.toResponse(card);
     }
 
-    //pageable
-//    public List<CardResponse> getCardsByStatus(CardStatus status) {
-//        List<CardEntity> cards = cardRepository.findByStatus(status);
-//        Locale locale = LocaleContextHolder.getLocale();
-//        if (cards.isEmpty()) {
-//            throw new CardNotFoundException(messageSource.getMessage("cardService.getCardsByStatus.cardNotFound", null, locale));
-//        }
-//        return cards.stream().map(cardMapper::toResponse).collect(Collectors.toList());
-//    }
-
     public Page<CardResponse> getCardsByStatus(CardStatus status, int page) {
         Locale locale = LocaleContextHolder.getLocale();
 

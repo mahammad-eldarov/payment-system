@@ -13,7 +13,6 @@ import az.bank.paymentsystem.dto.request.CreateCustomerRequest;
 import az.bank.paymentsystem.dto.request.UpdateCustomerRequest;
 import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.service.CustomerService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -58,15 +57,6 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(response);
     }
 
-//    @GetMapping("/internal/status")
-//    @Operation(summary = "Get customers by status",
-//            description = "Retrieves a list of customers filtered by the specified status (e.g. ACTIVE, BLOCKED, SUSPICIOUS, CLOSED). Accessible for internal use only.")
-//    public ResponseEntity<List<CustomerShortResponse>> getCustomersByStatus(
-//            @RequestParam CustomerStatus status) {
-//
-//        return ResponseEntity.ok(customerService.getCustomersByStatus(status));
-//    }
-
     @GetMapping("/internal/status/{status}")
     @Operation(summary = "Get customers by status",
             description = "Retrieves a list of customers filtered by the specified status (e.g. ACTIVE, BLOCKED, SUSPICIOUS, CLOSED). Accessible for internal use only.")
@@ -75,13 +65,6 @@ public class CustomerV1Controller {
             @RequestParam(required = false, defaultValue = "1") int page) {
         return ResponseEntity.ok(customerService.getCustomersByStatus(status, page).getContent());
     }
-
-//    @GetMapping("/internal/allcustomers")
-//    @Operation(summary = "Get all customers",
-//            description = "Retrieves a list of all registered customers in the system. Accessible for internal use only.")
-//    public ResponseEntity<List<CustomerShortResponse>> getAllCustomers() {
-//        return ResponseEntity.ok(customerService.getAllCustomers());
-//    }
 
     @GetMapping("/internal/allcustomers")
     @Operation(summary = "Get all customers",

@@ -70,15 +70,6 @@ public class CardV1Controller {
         return ResponseEntity.ok(cardService.getCardByPan(pan));
     }
 
-//    @GetMapping("/internal/status")
-//    @Operation(summary = "Get card by status.",
-//            description = "Search a card status.")
-//    public ResponseEntity<List<CardResponse>> getCardsByStatus(
-//            @RequestParam CardStatus status) {
-//
-//        return ResponseEntity.ok(cardService.getCardsByStatus(status));
-//    }
-
     @GetMapping("/internal/status/{status}")
     @Operation(summary = "Get card by status.",
             description = "Search a card status.")

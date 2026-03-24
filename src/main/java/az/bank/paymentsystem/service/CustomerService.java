@@ -6,10 +6,8 @@ import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.time.Instant;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.response.MessageResponse;
 import az.bank.paymentsystem.exception.CustomerDeletedException;
@@ -63,19 +61,6 @@ public class CustomerService {
         throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomerById.customerNotFound",null, locale));
     }
 
-    //pageable
-//    public List<CustomerShortResponse> getCustomersByStatus(CustomerStatus status) {
-//        List<CustomerEntity> activeCustomers = customerRepository.findByStatus(status);
-//        Locale locale = LocaleContextHolder.getLocale();
-//
-//        if (!activeCustomers.isEmpty()) {
-//            return activeCustomers.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
-//        }
-//        if (!customerRepository.findByStatusAndIsVisibleFalse(status).isEmpty()) {
-//            throw new CustomerDeletedException(messageSource.getMessage("customerService.getCustomersByStatus.customerDeletedStatus", null, locale));
-//        }
-//        throw new CustomerNotFoundException(messageSource.getMessage("customerService.getCustomersByStatus.customerNotFoundStatus", null, locale));
-//    }
     public Page<CustomerShortResponse> getCustomersByStatus(CustomerStatus status, int page) {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -99,18 +84,6 @@ public class CustomerService {
         customerResponseBuilder.setCardsAndAccounts(response, id,customer);
         return response;
     }
-
-    //pageable
-
-//    public List<CustomerShortResponse> getAllCustomers() {
-//        List<CustomerEntity> activeCustomer = customerRepository.findAllByIsVisibleTrue();
-//        Locale locale = LocaleContextHolder.getLocale();
-//        if (activeCustomer.isEmpty()) {
-//            throw new EmptyListException(messageSource.getMessage("customerService.getAllCustomers.listEmpty", null, locale));
-//        }
-//
-//        return activeCustomer.stream().map(customerMapper::toShortResponse).collect(Collectors.toList());
-//    }
 
     public Page<CustomerShortResponse> getAllCustomers(int page) {
         Locale locale = LocaleContextHolder.getLocale();

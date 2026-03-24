@@ -8,7 +8,6 @@ import az.bank.paymentsystem.dto.response.CurrentAccountResponse;
 import az.bank.paymentsystem.dto.response.MessageResponse;
 import az.bank.paymentsystem.enums.CurrentAccountStatus;
 import az.bank.paymentsystem.service.CurrentAccountService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,14 +49,6 @@ public class CurrentAccountV1Controller {
             @PathVariable String accountNumber) {
         return ResponseEntity.ok(currentAccountService.getAccountByAccountNumber(accountNumber));
     }
-
-//    @GetMapping("/internal/status")
-//    @Operation(summary = "Get a current account status.", description = "Get current account by status.")
-//    public ResponseEntity<List<CurrentAccountResponse>> getCurrentAccountByStatus(
-//            @RequestParam CurrentAccountStatus status) {
-//
-//        return ResponseEntity.ok(currentAccountService.getCurrentAccountByStatus(status));
-//    }
 
     @GetMapping("/internal/status/{status}")
     @Operation(summary = "Get a current account status.", description = "Get current account by status.")
