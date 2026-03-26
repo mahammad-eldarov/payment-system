@@ -41,11 +41,6 @@ public class BalanceUpdater {
         }
     }
 
-    //    private void withdrawFromCard(CardEntity card, BigDecimal amount) {
-//        card.setBalance(card.getBalance().subtract(amount));
-//        card.setUpdatedAt(Instant.now());
-//        cardRepository.save(card);
-//    }
     private void withdrawFromCard(CardEntity card, BigDecimal amount) {
         Locale locale = messageUtil.resolveLocale(card.getCustomer());
         CardEntity lockedCard = cardRepository.findByIdWithLock(card.getId())
@@ -56,13 +51,6 @@ public class BalanceUpdater {
         lockedCard.setUpdatedAt(Instant.now());
         cardRepository.save(lockedCard);
     }
-
-
-//    private void withdrawFromAccount(CurrentAccountEntity account, BigDecimal amount) {
-//        account.setBalance(account.getBalance().subtract(amount));
-//        account.setUpdatedAt(Instant.now());
-//        currentAccountRepository.save(account);
-//    }
 
     private void withdrawFromAccount(CurrentAccountEntity account, BigDecimal amount) {
         Locale locale = messageUtil.resolveLocale(account.getCustomer());
@@ -75,12 +63,6 @@ public class BalanceUpdater {
         currentAccountRepository.save(lockedAccount);
     }
 
-    //    private void depositToCard(CardEntity card, BigDecimal amount, Currency sourceCurrency) {
-//        BigDecimal converted = currencyConverter.convert(amount, sourceCurrency, card.getCurrency());
-//        card.setBalance(card.getBalance().add(converted));
-//        card.setUpdatedAt(Instant.now());
-//        cardRepository.save(card);
-//    }
     private void depositToCard(CardEntity card, BigDecimal amount, Currency sourceCurrency) {
         Locale locale = messageUtil.resolveLocale(card.getCustomer());
         CardEntity lockedCard = cardRepository.findByIdWithLock(card.getId())
@@ -93,13 +75,6 @@ public class BalanceUpdater {
         cardRepository.save(lockedCard);
     }
 
-//    private void depositToAccount(CurrentAccountEntity account, BigDecimal amount, Currency sourceCurrency) {
-//        BigDecimal converted = currencyConverter.convert(amount, sourceCurrency, account.getCurrency());
-//        account.setBalance(account.getBalance().add(converted));
-//        account.setUpdatedAt(Instant.now());
-//        currentAccountRepository.save(account);
-//    }
-
     private void depositToAccount(CurrentAccountEntity account, BigDecimal amount, Currency sourceCurrency) {
         Locale locale = messageUtil.resolveLocale(account.getCustomer());
         CurrentAccountEntity lockedAccount = currentAccountRepository.findByIdWithLock(account.getId())
@@ -110,5 +85,12 @@ public class BalanceUpdater {
         lockedAccount.setBalance(lockedAccount.getBalance().add(converted));
         lockedAccount.setUpdatedAt(Instant.now());
         currentAccountRepository.save(lockedAccount);
+    }
+
+    public void refund(PaymentEntity payment) {
+        switch (payment.getFromType()) {
+            case CARD -> depositToCard(payment.getFromCard(), payment.getAmount(), payment.getCurrency());
+            case CURRENT_ACCOUNT -> depositToAccount(payment.getFromAccount(), payment.getAmount(), payment.getCurrency());
+        }
     }
 }

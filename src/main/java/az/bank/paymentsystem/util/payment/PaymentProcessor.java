@@ -6,6 +6,7 @@ import az.bank.paymentsystem.util.shared.MessageUtil;
 import az.bank.paymentsystem.util.shared.SuspiciousTransactionChecker;
 import az.bank.paymentsystem.util.shared.TransactionCreator;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -59,13 +60,32 @@ public class PaymentProcessor {
         paymentRepository.save(payment);
     }
 
+//    private void processPaymentLogic(PaymentEntity payment) {
+//        List<ExceptionResponse> errors = new ArrayList<>();
+//        paymentValidator.validate(payment, errors);
+//        if (!errors.isEmpty()) throw new MultiValidationException(errors);
+//
+//        balanceUpdater.withdraw(payment);
+//        balanceUpdater.deposit(payment);
+//        suspiciousTransactionChecker.check(payment);
+//    }
+
     private void processPaymentLogic(PaymentEntity payment) {
         List<ExceptionResponse> errors = new ArrayList<>();
         paymentValidator.validate(payment, errors);
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
 
         balanceUpdater.withdraw(payment);
-        balanceUpdater.deposit(payment);
+        try {
+            balanceUpdater.deposit(payment);
+        } catch (Exception e) {
+            balanceUpdater.refund(payment);
+            Locale locale = messageUtil.resolveLocale(payment.getCustomer());
+            throw new MultiValidationException(List.of(
+                    new ExceptionResponse(500,
+                            messageSource.getMessage("paymentProcessor.processPaymentLogic.depositFailed", null, locale),
+                            LocalDateTime.now())));
+        }
         suspiciousTransactionChecker.check(payment);
     }
 
@@ -88,4 +108,5 @@ public class PaymentProcessor {
                 messageSource.getMessage("paymentProcessor.markFailed",new Object[]{payment.getAmount(), payment.getCurrency()}, locale)
                         + reason);
     }
+
 }

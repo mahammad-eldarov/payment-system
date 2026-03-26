@@ -14,6 +14,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CardToCardRequest {
 
+    private String idempotencyKey;
+
+
     @NotNull(message = "{notNull.bigDecimal}")
     private BigDecimal amount;
 

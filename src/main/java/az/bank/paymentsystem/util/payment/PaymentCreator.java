@@ -28,7 +28,7 @@ public class PaymentCreator {
     private final MessageSource messageSource;
 
     public PaymentEntity buildPayment(Integer customerId, BigDecimal amount,
-                                      PaymentSourceType fromType, PaymentSourceType toType) {
+                                      PaymentSourceType fromType, PaymentSourceType toType,String idempotencyKey) {
         Locale fallbackLocale = LocaleContextHolder.getLocale();
 
 //        if (paymentRepository.existsByCustomerIdAndScheduledDateAndStatus(
@@ -61,6 +61,7 @@ public class PaymentCreator {
                 ? amount : BigDecimal.ZERO;
 
         PaymentEntity payment = new PaymentEntity();
+        payment.setIdempotencyKey(idempotencyKey);
         payment.setAmount(safeAmount);
         payment.setStatus(PaymentStatus.PENDING);
         payment.setScheduledDate(LocalDate.now());

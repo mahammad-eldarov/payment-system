@@ -41,4 +41,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
 
     Optional<PaymentEntity> findByIdAndCustomerId(Integer id, Integer customerId);
 
+    Boolean existsByIdempotencyKey(String idempotencyKey);
+    Optional<PaymentEntity> findByIdempotencyKey(String idempotencyKey);
+
 }

@@ -16,6 +16,13 @@ databaseChangeLog:
                     primaryKeyName: payment_pkey
 
               - column:
+                  name: idempotency_key
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+                    unique: true
+
+              - column:
                   name: amount
                   type: DECIMAL(19,2)
                   constraints:
