@@ -94,6 +94,7 @@ public class PaymentEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Language language;
 
+    @NotNull
     private String idempotencyKey;
 
 

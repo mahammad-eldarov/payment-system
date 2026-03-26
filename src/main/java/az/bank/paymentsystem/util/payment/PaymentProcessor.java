@@ -60,16 +60,6 @@ public class PaymentProcessor {
         paymentRepository.save(payment);
     }
 
-//    private void processPaymentLogic(PaymentEntity payment) {
-//        List<ExceptionResponse> errors = new ArrayList<>();
-//        paymentValidator.validate(payment, errors);
-//        if (!errors.isEmpty()) throw new MultiValidationException(errors);
-//
-//        balanceUpdater.withdraw(payment);
-//        balanceUpdater.deposit(payment);
-//        suspiciousTransactionChecker.check(payment);
-//    }
-
     private void processPaymentLogic(PaymentEntity payment) {
         List<ExceptionResponse> errors = new ArrayList<>();
         paymentValidator.validate(payment, errors);

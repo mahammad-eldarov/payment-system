@@ -31,13 +31,6 @@ public class PaymentCreator {
                                       PaymentSourceType fromType, PaymentSourceType toType,String idempotencyKey) {
         Locale fallbackLocale = LocaleContextHolder.getLocale();
 
-//        if (paymentRepository.existsByCustomerIdAndScheduledDateAndStatus(
-//                customerId, LocalDate.now(), PaymentStatus.PENDING)) {
-//            throw new MultiValidationException(List.of(
-//                    new ExceptionResponse(400, messageSource.getMessage("paymentCreator.buildPayment.pendingPayment",null,fallbackLocale), LocalDateTime.now())));
-//        }
-        // Eyni anda 2 PENDING olmasın
-
         PaymentSourceType blockedType = switch (fromType) {
             case CARD -> PaymentSourceType.CURRENT_ACCOUNT;
             case CURRENT_ACCOUNT -> PaymentSourceType.CARD;

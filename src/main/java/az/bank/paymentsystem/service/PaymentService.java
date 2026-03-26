@@ -5,7 +5,7 @@ import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.util.payment.PaymentCooldownChecker;
 import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -182,7 +182,7 @@ public class PaymentService {
 
     private String generateIdempotencyKey(Integer customerId, BigDecimal amount,
                                           String fromSource, String toSource) {
-        String raw = customerId + ":" + amount + ":" + fromSource + ":" + toSource + ":" + LocalDate.now();
+        String raw = customerId + ":" + amount + ":" + fromSource + ":" + toSource + ":" + Instant.now();
         return UUID.nameUUIDFromBytes(raw.getBytes()).toString();
     }
 
