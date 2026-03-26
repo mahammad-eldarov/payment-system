@@ -48,7 +48,7 @@ public class PaymentCreator {
         if (paymentRepository.existsByCustomerIdAndScheduledDateAndFromType(
                 customerId, LocalDate.now(), blockedType)) {
             throw new MultiValidationException(List.of(
-                    new ExceptionResponse(400,
+                    new ExceptionResponse(422,
                             messageSource.getMessage("paymentCreator.buildPayment.sourceTypeMismatch", null, fallbackLocale),
                             LocalDateTime.now())));
         }
