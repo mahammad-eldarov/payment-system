@@ -15,14 +15,16 @@ public class CurrentAccountBalanceTransfer {
     private final NotificationService notificationService;
     private final MessageSource messageSource;
 
-    public String transfer(CurrentAccountEntity account, Locale locale) {
+    public void transfer(CurrentAccountEntity account, Locale locale) {
         BigDecimal balance = account.getBalance();
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
-            return messageSource.getMessage("currentAccountBalanceTransfer.transfer.accountExpired",null,locale);
+            messageSource.getMessage("currentAccountBalanceTransfer.transfer.accountExpired", null, locale);
+            return;
         }
         if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
-            return messageSource.getMessage("currentAccountBalanceTransfer.transfer.accountSuspiciousActivity",new Object[]{balance,account.getCurrency()},locale);
+            messageSource.getMessage("currentAccountBalanceTransfer.transfer.accountSuspiciousActivity", new Object[]{balance, account.getCurrency()}, locale);
+            return;
         }
 
         String reason = getStatusReason(account.getStatus(),locale);
@@ -31,7 +33,6 @@ public class CurrentAccountBalanceTransfer {
 
         notificationService.send(account.getCustomer(), message);
 
-        return message;
     }
 
     private String getStatusReason(CurrentAccountStatus status, Locale locale) {

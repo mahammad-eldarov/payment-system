@@ -19,16 +19,17 @@ public class CardBalanceTransfer {
     private final NotificationService notificationService;
     private final MessageSource messageSource;
 
-    public String transfer(CardEntity card,Locale locale) {
+    public void transfer(CardEntity card, Locale locale) {
         BigDecimal balance = card.getBalance();
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
-            return messageSource.getMessage("cardBalanceTransfer.transfer.cardDeleted", null, locale);
+            messageSource.getMessage("cardBalanceTransfer.transfer.cardDeleted", null, locale);
+            return;
         }
         if (card.getStatus() == CardStatus.SUSPICIOUS) {
             String message = messageSource.getMessage("cardBalanceTransfer.transfer.cardSuspiciousActivity", new Object[]{balance, card.getCurrency()},locale);
             notificationService.send(card.getCustomer(), message);
-            return message;
+            return;
         }
 
         Integer customerId = card.getCustomer().getId();
@@ -38,11 +39,11 @@ public class CardBalanceTransfer {
         CardEntity otherCard = cardRepository
                 .findFirstByCustomerIdAndIsVisibleTrueAndIdNot(customerId, card.getId()).orElse(null);
         if (otherCard != null && isTransferableCard(otherCard)) {
-            return transferToCard(card, otherCard, balance, reason, locale);
+            transferToCard(card, otherCard, balance, reason, locale);
+            return;
         }
         String message = messageSource.getMessage("cardBalanceTransfer.transfer.visitingBranch",new Object[]{lastFour, reason, balance, card.getCurrency()},locale);
         notificationService.send(card.getCustomer(), message);
-        return message;
 
     }
 
@@ -67,7 +68,7 @@ public class CardBalanceTransfer {
                 && card.getStatus() != CardStatus.EXPIRED;
     }
 
-    private String transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance, String reason, Locale locale) {
+    private void transferToCard(CardEntity card, CardEntity otherCard, BigDecimal balance, String reason, Locale locale) {
         otherCard.setBalance(otherCard.getBalance().add(balance));
         card.setBalance(BigDecimal.ZERO);
         cardRepository.save(otherCard);
@@ -82,7 +83,7 @@ public class CardBalanceTransfer {
         transactionCreator.createBalanceTransfer(card, otherCard, balance, debitDescription, creditDescription);
 
 
-        return messageSource.getMessage("cardBalanceTransfer.transferToCard.remainingBalance.regexp", new Object[]{balance, card.getCurrency(), otherLastFour}, locale);
+        messageSource.getMessage("cardBalanceTransfer.transferToCard.remainingBalance.regexp", new Object[]{balance, card.getCurrency(), otherLastFour}, locale);
     }
 
 }
