@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.repository;
 
+import jakarta.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -40,4 +42,7 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
     Optional<CardEntity> findFirstByCustomerIdAndIsVisibleTrueAndIdNot(Integer customerId, Integer cardId);
 
     Boolean existsByCustomerIdAndStatus(Integer customerId, CardStatus status);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<CardEntity> findByIdWithLock(Integer id);
 }
