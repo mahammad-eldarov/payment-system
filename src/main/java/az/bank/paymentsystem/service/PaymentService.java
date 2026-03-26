@@ -2,11 +2,16 @@ package az.bank.paymentsystem.service;
 
 
 import az.bank.paymentsystem.entity.CustomerEntity;
+import az.bank.paymentsystem.util.payment.PaymentCooldownChecker;
 import az.bank.paymentsystem.util.shared.MessageUtil;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.request.AccountToAccountRequest;
 import az.bank.paymentsystem.dto.request.AccountToCardRequest;
@@ -40,6 +45,7 @@ public class PaymentService {
     private final PaymentSourceResolver paymentSourceResolver;
     private final PaymentMapper paymentMapper;
     private final PaymentCreator paymentCreator;
+    private final PaymentCooldownChecker paymentCooldownChecker;
     private final MessageSource messageSource;
     private final CustomerService customerService;
     private final MessageUtil messageUtil;
@@ -47,15 +53,20 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse cardToCard(Integer customerId, CardToCardRequest request) {
+        checkCooldown(customerId, request.getAmount(), request.getFromPan(), request.getToPan());
 
-        Optional<PaymentResponse> idempotentResponse = checkIdempotency(request.getIdempotencyKey());
+        String idempotencyKey = generateIdempotencyKey(
+                customerId, request.getAmount(),
+                request.getFromPan(), request.getToPan());
+
+        Optional<PaymentResponse> idempotentResponse = checkIdempotency(idempotencyKey);
         if (idempotentResponse.isPresent()) return idempotentResponse.get();
 
         List<ExceptionResponse> errors = new ArrayList<>();
         paymentValidator.validateAmount(request.getAmount(), errors);
 
         PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CARD, PaymentSourceType.CARD, request.getIdempotencyKey());
+                PaymentSourceType.CARD, PaymentSourceType.CARD, idempotencyKey);
 
         paymentSourceResolver.fromCheckCard(payment, customerId, request.getFromPan(), errors);
         paymentSourceResolver.toCheckCard(payment, request.getToPan(), errors);
@@ -67,14 +78,20 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse cardToAccount(Integer customerId, CardToAccountRequest request) {
-        Optional<PaymentResponse> idempotentResponse = checkIdempotency(request.getIdempotencyKey());
+        checkCooldown(customerId, request.getAmount(), request.getFromPan(), request.getToAccountNumber());
+
+        String idempotencyKey = generateIdempotencyKey(
+                customerId, request.getAmount(),
+                request.getFromPan(), request.getToAccountNumber());
+
+        Optional<PaymentResponse> idempotentResponse = checkIdempotency(idempotencyKey);
         if (idempotentResponse.isPresent()) return idempotentResponse.get();
 
         List<ExceptionResponse> errors = new ArrayList<>();
         paymentValidator.validateAmount(request.getAmount(), errors);
 
         PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CARD, PaymentSourceType.CURRENT_ACCOUNT, request.getIdempotencyKey());
+                PaymentSourceType.CARD, PaymentSourceType.CURRENT_ACCOUNT, idempotencyKey);
 
         paymentSourceResolver.fromCheckCard(payment, customerId, request.getFromPan(), errors);
         paymentSourceResolver.toCheckAccount(payment, request.getToAccountNumber(), errors);
@@ -86,14 +103,19 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse accountToCard(Integer customerId, AccountToCardRequest request) {
-        Optional<PaymentResponse> idempotentResponse = checkIdempotency(request.getIdempotencyKey());
+        checkCooldown(customerId, request.getAmount(), request.getFromAccountNumber(), request.getToPan());
+
+        String idempotencyKey = generateIdempotencyKey(
+                customerId, request.getAmount(),
+                request.getFromAccountNumber(), request.getToPan());
+        Optional<PaymentResponse> idempotentResponse = checkIdempotency(idempotencyKey);
         if (idempotentResponse.isPresent()) return idempotentResponse.get();
 
         List<ExceptionResponse> errors = new ArrayList<>();
         paymentValidator.validateAmount(request.getAmount(), errors);
 
         PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.CARD, request.getIdempotencyKey());
+                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.CARD, idempotencyKey);
 
         paymentSourceResolver.fromCheckAccount(payment, customerId, request.getFromAccountNumber(), errors);
         paymentSourceResolver.toCheckCard(payment, request.getToPan(), errors);
@@ -105,14 +127,19 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse accountToAccount(Integer customerId, AccountToAccountRequest request) {
-        Optional<PaymentResponse> idempotentResponse = checkIdempotency(request.getIdempotencyKey());
+        checkCooldown(customerId, request.getAmount(), request.getFromAccountNumber(), request.getToAccountNumber());
+
+        String idempotencyKey = generateIdempotencyKey(
+                customerId, request.getAmount(),
+                request.getFromAccountNumber(), request.getToAccountNumber());
+        Optional<PaymentResponse> idempotentResponse = checkIdempotency(idempotencyKey);
         if (idempotentResponse.isPresent()) return idempotentResponse.get();
 
         List<ExceptionResponse> errors = new ArrayList<>();
         paymentValidator.validateAmount(request.getAmount(), errors);
 
         PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.CURRENT_ACCOUNT, request.getIdempotencyKey());
+                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.CURRENT_ACCOUNT, idempotencyKey);
 
         paymentSourceResolver.fromCheckAccount(payment, customerId, request.getFromAccountNumber(), errors);
         paymentSourceResolver.toCheckAccount(payment, request.getToAccountNumber(), errors);
@@ -147,9 +174,25 @@ public class PaymentService {
             return Optional.of(paymentMapper.toResponse(
                     paymentRepository.findByIdempotencyKey(idempotencyKey)
                             .orElseThrow(() -> new PaymentNotFoundException(
-                                    messageSource.getMessage("paymentService.findPaymentById.paymentNotFound", null, LocaleContextHolder.getLocale())))));
+                                    messageSource.getMessage("paymentService.findPaymentById.paymentNotFound",
+                                            null, LocaleContextHolder.getLocale())))));
         }
         return Optional.empty();
+    }
+
+    private String generateIdempotencyKey(Integer customerId, BigDecimal amount,
+                                          String fromSource, String toSource) {
+        String raw = customerId + ":" + amount + ":" + fromSource + ":" + toSource + ":" + LocalDate.now();
+        return UUID.nameUUIDFromBytes(raw.getBytes()).toString();
+    }
+
+    private void checkCooldown(Integer customerId, BigDecimal amount, String fromSource, String toSource) {
+        if (paymentCooldownChecker.isInCooldown(customerId, amount, fromSource, toSource)) {
+            throw new MultiValidationException(List.of(
+                    new ExceptionResponse(429,
+                            messageSource.getMessage("paymentService.cooldown", null, LocaleContextHolder.getLocale()),
+                            LocalDateTime.now())));
+        }
     }
 
 }
