@@ -31,10 +31,26 @@ public class PaymentCreator {
                                       PaymentSourceType fromType, PaymentSourceType toType) {
         Locale fallbackLocale = LocaleContextHolder.getLocale();
 
-        if (paymentRepository.existsByCustomerIdAndScheduledDateAndStatus(
-                customerId, LocalDate.now(), PaymentStatus.PENDING)) {
+//        if (paymentRepository.existsByCustomerIdAndScheduledDateAndStatus(
+//                customerId, LocalDate.now(), PaymentStatus.PENDING)) {
+//            throw new MultiValidationException(List.of(
+//                    new ExceptionResponse(400, messageSource.getMessage("paymentCreator.buildPayment.pendingPayment",null,fallbackLocale), LocalDateTime.now())));
+//        }
+        // Eyni anda 2 PENDING olmasın
+
+        PaymentSourceType blockedType = switch (fromType) {
+            case CARD -> PaymentSourceType.CURRENT_ACCOUNT;
+            case CURRENT_ACCOUNT -> PaymentSourceType.CARD;
+            case EXTERNAL -> throw new IllegalStateException(
+                    messageSource.getMessage("paymentCreator.buildPayment.illegalFromType", null, fallbackLocale));
+        };
+
+        if (paymentRepository.existsByCustomerIdAndScheduledDateAndFromType(
+                customerId, LocalDate.now(), blockedType)) {
             throw new MultiValidationException(List.of(
-                    new ExceptionResponse(400, messageSource.getMessage("paymentCreator.buildPayment.pendingPayment",null,fallbackLocale), LocalDateTime.now())));
+                    new ExceptionResponse(400,
+                            messageSource.getMessage("paymentCreator.buildPayment.sourceTypeMismatch", null, fallbackLocale),
+                            LocalDateTime.now())));
         }
 
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleTrue(customerId)

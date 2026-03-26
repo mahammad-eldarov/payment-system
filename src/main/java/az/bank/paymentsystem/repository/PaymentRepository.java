@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.repository;
 
+import az.bank.paymentsystem.enums.PaymentSourceType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -29,11 +30,14 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
     List<PaymentEntity> findAllByStatus(PaymentStatus status);
 
 
-    Boolean existsByCustomerIdAndScheduledDateAndStatus(
-            Integer customerId,
-            LocalDate scheduledDate,
-            PaymentStatus status
-    );
+//    Boolean existsByCustomerIdAndScheduledDateAndStatus(
+//            Integer customerId,
+//            LocalDate scheduledDate,
+//            PaymentStatus status
+//    );
+
+    Boolean existsByCustomerIdAndScheduledDateAndFromType(
+            Integer customerId, LocalDate scheduledDate, PaymentSourceType fromType);
 
     Optional<PaymentEntity> findByIdAndCustomerId(Integer id, Integer customerId);
 
