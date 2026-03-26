@@ -43,5 +43,6 @@ public interface CurrentAccountRepository extends JpaRepository<CurrentAccountEn
     Boolean existsByCustomerIdAndStatus(Integer customerId, CurrentAccountStatus status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM CurrentAccountEntity a WHERE a.id = :id")
     Optional<CurrentAccountEntity> findByIdWithLock(Integer id);
 }

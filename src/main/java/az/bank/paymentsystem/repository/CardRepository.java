@@ -44,5 +44,6 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
     Boolean existsByCustomerIdAndStatus(Integer customerId, CardStatus status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT c FROM CardEntity c WHERE c.id = :id")
     Optional<CardEntity> findByIdWithLock(Integer id);
 }
