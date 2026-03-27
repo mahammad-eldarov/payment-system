@@ -23,6 +23,9 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
     })
     Optional<PaymentEntity> findById(Integer id);
 
+    Boolean existsByCustomerIdAndScheduledDateAndFromType(
+            Integer customerId, LocalDate scheduledDate, PaymentSourceType fromType);
+
     @EntityGraph(attributePaths = {
             "customer",
             "fromCard", "fromCard.customer",
@@ -30,13 +33,17 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
             "fromAccount", "fromAccount.customer",
             "toAccount", "toAccount.customer"
     })
-
-    Boolean existsByCustomerIdAndScheduledDateAndFromType(
-            Integer customerId, LocalDate scheduledDate, PaymentSourceType fromType);
-
     Optional<PaymentEntity> findByIdAndCustomerId(Integer id, Integer customerId);
 
     Boolean existsByIdempotencyKey(String idempotencyKey);
+
+    @EntityGraph(attributePaths = {
+            "customer",
+            "fromCard", "fromCard.customer",
+            "toCard", "toCard.customer",
+            "fromAccount", "fromAccount.customer",
+            "toAccount", "toAccount.customer"
+    })
     Optional<PaymentEntity> findByIdempotencyKey(String idempotencyKey);
 
     Page<PaymentEntity> findAllByStatusOrderByCreatedAtAsc(PaymentStatus status, Pageable pageable);

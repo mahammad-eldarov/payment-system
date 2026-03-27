@@ -36,6 +36,7 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
 
     Page<CardEntity> findByStatus(CardStatus status, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"customer"})
     @Query("SELECT c FROM CardEntity c WHERE c.customer.id = :customerId AND c.isVisible = true AND c.balance >= :amount ORDER BY c.balance ASC LIMIT 1")
     Optional<CardEntity> findSufficientCard(@Param("customerId") Integer customerId, @Param("amount") BigDecimal amount);
 

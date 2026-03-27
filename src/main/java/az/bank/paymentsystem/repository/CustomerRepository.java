@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.enums.CustomerStatus;
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,9 +12,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Integer> {
 
+    @NonNull
     @EntityGraph(attributePaths = {"cardEntity", "currentAccountEntity", "transactionEntity"})
-    Optional<CustomerEntity> findById(Integer id);
+    Optional<CustomerEntity> findById(@NonNull Integer id);
 
+    @EntityGraph(attributePaths = {"cardEntity", "currentAccountEntity"})
     Optional<CustomerEntity> findByIdAndIsVisibleTrue(Integer id);
 
     Page<CustomerEntity> findAllByIsVisibleTrue(Pageable pageable);
