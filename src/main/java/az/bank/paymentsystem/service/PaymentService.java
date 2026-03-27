@@ -32,6 +32,8 @@ import az.bank.paymentsystem.util.payment.PaymentSourceResolver;
 import az.bank.paymentsystem.util.payment.PaymentValidator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -149,13 +151,21 @@ public class PaymentService {
         return paymentMapper.toResponse(paymentRepository.save(payment));
     }
 
-
-    @Transactional
     public void processPayments() {
-        List<PaymentEntity> pendingPayments = paymentRepository.findAllByStatus(PaymentStatus.PENDING);
-        for (PaymentEntity payment : pendingPayments) {
-            paymentProcessor.process(payment.getId());
-        }
+        int page = 0;
+        int pageSize = 100;
+        Page<PaymentEntity> pageResult;
+
+        do {
+            pageResult = paymentRepository.findAllByStatusOrderByCreatedAtAsc(
+                    PaymentStatus.PENDING,
+                    PageRequest.of(page, pageSize));
+
+            for (PaymentEntity payment : pageResult.getContent()) {
+                paymentProcessor.process(payment.getId());
+            }
+            page++;
+        } while (pageResult.hasNext());
     }
 
     public PaymentResponse getPaymentById(Integer customerId, Integer paymentId) {

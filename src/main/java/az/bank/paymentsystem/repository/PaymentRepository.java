@@ -2,15 +2,18 @@ package az.bank.paymentsystem.repository;
 
 import az.bank.paymentsystem.enums.PaymentSourceType;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import az.bank.paymentsystem.entity.PaymentEntity;
 import az.bank.paymentsystem.enums.PaymentStatus;
+import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer> {
 
+    @NonNull
     @EntityGraph(attributePaths = {
             "customer",
             "fromCard", "fromCard.customer",
@@ -27,14 +30,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
             "fromAccount", "fromAccount.customer",
             "toAccount", "toAccount.customer"
     })
-    List<PaymentEntity> findAllByStatus(PaymentStatus status);
-
-
-//    Boolean existsByCustomerIdAndScheduledDateAndStatus(
-//            Integer customerId,
-//            LocalDate scheduledDate,
-//            PaymentStatus status
-//    );
 
     Boolean existsByCustomerIdAndScheduledDateAndFromType(
             Integer customerId, LocalDate scheduledDate, PaymentSourceType fromType);
@@ -43,5 +38,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
 
     Boolean existsByIdempotencyKey(String idempotencyKey);
     Optional<PaymentEntity> findByIdempotencyKey(String idempotencyKey);
+
+    Page<PaymentEntity> findAllByStatusOrderByCreatedAtAsc(PaymentStatus status, Pageable pageable);
 
 }
