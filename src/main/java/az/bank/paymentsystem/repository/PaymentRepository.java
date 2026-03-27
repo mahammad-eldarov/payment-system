@@ -21,7 +21,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
             "fromAccount", "fromAccount.customer",
             "toAccount", "toAccount.customer"
     })
-    Optional<PaymentEntity> findById(Integer id);
+    Optional<PaymentEntity> findById(@NonNull Integer id);
 
     Boolean existsByCustomerIdAndScheduledDateAndFromType(
             Integer customerId, LocalDate scheduledDate, PaymentSourceType fromType);
