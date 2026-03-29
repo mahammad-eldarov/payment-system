@@ -16,6 +16,7 @@ import az.bank.paymentsystem.enums.PaymentStatus;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentResponse {
+    private Integer id;
     private BigDecimal amount;
     private Currency currency;
     private PaymentStatus status;
