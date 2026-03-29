@@ -17,6 +17,7 @@ import az.bank.paymentsystem.enums.TransactionStatus;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionResponse {
 
+    private Integer id;
     private Integer paymentId;
     private String customerName;
     private BigDecimal amount;
