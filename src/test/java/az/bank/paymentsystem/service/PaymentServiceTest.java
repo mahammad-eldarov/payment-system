@@ -132,6 +132,8 @@ class PaymentServiceTest {
 
     @Test
     void shouldThrowMultiValidationExceptionWhenCardToCardCooldownIsActive() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         CardToCardRequest request = new CardToCardRequest();
         request.setFromPan("4000000000000001");
         request.setToPan("4000000000000002");
@@ -140,12 +142,14 @@ class PaymentServiceTest {
         when(paymentCooldownChecker.isInCooldown(anyInt(), any(), anyString(), anyString()))
                 .thenReturn(true);
 
-        assertThrows(MultiValidationException.class, () -> paymentService.cardToCard(1, request));
+        assertThrows(expected, () -> paymentService.cardToCard(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
     void shouldThrowMultiValidationExceptionWhenCardToCardValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         CardToCardRequest request = new CardToCardRequest();
         request.setFromPan("4000000000000001");
         request.setToPan("4000000000000002");
@@ -160,7 +164,7 @@ class PaymentServiceTest {
             return null;
         }).when(paymentValidator).validateAmount(any(), anyList());
 
-        assertThrows(MultiValidationException.class, () -> paymentService.cardToCard(1, request));
+        assertThrows(expected, () -> paymentService.cardToCard(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
@@ -211,6 +215,8 @@ class PaymentServiceTest {
 
     @Test
     void shouldThrowMultiValidationExceptionWhenCardToAccountCooldownIsActive() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         CardToAccountRequest request = new CardToAccountRequest();
         request.setFromPan("4000000000000001");
         request.setToAccountNumber("AZ12BANK0000000001");
@@ -219,12 +225,14 @@ class PaymentServiceTest {
         when(paymentCooldownChecker.isInCooldown(anyInt(), any(), anyString(), anyString()))
                 .thenReturn(true);
 
-        assertThrows(MultiValidationException.class, () -> paymentService.cardToAccount(1, request));
+        assertThrows(expected, () -> paymentService.cardToAccount(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
     void shouldThrowMultiValidationExceptionWhenCardToAccountValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         CardToAccountRequest request = new CardToAccountRequest();
         request.setFromPan("4000000000000001");
         request.setToAccountNumber("AZ12BANK0000000001");
@@ -239,7 +247,7 @@ class PaymentServiceTest {
             return null;
         }).when(paymentValidator).validateAmount(any(), anyList());
 
-        assertThrows(MultiValidationException.class, () -> paymentService.cardToAccount(1, request));
+        assertThrows(expected, () -> paymentService.cardToAccount(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
@@ -290,6 +298,8 @@ class PaymentServiceTest {
 
     @Test
     void shouldThrowMultiValidationExceptionWhenAccountToCardCooldownIsActive() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         AccountToCardRequest request = new AccountToCardRequest();
         request.setFromAccountNumber("AZ12BANK0000000001");
         request.setToPan("4000000000000002");
@@ -298,12 +308,14 @@ class PaymentServiceTest {
         when(paymentCooldownChecker.isInCooldown(anyInt(), any(), anyString(), anyString()))
                 .thenReturn(true);
 
-        assertThrows(MultiValidationException.class, () -> paymentService.accountToCard(1, request));
+        assertThrows(expected, () -> paymentService.accountToCard(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
     void shouldThrowMultiValidationExceptionWhenAccountToCardValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         AccountToCardRequest request = new AccountToCardRequest();
         request.setFromAccountNumber("AZ12BANK0000000001");
         request.setToPan("4000000000000002");
@@ -318,7 +330,7 @@ class PaymentServiceTest {
             return null;
         }).when(paymentValidator).validateAmount(any(), anyList());
 
-        assertThrows(MultiValidationException.class, () -> paymentService.accountToCard(1, request));
+        assertThrows(expected, () -> paymentService.accountToCard(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
@@ -369,6 +381,8 @@ class PaymentServiceTest {
 
     @Test
     void shouldThrowMultiValidationExceptionWhenAccountToAccountCooldownIsActive() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         AccountToAccountRequest request = new AccountToAccountRequest();
         request.setFromAccountNumber("AZ12BANK0000000001");
         request.setToAccountNumber("AZ12BANK0000000002");
@@ -377,12 +391,14 @@ class PaymentServiceTest {
         when(paymentCooldownChecker.isInCooldown(anyInt(), any(), anyString(), anyString()))
                 .thenReturn(true);
 
-        assertThrows(MultiValidationException.class, () -> paymentService.accountToAccount(1, request));
+        assertThrows(expected, () -> paymentService.accountToAccount(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
     void shouldThrowMultiValidationExceptionWhenAccountToAccountValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         AccountToAccountRequest request = new AccountToAccountRequest();
         request.setFromAccountNumber("AZ12BANK0000000001");
         request.setToAccountNumber("AZ12BANK0000000002");
@@ -397,7 +413,7 @@ class PaymentServiceTest {
             return null;
         }).when(paymentValidator).validateAmount(any(), anyList());
 
-        assertThrows(MultiValidationException.class, () -> paymentService.accountToAccount(1, request));
+        assertThrows(expected, () -> paymentService.accountToAccount(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
@@ -447,20 +463,22 @@ class PaymentServiceTest {
 
     @Test
     void shouldThrowPaymentNotFoundExceptionWhenPaymentDoesNotExist() {
+        Class<PaymentNotFoundException> expected = PaymentNotFoundException.class;
+
         when(customerService.findActiveCustomer(1)).thenReturn(customer);
         when(paymentRepository.findByIdAndCustomerId(99, 1)).thenReturn(Optional.empty());
 
-        assertThrows(PaymentNotFoundException.class, () -> paymentService.getPaymentById(1, 99));
+        assertThrows(expected, () -> paymentService.getPaymentById(1, 99));
     }
 
     @Test
     void shouldThrowPaymentNotFoundExceptionWhenIdempotencyKeyExistsButPaymentNotFound() {
+        Class<PaymentNotFoundException> expected = PaymentNotFoundException.class;
+
         CardToCardRequest request = new CardToCardRequest();
         request.setFromPan("4000000000000001");
         request.setToPan("4000000000000002");
         request.setAmount(BigDecimal.TEN);
-
-        Class<PaymentNotFoundException> expected = PaymentNotFoundException.class;
 
         when(paymentRepository.existsByIdempotencyKey(anyString())).thenReturn(true);
         when(paymentRepository.findByIdempotencyKey(anyString())).thenReturn(Optional.empty());

@@ -123,46 +123,47 @@ class CurrentAccountOrderServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExist() {
-        when(customerService.findActiveCustomer(99)).thenThrow(CustomerNotFoundException.class);
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> currentAccountOrderService.orderCurrentAccount(99, request));
+        when(customerService.findActiveCustomer(99)).thenThrow(expected);
+
+        assertThrows(expected, () -> currentAccountOrderService.orderCurrentAccount(99, request));
     }
 
     @Test
     void shouldThrowMultiValidationExceptionWhenCurrentAccountValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         when(customerService.findActiveCustomer(1)).thenReturn(customer);
         when(currentAccountCreator.createOrder(customer, request)).thenReturn(orderEntity);
-        doThrow(MultiValidationException.class)
-                .when(currentAccountValidator).validateCurrentAccountOrder(1);
+        doThrow(expected).when(currentAccountValidator).validateCurrentAccountOrder(1);
 
-        assertThrows(MultiValidationException.class,
-                () -> currentAccountOrderService.orderCurrentAccount(1, request));
+        assertThrows(expected, () -> currentAccountOrderService.orderCurrentAccount(1, request));
     }
 
     @Test
     void shouldCallRejectionHandlerWhenCurrentAccountValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
         MultiValidationException ex = new MultiValidationException(List.of());
 
         when(customerService.findActiveCustomer(1)).thenReturn(customer);
         when(currentAccountCreator.createOrder(customer, request)).thenReturn(orderEntity);
         doThrow(ex).when(currentAccountValidator).validateCurrentAccountOrder(1);
 
-        assertThrows(MultiValidationException.class,
-                () -> currentAccountOrderService.orderCurrentAccount(1, request));
+        assertThrows(expected, () -> currentAccountOrderService.orderCurrentAccount(1, request));
 
         verify(currentAccountOrderRejectionHandler).handleRejection(orderEntity, customer, ex);
     }
 
     @Test
     void shouldNotSaveAccountWhenCurrentAccountValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         when(customerService.findActiveCustomer(1)).thenReturn(customer);
         when(currentAccountCreator.createOrder(customer, request)).thenReturn(orderEntity);
-        doThrow(MultiValidationException.class)
-                .when(currentAccountValidator).validateCurrentAccountOrder(1);
+        doThrow(expected).when(currentAccountValidator).validateCurrentAccountOrder(1);
 
-        assertThrows(MultiValidationException.class,
-                () -> currentAccountOrderService.orderCurrentAccount(1, request));
+        assertThrows(expected, () -> currentAccountOrderService.orderCurrentAccount(1, request));
 
         verify(currentAccountRepository, never()).save(any());
         verify(currentAccountOrderRepository, never()).save(any());

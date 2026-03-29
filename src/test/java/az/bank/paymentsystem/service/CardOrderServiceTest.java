@@ -26,9 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -129,47 +127,47 @@ class CardOrderServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExist() {
-        when(customerService.findActiveCustomer(99))
-                .thenThrow(CustomerNotFoundException.class);
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> cardOrderService.orderCard(99, request));
+        when(customerService.findActiveCustomer(99)).thenThrow(expected);
+
+        assertThrows(expected, () -> cardOrderService.orderCard(99, request));
     }
 
     @Test
     void shouldThrowMultiValidationExceptionWhenCardValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         when(customerService.findActiveCustomer(1)).thenReturn(customer);
         when(cardCreator.createOrder(customer, request)).thenReturn(orderEntity);
-        doThrow(MultiValidationException.class)
-                .when(cardValidator).validateCardOrder(1);
+        doThrow(expected).when(cardValidator).validateCardOrder(1);
 
-        assertThrows(MultiValidationException.class,
-                () -> cardOrderService.orderCard(1, request));
+        assertThrows(expected, () -> cardOrderService.orderCard(1, request));
     }
 
     @Test
     void shouldCallRejectionHandlerWhenCardValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
         MultiValidationException ex = new MultiValidationException(List.of());
 
         when(customerService.findActiveCustomer(1)).thenReturn(customer);
         when(cardCreator.createOrder(customer, request)).thenReturn(orderEntity);
         doThrow(ex).when(cardValidator).validateCardOrder(1);
 
-        assertThrows(MultiValidationException.class,
-                () -> cardOrderService.orderCard(1, request));
+        assertThrows(expected, () -> cardOrderService.orderCard(1, request));
 
         verify(cardOrderRejectionHandler).handleRejection(orderEntity, customer, ex);
     }
 
     @Test
     void shouldNotSaveCardWhenCardValidationFails() {
+        Class<MultiValidationException> expected = MultiValidationException.class;
+
         when(customerService.findActiveCustomer(1)).thenReturn(customer);
         when(cardCreator.createOrder(customer, request)).thenReturn(orderEntity);
-        doThrow(MultiValidationException.class)
-                .when(cardValidator).validateCardOrder(1);
+        doThrow(expected).when(cardValidator).validateCardOrder(1);
 
-        assertThrows(MultiValidationException.class,
-                () -> cardOrderService.orderCard(1, request));
+        assertThrows(expected, () -> cardOrderService.orderCard(1, request));
 
         verify(cardRepository, never()).save(any());
         verify(cardOrderRepository, never()).save(any());

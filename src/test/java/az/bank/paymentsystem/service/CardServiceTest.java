@@ -137,9 +137,11 @@ class CardServiceTest {
 
     @Test
     void shouldThrowCardNotFoundExceptionWhenCardDoesNotExistForDelete() {
+        Class<CardNotFoundException> expected = CardNotFoundException.class;
+
         when(cardRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CardNotFoundException.class, () -> cardService.deleteCard(99));
+        assertThrows(expected, () -> cardService.deleteCard(99));
     }
 
     @Test
@@ -218,10 +220,11 @@ class CardServiceTest {
 
     @Test
     void shouldThrowCardNotFoundExceptionWhenCardDoesNotExistForStatusUpdate() {
+        Class<CardNotFoundException> expected = CardNotFoundException.class;
+
         when(cardRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CardNotFoundException.class,
-                () -> cardService.updateCardStatus(99, CardStatus.BLOCKED));
+        assertThrows(expected, () -> cardService.updateCardStatus(99, CardStatus.BLOCKED));
     }
 
     @Test
@@ -246,10 +249,11 @@ class CardServiceTest {
 
     @Test
     void shouldThrowCardNotFoundExceptionWhenCardDoesNotExistForPasswordUpdate() {
+        Class<CardNotFoundException> expected = CardNotFoundException.class;
+
         when(cardRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CardNotFoundException.class,
-                () -> cardService.updateCardPassword(99, new UpdateCardPasswordRequest()));
+        assertThrows(expected, () -> cardService.updateCardPassword(99, new UpdateCardPasswordRequest()));
     }
 
     @Test
@@ -269,17 +273,21 @@ class CardServiceTest {
 
     @Test
     void shouldThrowEmptyListExceptionWhenCustomerHasNoCards() {
+        Class<EmptyListException> expected = EmptyListException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(customer));
         when(cardRepository.findCardsByCustomerId(1)).thenReturn(Collections.emptyList());
 
-        assertThrows(EmptyListException.class, () -> cardService.getCardsByCustomerId(1));
+        assertThrows(expected, () -> cardService.getCardsByCustomerId(1));
     }
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForGetCards() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class, () -> cardService.getCardsByCustomerId(99));
+        assertThrows(expected, () -> cardService.getCardsByCustomerId(99));
     }
 
     @Test
@@ -298,26 +306,29 @@ class CardServiceTest {
 
     @Test
     void shouldThrowCardNotFoundExceptionWhenCardNotFoundByPan() {
+        Class<CardNotFoundException> expected = CardNotFoundException.class;
+
         when(cardRepository.findByPanAndIsVisibleTrue("0000000000000000"))
                 .thenReturn(Optional.empty());
 
-        assertThrows(CardNotFoundException.class,
-                () -> cardService.getCardByPan("0000000000000000"));
+        assertThrows(expected, () -> cardService.getCardByPan("0000000000000000"));
     }
 
     @Test
     void shouldThrowPageRequestExceptionWhenPageIsLessThanOneForGetByStatus() {
-        assertThrows(PageRequestException.class,
-                () -> cardService.getCardsByStatus(CardStatus.ACTIVE, 0));
+        Class<PageRequestException> expected = PageRequestException.class;
+
+        assertThrows(expected, () -> cardService.getCardsByStatus(CardStatus.ACTIVE, 0));
     }
 
     @Test
     void shouldThrowCardNotFoundExceptionWhenNoCardsMatchGivenStatus() {
+        Class<CardNotFoundException> expected = CardNotFoundException.class;
+
         when(cardRepository.findByStatus(eq(CardStatus.ACTIVE), any(Pageable.class)))
                 .thenReturn(Page.empty());
 
-        assertThrows(CardNotFoundException.class,
-                () -> cardService.getCardsByStatus(CardStatus.ACTIVE, 1));
+        assertThrows(expected, () -> cardService.getCardsByStatus(CardStatus.ACTIVE, 1));
     }
 
     @Test
@@ -347,9 +358,11 @@ class CardServiceTest {
 
     @Test
     void shouldThrowCardNotFoundExceptionWhenActiveCardDoesNotExist() {
+        Class<CardNotFoundException> expected = CardNotFoundException.class;
+
         when(cardRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CardNotFoundException.class, () -> cardService.findActiveCard(99));
+        assertThrows(expected, () -> cardService.findActiveCard(99));
     }
 
     @Test
@@ -363,8 +376,10 @@ class CardServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenActiveCustomerDoesNotExist() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class, () -> cardService.findActiveCustomer(99));
+        assertThrows(expected, () -> cardService.findActiveCustomer(99));
     }
 }

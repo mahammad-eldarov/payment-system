@@ -109,33 +109,39 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerDeletedExceptionWhenCustomerIsSoftDeleted() {
+        Class<CustomerDeletedException> expected = CustomerDeletedException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(2)).thenReturn(Optional.empty());
         when(customerRepository.findByIdAndIsVisibleFalse(2)).thenReturn(Optional.of(deletedCustomer));
 
-        assertThrows(CustomerDeletedException.class, () -> customerService.getCustomerById(2));
+        assertThrows(expected, () -> customerService.getCustomerById(2));
     }
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExist() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
         when(customerRepository.findByIdAndIsVisibleFalse(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class, () -> customerService.getCustomerById(99));
+        assertThrows(expected, () -> customerService.getCustomerById(99));
     }
 
     @Test
     void shouldThrowPageRequestExceptionWhenPageIsLessThanOneForGetByStatus() {
-        assertThrows(PageRequestException.class,
-                () -> customerService.getCustomersByStatus(CustomerStatus.ACTIVE, 0));
+        Class<PageRequestException> expected = PageRequestException.class;
+
+        assertThrows(expected, () -> customerService.getCustomersByStatus(CustomerStatus.ACTIVE, 0));
     }
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenNoCustomersMatchGivenStatus() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByStatus(eq(CustomerStatus.ACTIVE), any(Pageable.class)))
                 .thenReturn(Page.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> customerService.getCustomersByStatus(CustomerStatus.ACTIVE, 1));
+        assertThrows(expected, () -> customerService.getCustomersByStatus(CustomerStatus.ACTIVE, 1));
     }
 
     @Test
@@ -170,23 +176,28 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenDeletedCustomerDoesNotExist() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleFalse(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> customerService.getDeletedCustomerById(99));
+        assertThrows(expected, () -> customerService.getDeletedCustomerById(99));
     }
 
     @Test
     void shouldThrowPageRequestExceptionWhenPageIsLessThanOneForGetAll() {
-        assertThrows(PageRequestException.class, () -> customerService.getAllCustomers(0));
+        Class<PageRequestException> expected = PageRequestException.class;
+
+        assertThrows(expected, () -> customerService.getAllCustomers(0));
     }
 
     @Test
     void shouldThrowEmptyListExceptionWhenNoActiveCustomersExist() {
+        Class<EmptyListException> expected = EmptyListException.class;
+
         when(customerRepository.findAllByIsVisibleTrue(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        assertThrows(EmptyListException.class, () -> customerService.getAllCustomers(1));
+        assertThrows(expected, () -> customerService.getAllCustomers(1));
     }
 
     @Test
@@ -220,10 +231,11 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForCardsAndAccounts() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> customerService.getCustomersCardsAndAccounts(99));
+        assertThrows(expected, () -> customerService.getCustomersCardsAndAccounts(99));
     }
 
     @Test
@@ -242,10 +254,11 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForCardTransactions() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(5)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> customerService.getCardTransactions(5, "4000000000000001", 1));
+        assertThrows(expected, () -> customerService.getCardTransactions(5, "4000000000000001", 1));
     }
 
     @Test
@@ -264,10 +277,11 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForAccountTransactions() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(5)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> customerService.getAccountTransactions(5, "AZ12BANK0000000002", 1));
+        assertThrows(expected, () -> customerService.getAccountTransactions(5, "AZ12BANK0000000002", 1));
     }
 
     @Test
@@ -289,10 +303,11 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForStatusUpdate() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> customerService.updateCustomerStatus(99, CustomerStatus.BLOCKED));
+        assertThrows(expected, () -> customerService.updateCustomerStatus(99, CustomerStatus.BLOCKED));
     }
 
     @Test
@@ -342,10 +357,11 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForUpdate() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> customerService.updateCustomer(99, new UpdateCustomerRequest()));
+        assertThrows(expected, () -> customerService.updateCustomer(99, new UpdateCustomerRequest()));
     }
 
     @Test
@@ -368,9 +384,11 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForDelete() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class, () -> customerService.deleteCustomer(99));
+        assertThrows(expected, () -> customerService.deleteCustomer(99));
     }
 
     @Test
@@ -386,8 +404,10 @@ class CustomerServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenActiveCustomerDoesNotExist() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class, () -> customerService.findActiveCustomer(99));
+        assertThrows(expected, () -> customerService.findActiveCustomer(99));
     }
 }

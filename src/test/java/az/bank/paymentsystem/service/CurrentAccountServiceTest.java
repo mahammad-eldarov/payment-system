@@ -99,20 +99,22 @@ class CurrentAccountServiceTest {
 
     @Test
     void shouldThrowEmptyListExceptionWhenCustomerHasNoAccounts() {
+        Class<EmptyListException> expected = EmptyListException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(customer));
         when(currentAccountRepository.findByCustomerIdAndIsVisibleTrue(1))
                 .thenReturn(Collections.emptyList());
 
-        assertThrows(EmptyListException.class,
-                () -> currentAccountService.getAccountsByCustomerId(1));
+        assertThrows(expected, () -> currentAccountService.getAccountsByCustomerId(1));
     }
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForGetAccounts() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> currentAccountService.getAccountsByCustomerId(99));
+        assertThrows(expected, () -> currentAccountService.getAccountsByCustomerId(99));
     }
 
     @Test
@@ -132,25 +134,31 @@ class CurrentAccountServiceTest {
 
     @Test
     void shouldThrowAccountNotFoundExceptionWhenAccountNotFoundByAccountNumber() {
+        Class<AccountNotFoundException> expected = AccountNotFoundException.class;
+
         when(currentAccountRepository.findByAccountNumberAndIsVisibleTrue("AZ00BANK0000000000"))
                 .thenReturn(Optional.empty());
 
-        assertThrows(AccountNotFoundException.class,
+        assertThrows(expected,
                 () -> currentAccountService.getAccountByAccountNumber("AZ00BANK0000000000"));
     }
 
     @Test
     void shouldThrowPageRequestExceptionWhenPageIsLessThanOneForGetByStatus() {
-        assertThrows(PageRequestException.class,
+        Class<PageRequestException> expected = PageRequestException.class;
+
+        assertThrows(expected,
                 () -> currentAccountService.getCurrentAccountByStatus(CurrentAccountStatus.ACTIVE, 0));
     }
 
     @Test
     void shouldThrowAccountNotFoundExceptionWhenNoAccountsMatchGivenStatus() {
+        Class<AccountNotFoundException> expected = AccountNotFoundException.class;
+
         when(currentAccountRepository.findByStatus(eq(CurrentAccountStatus.ACTIVE), any(Pageable.class)))
                 .thenReturn(Page.empty());
 
-        assertThrows(AccountNotFoundException.class,
+        assertThrows(expected,
                 () -> currentAccountService.getCurrentAccountByStatus(CurrentAccountStatus.ACTIVE, 1));
     }
 
@@ -199,9 +207,11 @@ class CurrentAccountServiceTest {
 
     @Test
     void shouldThrowAccountNotFoundExceptionWhenAccountDoesNotExistForStatusUpdate() {
+        Class<AccountNotFoundException> expected = AccountNotFoundException.class;
+
         when(currentAccountRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(AccountNotFoundException.class,
+        assertThrows(expected,
                 () -> currentAccountService.updateCurrentAccountStatus(99, CurrentAccountStatus.SUSPICIOUS));
     }
 
@@ -290,10 +300,11 @@ class CurrentAccountServiceTest {
 
     @Test
     void shouldThrowAccountNotFoundExceptionWhenAccountDoesNotExistForDelete() {
+        Class<AccountNotFoundException> expected = AccountNotFoundException.class;
+
         when(currentAccountRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(AccountNotFoundException.class,
-                () -> currentAccountService.deleteCurrentAccount(99));
+        assertThrows(expected, () -> currentAccountService.deleteCurrentAccount(99));
     }
 
     @Test
@@ -307,10 +318,11 @@ class CurrentAccountServiceTest {
 
     @Test
     void shouldThrowAccountNotFoundExceptionWhenActiveAccountDoesNotExist() {
+        Class<AccountNotFoundException> expected = AccountNotFoundException.class;
+
         when(currentAccountRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(AccountNotFoundException.class,
-                () -> currentAccountService.findActiveAccount(99));
+        assertThrows(expected, () -> currentAccountService.findActiveAccount(99));
     }
 
     @Test
@@ -326,10 +338,12 @@ class CurrentAccountServiceTest {
 
     @Test
     void shouldThrowAccountNotFoundExceptionWhenActiveAccountNotFoundByAccountNumber() {
+        Class<AccountNotFoundException> expected = AccountNotFoundException.class;
+
         when(currentAccountRepository.findByAccountNumberAndIsVisibleTrue("AZ00BANK0000000000"))
                 .thenReturn(Optional.empty());
 
-        assertThrows(AccountNotFoundException.class,
+        assertThrows(expected,
                 () -> currentAccountService.findActiveAccountByNumber("AZ00BANK0000000000"));
     }
 
@@ -344,9 +358,10 @@ class CurrentAccountServiceTest {
 
     @Test
     void shouldThrowCustomerNotFoundExceptionWhenActiveCustomerDoesNotExist() {
+        Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
+
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(CustomerNotFoundException.class,
-                () -> currentAccountService.findActiveCustomer(99));
+        assertThrows(expected, () -> currentAccountService.findActiveCustomer(99));
     }
 }
