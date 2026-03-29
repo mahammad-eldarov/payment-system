@@ -103,6 +103,9 @@ class PaymentServiceTest {
 
         PaymentResponse actual = paymentService.cardToCard(1, request);
 
+        verify(paymentSourceResolver).fromCheckCard(eq(payment), eq(1), eq("4000000000000001"), anyList());
+        verify(paymentSourceResolver).toCheckCard(eq(payment), eq("4000000000000002"), anyList());
+        verify(paymentValidator).checkSelfTransfer(eq(payment), anyList());
         verify(paymentRepository).save(payment);
         assertEquals(expected.getId(), actual.getId());
     }
@@ -179,6 +182,9 @@ class PaymentServiceTest {
 
         PaymentResponse actual = paymentService.cardToAccount(1, request);
 
+        verify(paymentSourceResolver).fromCheckCard(eq(payment), eq(1), eq("4000000000000001"), anyList());
+        verify(paymentSourceResolver).toCheckAccount(eq(payment), eq("AZ12BANK0000000001"), anyList());
+        verify(paymentValidator).checkSelfTransfer(eq(payment), anyList());
         verify(paymentRepository).save(payment);
         assertEquals(expected.getId(), actual.getId());
     }
@@ -255,6 +261,9 @@ class PaymentServiceTest {
 
         PaymentResponse actual = paymentService.accountToCard(1, request);
 
+        verify(paymentSourceResolver).fromCheckAccount(eq(payment), eq(1), eq("AZ12BANK0000000001"), anyList());
+        verify(paymentSourceResolver).toCheckCard(eq(payment), eq("4000000000000002"), anyList());
+        verify(paymentValidator).checkSelfTransfer(eq(payment), anyList());
         verify(paymentRepository).save(payment);
         assertEquals(expected.getId(), actual.getId());
     }
@@ -331,6 +340,9 @@ class PaymentServiceTest {
 
         PaymentResponse actual = paymentService.accountToAccount(1, request);
 
+        verify(paymentSourceResolver).fromCheckAccount(eq(payment), eq(1), eq("AZ12BANK0000000001"), anyList());
+        verify(paymentSourceResolver).toCheckAccount(eq(payment), eq("AZ12BANK0000000002"), anyList());
+        verify(paymentValidator).checkSelfTransfer(eq(payment), anyList());
         verify(paymentRepository).save(payment);
         assertEquals(expected.getId(), actual.getId());
     }
@@ -439,5 +451,20 @@ class PaymentServiceTest {
         when(paymentRepository.findByIdAndCustomerId(99, 1)).thenReturn(Optional.empty());
 
         assertThrows(PaymentNotFoundException.class, () -> paymentService.getPaymentById(1, 99));
+    }
+
+    @Test
+    void shouldThrowPaymentNotFoundExceptionWhenIdempotencyKeyExistsButPaymentNotFound() {
+        CardToCardRequest request = new CardToCardRequest();
+        request.setFromPan("4000000000000001");
+        request.setToPan("4000000000000002");
+        request.setAmount(BigDecimal.TEN);
+
+        Class<PaymentNotFoundException> expected = PaymentNotFoundException.class;
+
+        when(paymentRepository.existsByIdempotencyKey(anyString())).thenReturn(true);
+        when(paymentRepository.findByIdempotencyKey(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(expected, () -> paymentService.cardToCard(1, request));
     }
 }
