@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StatusAuditLogResponse {
+    private Integer id;
     private String entityType;
     private Integer entityId;
     private String previousStatus;
