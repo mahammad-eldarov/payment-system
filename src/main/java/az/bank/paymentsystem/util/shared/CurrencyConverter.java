@@ -28,7 +28,7 @@ public class CurrencyConverter {
 
         return response.getValTypes().stream()
                 .flatMap(valType -> valType.getValuteList().stream())
-                .filter(v -> v.getCode().equalsIgnoreCase(currencyCode))
+                .filter(value -> value.getCode().equalsIgnoreCase(currencyCode))
                 .findFirst()
                 .map(CbarResponse.Valute::getValue)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage("currencyConverter.getRate.rateNotFound",new Object[]{currencyCode},locale)));
