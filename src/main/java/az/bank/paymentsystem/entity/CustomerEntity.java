@@ -9,7 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,13 +56,13 @@ public class CustomerEntity extends BaseEntity {
     private Boolean isVisible;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private List<CardEntity> cardEntity;
+    private Set<CardEntity> cardEntity;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private List<CurrentAccountEntity> currentAccountEntity;
+    private Set<CurrentAccountEntity> currentAccountEntity;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private List<TransactionEntity> transactionEntity;
+    private Set<TransactionEntity> transactionEntity;
 
     @Enumerated(EnumType.STRING)
     private Language language;
