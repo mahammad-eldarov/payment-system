@@ -9,7 +9,6 @@ A banking payment system built with Spring Boot for managing customers, cards, c
 - **PostgreSQL**
 - **Liquibase** — database migrations
 - **Spring Data JPA / Hibernate**
-- **Spring Security**
 - **Spring Cloud OpenFeign** — external HTTP clients
 - **MapStruct** — object mapping
 - **ShedLock** — distributed scheduler locks
