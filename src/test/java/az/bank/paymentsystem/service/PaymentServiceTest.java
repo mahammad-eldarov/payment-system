@@ -1,8 +1,8 @@
 package az.bank.paymentsystem.service;
 
-import az.bank.paymentsystem.dto.request.AccountToAccountRequest;
-import az.bank.paymentsystem.dto.request.AccountToCardRequest;
-import az.bank.paymentsystem.dto.request.CardToAccountRequest;
+import az.bank.paymentsystem.dto.request.TinToTinRequest;
+import az.bank.paymentsystem.dto.request.TinToCardRequest;
+import az.bank.paymentsystem.dto.request.CardToTinRequest;
 import az.bank.paymentsystem.dto.request.CardToCardRequest;
 import az.bank.paymentsystem.dto.response.PaymentResponse;
 import az.bank.paymentsystem.entity.CustomerEntity;
@@ -169,35 +169,35 @@ class PaymentServiceTest {
     }
 
     @Test
-    void shouldSaveAndReturnPaymentResponseWhenCardToAccountIsSuccessful() {
-        CardToAccountRequest request = new CardToAccountRequest();
+    void shouldSaveAndReturnPaymentResponseWhenCardToTinIsSuccessful() {
+        CardToTinRequest request = new CardToTinRequest();
         request.setFromPan("4000000000000001");
-        request.setToAccountNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000001");
         request.setAmount(BigDecimal.TEN);
 
         PaymentResponse expected = new PaymentResponse();
         expected.setId(1);
 
         when(paymentCreator.buildPayment(eq(1), eq(BigDecimal.TEN),
-                eq(PaymentSourceType.CARD), eq(PaymentSourceType.CURRENT_ACCOUNT), anyString()))
+                eq(PaymentSourceType.CARD), eq(PaymentSourceType.TIN), anyString()))
                 .thenReturn(payment);
         when(paymentRepository.save(payment)).thenReturn(payment);
         when(paymentMapper.toResponse(payment)).thenReturn(expected);
 
-        PaymentResponse actual = paymentService.cardToAccount(1, request);
+        PaymentResponse actual = paymentService.cardToTin(1, request);
 
         verify(paymentSourceResolver).fromCheckCard(eq(payment), eq(1), eq("4000000000000001"), anyList());
-        verify(paymentSourceResolver).toCheckAccount(eq(payment), eq("AZ12BANK0000000001"), anyList());
+        verify(paymentSourceResolver).toCheckTin(eq(payment), eq("AZ12BANK0000000001"), anyList());
         verify(paymentValidator).checkSelfTransfer(eq(payment), anyList());
         verify(paymentRepository).save(payment);
         assertEquals(expected.getId(), actual.getId());
     }
 
     @Test
-    void shouldReturnExistingPaymentWhenCardToAccountIdempotencyKeyAlreadyExists() {
-        CardToAccountRequest request = new CardToAccountRequest();
+    void shouldReturnExistingPaymentWhenCardToTinIdempotencyKeyAlreadyExists() {
+        CardToTinRequest request = new CardToTinRequest();
         request.setFromPan("4000000000000001");
-        request.setToAccountNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000001");
         request.setAmount(BigDecimal.TEN);
 
         PaymentResponse expected = new PaymentResponse();
@@ -207,35 +207,35 @@ class PaymentServiceTest {
         when(paymentRepository.findByIdempotencyKey(anyString())).thenReturn(Optional.of(payment));
         when(paymentMapper.toResponse(payment)).thenReturn(expected);
 
-        PaymentResponse actual = paymentService.cardToAccount(1, request);
+        PaymentResponse actual = paymentService.cardToTin(1, request);
 
         verify(paymentRepository, never()).save(any());
         assertEquals(expected.getId(), actual.getId());
     }
 
     @Test
-    void shouldThrowMultiValidationExceptionWhenCardToAccountCooldownIsActive() {
+    void shouldThrowMultiValidationExceptionWhenCardToTinCooldownIsActive() {
         Class<MultiValidationException> expected = MultiValidationException.class;
 
-        CardToAccountRequest request = new CardToAccountRequest();
+        CardToTinRequest request = new CardToTinRequest();
         request.setFromPan("4000000000000001");
-        request.setToAccountNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000001");
         request.setAmount(BigDecimal.TEN);
 
         when(paymentCooldownChecker.isInCooldown(anyInt(), any(), anyString(), anyString()))
                 .thenReturn(true);
 
-        assertThrows(expected, () -> paymentService.cardToAccount(1, request));
+        assertThrows(expected, () -> paymentService.cardToTin(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
-    void shouldThrowMultiValidationExceptionWhenCardToAccountValidationFails() {
+    void shouldThrowMultiValidationExceptionWhenCardToTinValidationFails() {
         Class<MultiValidationException> expected = MultiValidationException.class;
 
-        CardToAccountRequest request = new CardToAccountRequest();
+        CardToTinRequest request = new CardToTinRequest();
         request.setFromPan("4000000000000001");
-        request.setToAccountNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000001");
         request.setAmount(BigDecimal.TEN);
 
         when(paymentCreator.buildPayment(anyInt(), any(), any(), any(), anyString()))
@@ -247,14 +247,14 @@ class PaymentServiceTest {
             return null;
         }).when(paymentValidator).validateAmount(any(), anyList());
 
-        assertThrows(expected, () -> paymentService.cardToAccount(1, request));
+        assertThrows(expected, () -> paymentService.cardToTin(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
-    void shouldSaveAndReturnPaymentResponseWhenAccountToCardIsSuccessful() {
-        AccountToCardRequest request = new AccountToCardRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
+    void shouldSaveAndReturnPaymentResponseWhenTinToCardIsSuccessful() {
+        TinToCardRequest request = new TinToCardRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
         request.setToPan("4000000000000002");
         request.setAmount(BigDecimal.TEN);
 
@@ -262,14 +262,14 @@ class PaymentServiceTest {
         expected.setId(1);
 
         when(paymentCreator.buildPayment(eq(1), eq(BigDecimal.TEN),
-                eq(PaymentSourceType.CURRENT_ACCOUNT), eq(PaymentSourceType.CARD), anyString()))
+                eq(PaymentSourceType.TIN), eq(PaymentSourceType.CARD), anyString()))
                 .thenReturn(payment);
         when(paymentRepository.save(payment)).thenReturn(payment);
         when(paymentMapper.toResponse(payment)).thenReturn(expected);
 
-        PaymentResponse actual = paymentService.accountToCard(1, request);
+        PaymentResponse actual = paymentService.tinToCard(1, request);
 
-        verify(paymentSourceResolver).fromCheckAccount(eq(payment), eq(1), eq("AZ12BANK0000000001"), anyList());
+        verify(paymentSourceResolver).fromCheckTin(eq(payment), eq(1), eq("AZ12BANK0000000001"), anyList());
         verify(paymentSourceResolver).toCheckCard(eq(payment), eq("4000000000000002"), anyList());
         verify(paymentValidator).checkSelfTransfer(eq(payment), anyList());
         verify(paymentRepository).save(payment);
@@ -277,9 +277,9 @@ class PaymentServiceTest {
     }
 
     @Test
-    void shouldReturnExistingPaymentWhenAccountToCardIdempotencyKeyAlreadyExists() {
-        AccountToCardRequest request = new AccountToCardRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
+    void shouldReturnExistingPaymentWhenTinToCardIdempotencyKeyAlreadyExists() {
+        TinToCardRequest request = new TinToCardRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
         request.setToPan("4000000000000002");
         request.setAmount(BigDecimal.TEN);
 
@@ -290,34 +290,34 @@ class PaymentServiceTest {
         when(paymentRepository.findByIdempotencyKey(anyString())).thenReturn(Optional.of(payment));
         when(paymentMapper.toResponse(payment)).thenReturn(expected);
 
-        PaymentResponse actual = paymentService.accountToCard(1, request);
+        PaymentResponse actual = paymentService.tinToCard(1, request);
 
         verify(paymentRepository, never()).save(any());
         assertEquals(expected.getId(), actual.getId());
     }
 
     @Test
-    void shouldThrowMultiValidationExceptionWhenAccountToCardCooldownIsActive() {
+    void shouldThrowMultiValidationExceptionWhenTinToCardCooldownIsActive() {
         Class<MultiValidationException> expected = MultiValidationException.class;
 
-        AccountToCardRequest request = new AccountToCardRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
+        TinToCardRequest request = new TinToCardRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
         request.setToPan("4000000000000002");
         request.setAmount(BigDecimal.TEN);
 
         when(paymentCooldownChecker.isInCooldown(anyInt(), any(), anyString(), anyString()))
                 .thenReturn(true);
 
-        assertThrows(expected, () -> paymentService.accountToCard(1, request));
+        assertThrows(expected, () -> paymentService.tinToCard(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
-    void shouldThrowMultiValidationExceptionWhenAccountToCardValidationFails() {
+    void shouldThrowMultiValidationExceptionWhenTinToCardValidationFails() {
         Class<MultiValidationException> expected = MultiValidationException.class;
 
-        AccountToCardRequest request = new AccountToCardRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
+        TinToCardRequest request = new TinToCardRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
         request.setToPan("4000000000000002");
         request.setAmount(BigDecimal.TEN);
 
@@ -330,40 +330,40 @@ class PaymentServiceTest {
             return null;
         }).when(paymentValidator).validateAmount(any(), anyList());
 
-        assertThrows(expected, () -> paymentService.accountToCard(1, request));
+        assertThrows(expected, () -> paymentService.tinToCard(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
-    void shouldSaveAndReturnPaymentResponseWhenAccountToAccountIsSuccessful() {
-        AccountToAccountRequest request = new AccountToAccountRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
-        request.setToAccountNumber("AZ12BANK0000000002");
+    void shouldSaveAndReturnPaymentResponseWhenTinToTinIsSuccessful() {
+        TinToTinRequest request = new TinToTinRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000002");
         request.setAmount(BigDecimal.TEN);
 
         PaymentResponse expected = new PaymentResponse();
         expected.setId(1);
 
         when(paymentCreator.buildPayment(eq(1), eq(BigDecimal.TEN),
-                eq(PaymentSourceType.CURRENT_ACCOUNT), eq(PaymentSourceType.CURRENT_ACCOUNT), anyString()))
+                eq(PaymentSourceType.TIN), eq(PaymentSourceType.TIN), anyString()))
                 .thenReturn(payment);
         when(paymentRepository.save(payment)).thenReturn(payment);
         when(paymentMapper.toResponse(payment)).thenReturn(expected);
 
-        PaymentResponse actual = paymentService.accountToAccount(1, request);
+        PaymentResponse actual = paymentService.tinToTin(1, request);
 
-        verify(paymentSourceResolver).fromCheckAccount(eq(payment), eq(1), eq("AZ12BANK0000000001"), anyList());
-        verify(paymentSourceResolver).toCheckAccount(eq(payment), eq("AZ12BANK0000000002"), anyList());
+        verify(paymentSourceResolver).fromCheckTin(eq(payment), eq(1), eq("AZ12BANK0000000001"), anyList());
+        verify(paymentSourceResolver).toCheckTin(eq(payment), eq("AZ12BANK0000000002"), anyList());
         verify(paymentValidator).checkSelfTransfer(eq(payment), anyList());
         verify(paymentRepository).save(payment);
         assertEquals(expected.getId(), actual.getId());
     }
 
     @Test
-    void shouldReturnExistingPaymentWhenAccountToAccountIdempotencyKeyAlreadyExists() {
-        AccountToAccountRequest request = new AccountToAccountRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
-        request.setToAccountNumber("AZ12BANK0000000002");
+    void shouldReturnExistingPaymentWhenTinToTinIdempotencyKeyAlreadyExists() {
+        TinToTinRequest request = new TinToTinRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000002");
         request.setAmount(BigDecimal.TEN);
 
         PaymentResponse expected = new PaymentResponse();
@@ -373,35 +373,35 @@ class PaymentServiceTest {
         when(paymentRepository.findByIdempotencyKey(anyString())).thenReturn(Optional.of(payment));
         when(paymentMapper.toResponse(payment)).thenReturn(expected);
 
-        PaymentResponse actual = paymentService.accountToAccount(1, request);
+        PaymentResponse actual = paymentService.tinToTin(1, request);
 
         verify(paymentRepository, never()).save(any());
         assertEquals(expected.getId(), actual.getId());
     }
 
     @Test
-    void shouldThrowMultiValidationExceptionWhenAccountToAccountCooldownIsActive() {
+    void shouldThrowMultiValidationExceptionWhenTinToTinCooldownIsActive() {
         Class<MultiValidationException> expected = MultiValidationException.class;
 
-        AccountToAccountRequest request = new AccountToAccountRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
-        request.setToAccountNumber("AZ12BANK0000000002");
+        TinToTinRequest request = new TinToTinRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000002");
         request.setAmount(BigDecimal.TEN);
 
         when(paymentCooldownChecker.isInCooldown(anyInt(), any(), anyString(), anyString()))
                 .thenReturn(true);
 
-        assertThrows(expected, () -> paymentService.accountToAccount(1, request));
+        assertThrows(expected, () -> paymentService.tinToTin(1, request));
         verify(paymentRepository, never()).save(any());
     }
 
     @Test
-    void shouldThrowMultiValidationExceptionWhenAccountToAccountValidationFails() {
+    void shouldThrowMultiValidationExceptionWhenTinToTinValidationFails() {
         Class<MultiValidationException> expected = MultiValidationException.class;
 
-        AccountToAccountRequest request = new AccountToAccountRequest();
-        request.setFromAccountNumber("AZ12BANK0000000001");
-        request.setToAccountNumber("AZ12BANK0000000002");
+        TinToTinRequest request = new TinToTinRequest();
+        request.setFromTinNumber("AZ12BANK0000000001");
+        request.setToTinNumber("AZ12BANK0000000002");
         request.setAmount(BigDecimal.TEN);
 
         when(paymentCreator.buildPayment(anyInt(), any(), any(), any(), anyString()))
@@ -413,7 +413,7 @@ class PaymentServiceTest {
             return null;
         }).when(paymentValidator).validateAmount(any(), anyList());
 
-        assertThrows(expected, () -> paymentService.accountToAccount(1, request));
+        assertThrows(expected, () -> paymentService.tinToTin(1, request));
         verify(paymentRepository, never()).save(any());
     }
 

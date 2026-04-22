@@ -157,16 +157,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exceptionResponse,HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleGenericException() {
-        Locale locale  = LocaleContextHolder.getLocale();
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                messageSource.getMessage("globalExceptionHandler.handleGenericException", null, locale),
-                LocalDateTime.now()
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ExceptionResponse> handleGenericException() {
+//        Locale locale  = LocaleContextHolder.getLocale();
+//        ExceptionResponse exceptionResponse = new ExceptionResponse(
+//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                messageSource.getMessage("globalExceptionHandler.handleGenericException", null, locale),
+//                LocalDateTime.now()
+//        );
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+//    }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ExceptionResponse> handleValidationException(ValidationException validationException) {

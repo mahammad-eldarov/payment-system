@@ -161,7 +161,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    void shouldReturnFullResponseWithCardsAndAccountsForDeletedCustomer() {
+    void shouldReturnFullResponseWithCardsAndTinsForDeletedCustomer() {
         CustomerResponse expected = new CustomerResponse();
         expected.setId(2);
 
@@ -170,7 +170,7 @@ class CustomerServiceTest {
 
         CustomerResponse actual = customerService.getDeletedCustomerById(2);
 
-        verify(customerResponseBuilder).setCardsAndAccounts(expected, 2, deletedCustomer);
+        verify(customerResponseBuilder).setCardsAndTins(expected, 2, deletedCustomer);
         assertEquals(expected.getId(), actual.getId());
     }
 
@@ -216,26 +216,26 @@ class CustomerServiceTest {
     }
 
     @Test
-    void shouldReturnCustomerResponseWithCardsAndAccountsWhenCustomerIsActive() {
+    void shouldReturnCustomerResponseWithCardsAndTinsWhenCustomerIsActive() {
         CustomerResponse expected = new CustomerResponse();
         expected.setId(1);
 
         when(customerRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(activeCustomer));
         when(customerMapper.toResponse(activeCustomer)).thenReturn(expected);
 
-        CustomerResponse actual = customerService.getCustomersCardsAndAccounts(1);
+        CustomerResponse actual = customerService.getCustomersCardsAndTins(1);
 
-        verify(customerResponseBuilder).setCardsAndAccounts(expected, 1, activeCustomer);
+        verify(customerResponseBuilder).setCardsAndTins(expected, 1, activeCustomer);
         assertEquals(expected.getId(), actual.getId());
     }
 
     @Test
-    void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForCardsAndAccounts() {
+    void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForCardsAndTins() {
         Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
 
         when(customerRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(expected, () -> customerService.getCustomersCardsAndAccounts(99));
+        assertThrows(expected, () -> customerService.getCustomersCardsAndTins(99));
     }
 
     @Test
@@ -262,26 +262,26 @@ class CustomerServiceTest {
     }
 
     @Test
-    void shouldReturnAccountTransactionsWhenCustomerIsActive() {
+    void shouldReturnTinTransactionsWhenCustomerIsActive() {
         TransactionResponse transactionResponse = new TransactionResponse();
         Page<TransactionResponse> expected = new PageImpl<>(List.of(transactionResponse));
 
         when(customerRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(activeCustomer));
-        when(customerResponseBuilder.buildAccountTransactions(1, "AZ12BANK0000000001", 1))
+        when(customerResponseBuilder.buildTinTransactions(1, "AZ12BANK0000000001", 1))
                 .thenReturn(expected);
 
-        Page<TransactionResponse> actual = customerService.getAccountTransactions(1, "AZ12BANK0000000001", 1);
+        Page<TransactionResponse> actual = customerService.getTinTransactions(1, "AZ12BANK0000000001", 1);
 
         assertEquals(expected.getTotalElements(), actual.getTotalElements());
     }
 
     @Test
-    void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForAccountTransactions() {
+    void shouldThrowCustomerNotFoundExceptionWhenCustomerDoesNotExistForTinTransactions() {
         Class<CustomerNotFoundException> expected = CustomerNotFoundException.class;
 
         when(customerRepository.findByIdAndIsVisibleTrue(5)).thenReturn(Optional.empty());
 
-        assertThrows(expected, () -> customerService.getAccountTransactions(5, "AZ12BANK0000000002", 1));
+        assertThrows(expected, () -> customerService.getTinTransactions(5, "AZ12BANK0000000002", 1));
     }
 
     @Test

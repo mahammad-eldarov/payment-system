@@ -34,14 +34,14 @@ public class FraudDetectionChecker {
         }
     }
 
-    public void checkAccountCreationFrequency(String pin) {
+    public void checkTinCreationFrequency(String pin) {
         Locale locale = LocaleContextHolder.getLocale();
         List<CustomerEntity> deletedCustomers = customerRepository
                 .findAllByPinAndIsVisibleFalse(pin);
 
-        if (deletedCustomers.size() >= bankConfig.getFraud().getMaxAccountCreations()) {
+        if (deletedCustomers.size() >= bankConfig.getFraud().getMaxProfileCreations()) {
             throw new FraudDetectedException(
-                    messageSource.getMessage("fraudDetectionChecker.checkAccountCreationFrequency",null, locale)
+                    messageSource.getMessage("fraudDetectionChecker.checkTinCreationFrequency",null, locale)
             );
         }
     }

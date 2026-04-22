@@ -11,9 +11,9 @@ public interface CustomerMapper {
 
     @Mapping(target = "pin", ignore = true)
     @Mapping(target = "cardResponse", ignore = true)
-    @Mapping(target = "currentAccountResponse", ignore = true)
+    @Mapping(target = "tinResponse", ignore = true)
     @Mapping(target = "cardMessage", ignore = true)
-    @Mapping(target = "accountMessage", ignore = true)
+    @Mapping(target = "tinMessage", ignore = true)
     CustomerResponse toResponse(CustomerEntity customer);
 
 

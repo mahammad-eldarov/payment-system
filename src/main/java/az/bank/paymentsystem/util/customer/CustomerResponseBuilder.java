@@ -2,23 +2,23 @@ package az.bank.paymentsystem.util.customer;
 
 import az.bank.paymentsystem.dto.response.TransactionResponse;
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
+import az.bank.paymentsystem.entity.TinEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
-import az.bank.paymentsystem.exception.AccountNotFoundException;
+import az.bank.paymentsystem.exception.TinNotFoundException;
 import az.bank.paymentsystem.exception.CardNotFoundException;
 import az.bank.paymentsystem.exception.base.ForbiddenException;
 import az.bank.paymentsystem.mapper.CardMapper;
-import az.bank.paymentsystem.mapper.CurrentAccountMapper;
+import az.bank.paymentsystem.mapper.TinMapper;
 import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.response.CardResponse;
-import az.bank.paymentsystem.dto.response.CurrentAccountResponse;
+import az.bank.paymentsystem.dto.response.TinResponse;
 import az.bank.paymentsystem.dto.response.CustomerResponse;
 import az.bank.paymentsystem.repository.CardRepository;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.repository.TinRepository;
 import az.bank.paymentsystem.service.TransactionService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -30,26 +30,26 @@ import org.springframework.stereotype.Component;
 public class CustomerResponseBuilder {
 
     private final CardRepository cardRepository;
-    private final CurrentAccountRepository currentAccountRepository;
+    private final TinRepository tinRepository;
     private final TransactionService transactionService;
     private final CardMapper cardMapper;
-    private final CurrentAccountMapper currentAccountMapper;
+    private final TinMapper tinMapper;
     private final MessageSource messageSource;
     private final MessageUtil messageUtil;
 
-    public void setCardsAndAccounts(CustomerResponse response, Integer customerId, CustomerEntity customer) {
+    public void setCardsAndTins(CustomerResponse response, Integer customerId, CustomerEntity customer) {
         List<CardResponse> cardResponses = cardRepository.findCardsByCustomerId(customerId)
                 .stream().map(cardMapper::toResponse).collect(Collectors.toList());
 
 
-        List<CurrentAccountResponse> accountResponses = currentAccountRepository
-                .findCurrentAccountByCustomerId(customerId)
-                .stream().map(currentAccountMapper::toResponse).collect(Collectors.toList());
+        List<TinResponse> tinResponses = tinRepository
+                .findTinByCustomerId(customerId)
+                .stream().map(tinMapper::toResponse).collect(Collectors.toList());
 
         response.setCardResponse(cardResponses);
         response.setCardMessage(cardMessage(cardResponses,customer));
-        response.setCurrentAccountResponse(accountResponses);
-        response.setAccountMessage(accountMessage(accountResponses,customer));
+        response.setTinResponse(tinResponses);
+        response.setTinMessage(tinMessage(tinResponses,customer));
     }
 
     private String cardMessage(List<CardResponse> cards, CustomerEntity customer) {
@@ -60,12 +60,12 @@ public class CustomerResponseBuilder {
                 : messageSource.getMessage("customerResponseBuilder.cardMessage.cardsFound", new Object[]{cards.size()}, locale);
     }
 
-    private String accountMessage(List<CurrentAccountResponse> accounts,CustomerEntity customer) {
+    private String tinMessage(List<TinResponse> tins,CustomerEntity customer) {
         Locale locale = messageUtil.resolveLocale(customer);
 
-        return accounts.isEmpty()
-                ? messageSource.getMessage("customerResponseBuilder.accountMessage.accountsEmpty", null, locale)
-                : messageSource.getMessage("customerResponseBuilder.accountMessage.accountsFound", new Object[]{accounts.size()}, locale);
+        return tins.isEmpty()
+                ? messageSource.getMessage("customerResponseBuilder.tinMessage.tinEmpty", null, locale)
+                : messageSource.getMessage("customerResponseBuilder.tinMessage.tinFound", new Object[]{tins.size()}, locale);
     }
 
     public Page<TransactionResponse> buildCardTransactions(Integer customerId, String pan, int page) {
@@ -80,15 +80,15 @@ public class CustomerResponseBuilder {
         return transactionService.getTransactionsByCardId(card.getId(), page);
     }
 
-    public Page<TransactionResponse> buildAccountTransactions(Integer customerId, String accountNumber, int page) {
+    public Page<TransactionResponse> buildTinTransactions(Integer customerId, String tinNumber, int page) {
         Locale fallbackLocale = LocaleContextHolder.getLocale();
-        CurrentAccountEntity account = currentAccountRepository.findByAccountNumberAndIsVisibleTrue(accountNumber)
-                .orElseThrow(() -> new AccountNotFoundException(messageSource.getMessage("customerResponseBuilder.buildAccountTransactions.accountNotFound",null, fallbackLocale)));
-        Locale locale = messageUtil.resolveLocale(account.getCustomer());
-        if (!account.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException(messageSource.getMessage("customerResponseBuilder.buildAccountTransactions.accountNotBelong",null, locale));
+        TinEntity tin = tinRepository.findByTinNumberAndIsVisibleTrue(tinNumber)
+                .orElseThrow(() -> new TinNotFoundException(messageSource.getMessage("customerResponseBuilder.buildTinTransactions.tinNotFound",null, fallbackLocale)));
+        Locale locale = messageUtil.resolveLocale(tin.getCustomer());
+        if (!tin.getCustomer().getId().equals(customerId)) {
+            throw new ForbiddenException(messageSource.getMessage("customerResponseBuilder.buildTinTransactions.tinNotBelong",null, locale));
         }
 
-        return transactionService.getTransactionsByAccountId(account.getId(), page);
+        return transactionService.getTransactionsByTinId(tin.getId(), page);
     }
 }

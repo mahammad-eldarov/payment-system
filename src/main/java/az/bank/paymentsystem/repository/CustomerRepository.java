@@ -13,10 +13,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Integer> {
 
     @NonNull
-    @EntityGraph(attributePaths = {"cardEntity", "currentAccountEntity", "transactionEntity"})
+    @EntityGraph(attributePaths = {"cardEntity", "tinEntity", "transactionEntity"})
     Optional<CustomerEntity> findById(@NonNull Integer id);
 
-    @EntityGraph(attributePaths = {"cardEntity", "currentAccountEntity"})
+    @EntityGraph(attributePaths = {"cardEntity", "tinEntity"})
     Optional<CustomerEntity> findByIdAndIsVisibleTrue(Integer id);
 
     Page<CustomerEntity> findAllByIsVisibleTrue(Pageable pageable);

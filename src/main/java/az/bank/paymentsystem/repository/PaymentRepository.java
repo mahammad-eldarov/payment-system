@@ -18,8 +18,8 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
             "customer",
             "fromCard", "fromCard.customer",
             "toCard", "toCard.customer",
-            "fromAccount", "fromAccount.customer",
-            "toAccount", "toAccount.customer"
+            "fromTin", "fromTin.customer",
+            "toTin", "toTin.customer"
     })
     Optional<PaymentEntity> findById(@NonNull Integer id);
 
@@ -30,8 +30,8 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
             "customer",
             "fromCard", "fromCard.customer",
             "toCard", "toCard.customer",
-            "fromAccount", "fromAccount.customer",
-            "toAccount", "toAccount.customer"
+            "fromTin", "fromTin.customer",
+            "toTin", "toTin.customer"
     })
     Optional<PaymentEntity> findByIdAndCustomerId(Integer id, Integer customerId);
 
@@ -41,8 +41,8 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
             "customer",
             "fromCard", "fromCard.customer",
             "toCard", "toCard.customer",
-            "fromAccount", "fromAccount.customer",
-            "toAccount", "toAccount.customer"
+            "fromTin", "fromTin.customer",
+            "toTin", "toTin.customer"
     })
     Optional<PaymentEntity> findByIdempotencyKey(String idempotencyKey);
 

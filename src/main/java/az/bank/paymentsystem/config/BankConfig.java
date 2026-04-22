@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Configuration;
 public class BankConfig {
     private String bin;
     private Card card = new Card();
-    private Account account = new Account();
+    private Tin tin = new Tin();
     private Transaction transaction = new Transaction();
     private FraudConfig fraud;
 
     @Getter @Setter
     public static class FraudConfig {
-        private int maxAccountCreations;
+        private int maxProfileCreations;
     }
 
     @Getter @Setter
@@ -29,7 +29,7 @@ public class BankConfig {
     }
 
     @Getter @Setter
-    public static class Account {
+    public static class Tin {
         private BigDecimal minBalance;
         private String minBalanceCurrency;
     }

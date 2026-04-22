@@ -1,7 +1,7 @@
 package az.bank.paymentsystem.util.shared;
 
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
+import az.bank.paymentsystem.entity.TinEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.entity.StatusAuditLogEntity;
 import az.bank.paymentsystem.repository.StatusAuditLogRepository;
@@ -31,8 +31,8 @@ public class StatusAuditLogger {
         log("CARD", card.getId(), card.getStatus().name(), newStatus, reason);
     }
 
-    public void logAccount(CurrentAccountEntity account, String newStatus, String reason) {
-        log("ACCOUNT", account.getId(), account.getStatus().name(), newStatus, reason);
+    public void logTin(TinEntity tin, String newStatus, String reason) {
+        log("TIN", tin.getId(), tin.getStatus().name(), newStatus, reason);
     }
 
     public void logCustomer(CustomerEntity customer, String newStatus, String reason) {

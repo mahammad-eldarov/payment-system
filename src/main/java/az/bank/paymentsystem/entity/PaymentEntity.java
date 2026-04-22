@@ -67,8 +67,8 @@ public class PaymentEntity extends BaseEntity {
     private CardEntity fromCard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_account_id")
-    private CurrentAccountEntity fromAccount;
+    @JoinColumn(name = "from_tin_id")
+    private TinEntity fromTin;
 
     @NotNull
     @Column(name = "to_type", nullable = false, length = Integer.MAX_VALUE)
@@ -80,8 +80,8 @@ public class PaymentEntity extends BaseEntity {
     private CardEntity toCard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_account_id")
-    private CurrentAccountEntity toAccount;
+    @JoinColumn(name = "to_tin_id")
+    private TinEntity toTin;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id")

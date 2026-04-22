@@ -81,7 +81,7 @@ public class CustomerService {
         Locale locale = LocaleContextHolder.getLocale();
         CustomerEntity customer = customerRepository.findByIdAndIsVisibleFalse(id).orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage("customerService.getDeletedCustomerById.customerNotFound", null, locale)));
         CustomerResponse response = customerMapper.toResponse(customer);
-        customerResponseBuilder.setCardsAndAccounts(response, id,customer);
+        customerResponseBuilder.setCardsAndTins(response, id,customer);
         return response;
     }
 
@@ -101,10 +101,10 @@ public class CustomerService {
         return customers.map(customerMapper::toShortResponse);
     }
 
-    public CustomerResponse getCustomersCardsAndAccounts(Integer id) {
+    public CustomerResponse getCustomersCardsAndTins(Integer id) {
         CustomerEntity customer = findActiveCustomer(id);
         CustomerResponse response = customerMapper.toResponse(findActiveCustomer(id));
-        customerResponseBuilder.setCardsAndAccounts(response, id,customer);
+        customerResponseBuilder.setCardsAndTins(response, id,customer);
         return response;
     }
 
@@ -114,9 +114,9 @@ public class CustomerService {
     }
 
 
-    public Page<TransactionResponse> getAccountTransactions(Integer customerId, String accountNumber, int page) {
+    public Page<TransactionResponse> getTinTransactions(Integer customerId, String tinNumber, int page) {
         findActiveCustomer(customerId);
-        return customerResponseBuilder.buildAccountTransactions(customerId, accountNumber, page);
+        return customerResponseBuilder.buildTinTransactions(customerId, tinNumber, page);
     }
 
     public MessageResponse updateCustomerStatus(Integer id, CustomerStatus status) {

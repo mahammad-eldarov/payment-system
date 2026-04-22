@@ -37,14 +37,14 @@ spring:
 
 bank:
   fraud:
-    max-account-creations: 3
+    max-profile-creations: 3
   card:
     min-balance: 10
     min-balance-currency: AZN
     number:
       prefix: "9988"
       total-length: 16
-  account:
+  tin:
     min-balance: 5
     min-balance-currency: USD
     number:
@@ -56,10 +56,10 @@ bank:
 
 scheduler:
   payment:
-    cron: "0 5 0 * * *"
+    cron: "30 11 20 * * *"
   card:
     cron: "0 0 0 * * *"
-  currentAccount:
+  tin:
     cron: "0 1 0 * * *"
 
 

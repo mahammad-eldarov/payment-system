@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: 005-create-current-account-order-table
+      id: 005-create-tin-order-table
       author: Admin
       changes:
         - createTable:
-            tableName: current_account_order
+            tableName: tin_order
             columns:
               - column:
                   name: id
@@ -12,7 +12,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: current_account_order_pk
+                    primaryKeyName: tin_order_pk
 
               - column:
                   name: status
@@ -23,7 +23,7 @@ databaseChangeLog:
                   type: varchar
 
               - column:
-                  name: account_holder_name
+                  name: tin_holder_name
                   type: varchar
 
               - column:
@@ -42,5 +42,5 @@ databaseChangeLog:
                   name: customer_id
                   type: integer
                   constraints:
-                    foreignKeyName: current_account_order_customer_id_fk
+                    foreignKeyName: tin_order_customer_id_fk
                     references: customer(id)

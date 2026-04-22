@@ -5,14 +5,14 @@ import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.config.BankConfig;
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
+import az.bank.paymentsystem.entity.TinEntity;
 import az.bank.paymentsystem.entity.CustomerEntity;
 import az.bank.paymentsystem.entity.PaymentEntity;
 import az.bank.paymentsystem.enums.CardStatus;
-import az.bank.paymentsystem.enums.CurrentAccountStatus;
+import az.bank.paymentsystem.enums.TinStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.repository.CardRepository;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.repository.TinRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class SuspiciousTransactionChecker {
 
     private final CardRepository cardRepository;
-    private final CurrentAccountRepository currentAccountRepository;
+    private final TinRepository tinRepository;
     private final CustomerRepository customerRepository;
     private final BankConfig bankConfig;
     private final StatusAuditLogger statusAuditLogger;
@@ -50,7 +50,7 @@ public class SuspiciousTransactionChecker {
 
     private boolean isAlreadySuspicious(Integer customerId) {
         return cardRepository.existsByCustomerIdAndStatus(customerId, CardStatus.SUSPICIOUS)
-                || currentAccountRepository.existsByCustomerIdAndStatus(customerId, CurrentAccountStatus.SUSPICIOUS);
+                || tinRepository.existsByCustomerIdAndStatus(customerId, TinStatus.SUSPICIOUS);
     }
 
     private void markSourceSuspicious(PaymentEntity payment) {
@@ -62,13 +62,13 @@ public class SuspiciousTransactionChecker {
             cardRepository.save(card);
             notificationService.send(card.getCustomer(),
                     messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.cardSuspiciousActivity",new Object[]{card.getPan().substring(card.getPan().length() - 4)},locale));
-        } else if (payment.getFromAccount() != null) {
-            CurrentAccountEntity account = payment.getFromAccount();
-            statusAuditLogger.logAccount(account, CurrentAccountStatus.SUSPICIOUS.name(), messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.suspiciousTransaction", null, locale));
-            account.setStatus(CurrentAccountStatus.SUSPICIOUS);
-            currentAccountRepository.save(account);
-            notificationService.send(account.getCustomer(),
-                    messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.accountSuspiciousActivity", new Object[]{account.getAccountNumber()},locale));
+        } else if (payment.getFromTin() != null) {
+            TinEntity tin = payment.getFromTin();
+            statusAuditLogger.logTin(tin, TinStatus.SUSPICIOUS.name(), messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.suspiciousTransaction", null, locale));
+            tin.setStatus(TinStatus.SUSPICIOUS);
+            tinRepository.save(tin);
+            notificationService.send(tin.getCustomer(),
+                    messageSource.getMessage("suspiciousTransactionChecker.markSourceSuspicious.tinSuspiciousActivity", new Object[]{tin.getTinNumber()},locale));
         }
     }
 
@@ -85,9 +85,9 @@ public class SuspiciousTransactionChecker {
         if (payment.getFromCard() != null) {
             payment.getFromCard().setStatus(CardStatus.SUSPICIOUS);
             cardRepository.save(payment.getFromCard());
-        } else if (payment.getFromAccount() != null) {
-            payment.getFromAccount().setStatus(CurrentAccountStatus.SUSPICIOUS);
-            currentAccountRepository.save(payment.getFromAccount());
+        } else if (payment.getFromTin() != null) {
+            payment.getFromTin().setStatus(TinStatus.SUSPICIOUS);
+            tinRepository.save(payment.getFromTin());
         }
     }
 }

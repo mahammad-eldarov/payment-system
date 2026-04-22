@@ -38,7 +38,7 @@ databaseChangeLog:
                   type: varchar(16)
 
               - column:
-                  name: account_number
+                  name: tin_number
                   type: varchar(20)
 
               - column:

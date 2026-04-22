@@ -2,17 +2,17 @@ package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.dto.response.TransactionResponse;
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
+import az.bank.paymentsystem.entity.TinEntity;
 import az.bank.paymentsystem.entity.PaymentEntity;
 import az.bank.paymentsystem.entity.TransactionEntity;
-import az.bank.paymentsystem.exception.AccountNotFoundException;
+import az.bank.paymentsystem.exception.TinNotFoundException;
 import az.bank.paymentsystem.exception.CardNotFoundException;
 import az.bank.paymentsystem.exception.EmptyListException;
 import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.exception.PaymentNotFoundException;
 import az.bank.paymentsystem.mapper.TransactionMapper;
 import az.bank.paymentsystem.repository.CardRepository;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.repository.TinRepository;
 import az.bank.paymentsystem.repository.PaymentRepository;
 import az.bank.paymentsystem.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ class TransactionServiceTest {
 
     @Mock private TransactionRepository transactionRepository;
     @Mock private CardRepository cardRepository;
-    @Mock private CurrentAccountRepository currentAccountRepository;
+    @Mock private TinRepository tinRepository;
     @Mock private TransactionMapper transactionMapper;
     @Mock private PaymentRepository paymentRepository;
     @Mock private MessageSource messageSource;
@@ -48,7 +48,7 @@ class TransactionServiceTest {
     private TransactionService transactionService;
 
     private CardEntity card;
-    private CurrentAccountEntity account;
+    private TinEntity tin;
     private PaymentEntity payment;
     private TransactionEntity transaction;
 
@@ -57,8 +57,8 @@ class TransactionServiceTest {
         card = new CardEntity();
         card.setId(1);
 
-        account = new CurrentAccountEntity();
-        account.setId(1);
+        tin = new TinEntity();
+        tin.setId(1);
 
         payment = new PaymentEntity();
         payment.setId(1);
@@ -118,50 +118,50 @@ class TransactionServiceTest {
     }
 
     @Test
-    void shouldReturnMappedPageWhenAccountHasTransactions() {
+    void shouldReturnMappedPageWhenTinHasTransactions() {
         TransactionResponse expected = new TransactionResponse();
         expected.setId(1);
 
         Page<TransactionEntity> entityPage = new PageImpl<>(List.of(transaction));
 
-        when(currentAccountRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(account));
-        when(transactionRepository.findByFromAccountIdOrToAccountId(eq(1), eq(1), any(Pageable.class)))
+        when(tinRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(tin));
+        when(transactionRepository.findByFromTinIdOrToTinId(eq(1), eq(1), any(Pageable.class)))
                 .thenReturn(entityPage);
         when(transactionMapper.toResponse(transaction)).thenReturn(expected);
 
-        Page<TransactionResponse> actual = transactionService.getTransactionsByAccountId(1, 1);
+        Page<TransactionResponse> actual = transactionService.getTransactionsByTinId(1, 1);
 
         assertEquals(1, actual.getContent().size());
         assertEquals(expected.getId(), actual.getContent().get(0).getId());
     }
 
     @Test
-    void shouldThrowEmptyListExceptionWhenAccountHasNoTransactions() {
+    void shouldThrowEmptyListExceptionWhenTinHasNoTransactions() {
         Class<EmptyListException> expected = EmptyListException.class;
 
-        when(currentAccountRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(account));
-        when(transactionRepository.findByFromAccountIdOrToAccountId(eq(1), eq(1), any(Pageable.class)))
+        when(tinRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(tin));
+        when(transactionRepository.findByFromTinIdOrToTinId(eq(1), eq(1), any(Pageable.class)))
                 .thenReturn(Page.empty());
 
-        assertThrows(expected, () -> transactionService.getTransactionsByAccountId(1, 1));
+        assertThrows(expected, () -> transactionService.getTransactionsByTinId(1, 1));
     }
 
     @Test
-    void shouldThrowAccountNotFoundExceptionWhenAccountDoesNotExist() {
-        Class<AccountNotFoundException> expected = AccountNotFoundException.class;
+    void shouldThrowTinNotFoundExceptionWhenTinDoesNotExist() {
+        Class<TinNotFoundException> expected = TinNotFoundException.class;
 
-        when(currentAccountRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
+        when(tinRepository.findByIdAndIsVisibleTrue(99)).thenReturn(Optional.empty());
 
-        assertThrows(expected, () -> transactionService.getTransactionsByAccountId(99, 1));
+        assertThrows(expected, () -> transactionService.getTransactionsByTinId(99, 1));
     }
 
     @Test
-    void shouldThrowPageRequestExceptionWhenPageIsLessThanOneForGetByAccountId() {
+    void shouldThrowPageRequestExceptionWhenPageIsLessThanOneForGetByTinId() {
         Class<PageRequestException> expected = PageRequestException.class;
 
-        when(currentAccountRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(account));
+        when(tinRepository.findByIdAndIsVisibleTrue(1)).thenReturn(Optional.of(tin));
 
-        assertThrows(expected, () -> transactionService.getTransactionsByAccountId(1, 0));
+        assertThrows(expected, () -> transactionService.getTransactionsByTinId(1, 0));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package az.bank.paymentsystem.util.payment;
 
+import az.bank.paymentsystem.entity.TinEntity;
 import az.bank.paymentsystem.util.shared.MessageUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,10 +8,9 @@ import java.util.List;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.entity.PaymentEntity;
 import az.bank.paymentsystem.enums.CardStatus;
-import az.bank.paymentsystem.enums.CurrentAccountStatus;
+import az.bank.paymentsystem.enums.TinStatus;
 import az.bank.paymentsystem.exception.ExceptionResponse;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -25,7 +25,7 @@ public class PaymentValidator {
 
     public void validate(PaymentEntity payment, List<ExceptionResponse> errors) {
         validateCard(payment, errors);
-        validateAccount(payment, errors);
+        validateTin(payment, errors);
         checkSelfTransfer(payment, errors);
     }
 
@@ -47,20 +47,20 @@ public class PaymentValidator {
         }
     }
 
-    private void validateAccount(PaymentEntity payment, List<ExceptionResponse> errors) {
+    private void validateTin(PaymentEntity payment, List<ExceptionResponse> errors) {
         Locale locale = messageUtil.resolveLocale(payment.getCustomer());
-        if (payment.getFromAccount() != null) {
-            CurrentAccountEntity fromAccount = payment.getFromAccount();
-            if (fromAccount.getStatus() != CurrentAccountStatus.ACTIVE) {
-                errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.validateAccount.sourceAccountStatus", new Object[]{fromAccount.getStatus()},locale), LocalDateTime.now()));
-            } else if (fromAccount.getBalance().compareTo(payment.getAmount()) < 0) {
-                errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.validateAccount.insufficientBalance",null,locale), LocalDateTime.now()));
+        if (payment.getFromTin() != null) {
+            TinEntity fromTin = payment.getFromTin();
+            if (fromTin.getStatus() != TinStatus.ACTIVE) {
+                errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.validateTin.sourceTinStatus", new Object[]{fromTin.getStatus()},locale), LocalDateTime.now()));
+            } else if (fromTin.getBalance().compareTo(payment.getAmount()) < 0) {
+                errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.validateTin.insufficientBalance",null,locale), LocalDateTime.now()));
             }
         }
-        if (payment.getToAccount() != null) {
-            CurrentAccountEntity toAccount = payment.getToAccount();
-            if (toAccount.getStatus() != CurrentAccountStatus.ACTIVE) {
-                errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.validateAccount.destinationAccountStatus", new Object[]{toAccount.getStatus()},locale), LocalDateTime.now()));
+        if (payment.getToTin() != null) {
+            TinEntity toTin = payment.getToTin();
+            if (toTin.getStatus() != TinStatus.ACTIVE) {
+                errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.validateTin.destinationTinStatus", new Object[]{toTin.getStatus()},locale), LocalDateTime.now()));
             }
         }
     }
@@ -71,9 +71,9 @@ public class PaymentValidator {
                 payment.getFromCard().getId().equals(payment.getToCard().getId())) {
             errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.checkSelfTransfer.sameCard",null,locale), LocalDateTime.now()));
         }
-        if (payment.getFromAccount() != null && payment.getToAccount() != null &&
-                payment.getFromAccount().getId().equals(payment.getToAccount().getId())) {
-            errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.checkSelfTransfer.sameAccount",null,locale), LocalDateTime.now()));
+        if (payment.getFromTin() != null && payment.getToTin() != null &&
+                payment.getFromTin().getId().equals(payment.getToTin().getId())) {
+            errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentValidator.checkSelfTransfer.sameTin",null,locale), LocalDateTime.now()));
         }
     }
 

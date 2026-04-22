@@ -59,7 +59,7 @@ public class CustomerEntity extends BaseEntity {
     private Set<CardEntity> cardEntity;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private Set<CurrentAccountEntity> currentAccountEntity;
+    private Set<TinEntity> tinEntity;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private Set<TransactionEntity> transactionEntity;

@@ -24,9 +24,9 @@ public class CustomerResponse {
     private CustomerStatus status;
 
     private String cardMessage;
-    private String accountMessage;
+    private String tinMessage;
 
     private List<CardResponse> cardResponse;
-    private List<CurrentAccountResponse> currentAccountResponse;
+    private List<TinResponse> tinResponse;
 
 }

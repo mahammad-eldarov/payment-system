@@ -2,14 +2,14 @@ package az.bank.paymentsystem.service;
 
 import az.bank.paymentsystem.dto.response.StatusAuditLogResponse;
 import az.bank.paymentsystem.entity.StatusAuditLogEntity;
-import az.bank.paymentsystem.exception.AccountNotFoundException;
+import az.bank.paymentsystem.exception.TinNotFoundException;
 import az.bank.paymentsystem.exception.CardNotFoundException;
 import az.bank.paymentsystem.exception.CustomerNotFoundException;
 import az.bank.paymentsystem.exception.EmptyListException;
 import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.mapper.StatusAuditLogMapper;
 import az.bank.paymentsystem.repository.CardRepository;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.repository.TinRepository;
 import az.bank.paymentsystem.repository.CustomerRepository;
 import az.bank.paymentsystem.repository.StatusAuditLogRepository;
 import java.util.Locale;
@@ -29,7 +29,7 @@ public class StatusAuditLogService {
     private final StatusAuditLogRepository statusAuditLogRepository;
     private final StatusAuditLogMapper statusAuditLogMapper;
     private final CardRepository cardRepository;
-    private final CurrentAccountRepository currentAccountRepository;
+    private final TinRepository tinRepository;
     private final CustomerRepository customerRepository;
     private final MessageSource messageSource;
 
@@ -47,15 +47,15 @@ public class StatusAuditLogService {
 
     }
 
-    public Page<StatusAuditLogResponse> getAccountHistory(Integer accountId, int page) {
-        findAccount(accountId);
+    public Page<StatusAuditLogResponse> getTinHistory(Integer tinId, int page) {
+        findTin(tinId);
         Locale locale = LocaleContextHolder.getLocale();
         Pageable pageable = buildPageable(page);
 
         Page<StatusAuditLogEntity> logs = statusAuditLogRepository
-                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("ACCOUNT", accountId, pageable);
+                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc("TIN", tinId, pageable);
 
-        if (logs.isEmpty()) throw new EmptyListException(messageSource.getMessage("statusAuditLogService.getAccountHistory.accountStatusChanged",null,locale));
+        if (logs.isEmpty()) throw new EmptyListException(messageSource.getMessage("statusAuditLogService.getTinHistory.tinStatusChanged",null,locale));
 
         return logs.map(statusAuditLogMapper::toResponse);
     }
@@ -94,10 +94,10 @@ public class StatusAuditLogService {
                         messageSource.getMessage("statusAuditLogService.findActiveCustomer.customerNotFound", null, locale)));
     }
 
-    public void findAccount(Integer id) {
+    public void findTin(Integer id) {
         Locale locale = LocaleContextHolder.getLocale();
-        currentAccountRepository.findById(id)
-                .orElseThrow(() -> new AccountNotFoundException(
-                        messageSource.getMessage("statusAuditLogService.findActiveAccount.accountNotFound", null, locale)));
+        tinRepository.findById(id)
+                .orElseThrow(() -> new TinNotFoundException(
+                        messageSource.getMessage("statusAuditLogService.findActiveTin.tinNotFound", null, locale)));
     }
 }

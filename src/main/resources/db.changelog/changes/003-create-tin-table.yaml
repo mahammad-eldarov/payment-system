@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: 003-create-current-account-table
+      id: 003-create-tin-table
       author: Admin
       changes:
         - createTable:
-            tableName: current_account
+            tableName: tin
             columns:
               - column:
                   name: id
@@ -13,7 +13,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: current_account_pkey
+                    primaryKeyName: tin_pkey
 
               - column:
                   name: activation_date
@@ -39,7 +39,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     nullable: false
-                    foreignKeyName: current_account_customer_id_fk
+                    foreignKeyName: tin_customer_id_fk
                     references: customer(id)
 
               - column:
@@ -65,7 +65,7 @@ databaseChangeLog:
                   type: timestamp(6)
 
               - column:
-                  name: account_number
+                  name: tin_number
                   type: varchar(18)
                   constraints:
                     nullable: false
@@ -78,21 +78,21 @@ databaseChangeLog:
                     nullable: false
 
               - column:
-                  name: current_account_holder_name
+                  name: tin_holder_name
                   type: varchar
                   constraints:
                     nullable: false
 
         - sql:
-            comment: "current_account currency check constraint"
+            comment: "tin currency check constraint"
             sql: >
-              ALTER TABLE current_account
-              ADD CONSTRAINT current_account_currency_check
+              ALTER TABLE tin
+              ADD CONSTRAINT tin_currency_check
               CHECK (currency = ANY (ARRAY['AZN', 'USD', 'EUR']));
 
         - sql:
-            comment: "current_account status check constraint"
+            comment: "tin status check constraint"
             sql: >
-              ALTER TABLE current_account
-              ADD CONSTRAINT current_account_status_check
+              ALTER TABLE tin
+              ADD CONSTRAINT tin_status_check
               CHECK (status = ANY (ARRAY['ACTIVE', 'SUSPICIOUS', 'BLOCKED', 'CLOSED', 'EXPIRED']));

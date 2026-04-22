@@ -40,10 +40,10 @@ public class TransactionCreator {
 
         if (type == TransactionType.CREDIT) {
             transaction.setFromCard(payment.getFromCard());
-            transaction.setFromAccount(payment.getFromAccount());
+            transaction.setFromTin(payment.getFromTin());
         } else {
             transaction.setToCard(payment.getToCard());
-            transaction.setToAccount(payment.getToAccount());
+            transaction.setToTin(payment.getToTin());
             transaction.setToExternalParty(payment.getToExternalParty());
         }
 

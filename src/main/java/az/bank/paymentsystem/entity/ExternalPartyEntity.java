@@ -38,8 +38,8 @@ public class ExternalPartyEntity extends BaseEntity {
     private String cardNumber;
 
     @Size(max = 20)
-    @Column(name = "account_number", length = 20)
-    private String accountNumber;
+    @Column(name = "tin_number", length = 20)
+    private String tinNumber;
 
     @Size(max = 15)
     @Column(name = "phone", length = 15)

@@ -16,13 +16,13 @@ public interface TransactionMapper {
 
     default String getPaidBy(TransactionEntity t) {
         if (t.getFromCard() != null) return t.getFromCard().getPan();
-        if (t.getFromAccount() != null) return t.getFromAccount().getAccountNumber();
+        if (t.getFromTin() != null) return t.getFromTin().getTinNumber();
         return null;
     }
 
     default String getEnrollTo(TransactionEntity t) {
         if (t.getToCard() != null) return t.getToCard().getPan();
-        if (t.getToAccount() != null) return t.getToAccount().getAccountNumber();
+        if (t.getToTin() != null) return t.getToTin().getTinNumber();
         return null;
     }
 }

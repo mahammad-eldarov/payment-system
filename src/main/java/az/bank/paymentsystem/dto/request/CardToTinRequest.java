@@ -12,16 +12,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountToAccountRequest {
+public class CardToTinRequest {
 
     @NotNull(message = "{notNull.bigDecimal}")
     private BigDecimal amount;
 
-    @NotBlank(message = "{notBlank.fromAccountNumber}")
-    private String fromAccountNumber;
+    @NotBlank(message = "{notBlank.fromPan}")
+    private String fromPan;
 
     @NotBlank(message = "{notBlank.toAccountNumber}")
-    private String toAccountNumber;
-
+    private String toTinNumber;
 
 }

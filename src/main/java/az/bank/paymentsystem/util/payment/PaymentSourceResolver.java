@@ -1,8 +1,9 @@
 package az.bank.paymentsystem.util.payment;
 
 import az.bank.paymentsystem.entity.ExternalPartyEntity;
+import az.bank.paymentsystem.entity.TinEntity;
 import az.bank.paymentsystem.enums.CardStatus;
-import az.bank.paymentsystem.enums.CurrentAccountStatus;
+import az.bank.paymentsystem.enums.TinStatus;
 import az.bank.paymentsystem.enums.CustomerStatus;
 import az.bank.paymentsystem.repository.ExternalPartyRepository;
 import az.bank.paymentsystem.util.shared.CurrencyConverter;
@@ -15,13 +16,12 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.config.BankConfig;
 import az.bank.paymentsystem.entity.CardEntity;
-import az.bank.paymentsystem.entity.CurrentAccountEntity;
 import az.bank.paymentsystem.entity.PaymentEntity;
 import az.bank.paymentsystem.enums.Currency;
 import az.bank.paymentsystem.enums.PaymentSourceType;
 import az.bank.paymentsystem.exception.ExceptionResponse;
 import az.bank.paymentsystem.repository.CardRepository;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.repository.TinRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentSourceResolver {
     private final CardRepository cardRepository;
-    private final CurrentAccountRepository currentAccountRepository;
+    private final TinRepository tinRepository;
     private final BankConfig bankConfig;
     private final CurrencyConverter currencyConverter;
     private final ExternalPartyRepository externalPartyRepository;
@@ -59,7 +59,7 @@ public class PaymentSourceResolver {
             return;
         }
         if (payment.getCustomer().getStatus() == CustomerStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckCard.fromCheckAccount.customerSuspended",null,locale), LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckCard.fromCheckTin.customerSuspended",null,locale), LocalDateTime.now()));
             return;
         }
 
@@ -70,87 +70,87 @@ public class PaymentSourceResolver {
             payment.setFromCard(card);
             payment.setCurrency(card.getCurrency());
         } else {
-            fallbackToAccount(payment, customerId, card.getCurrency(), errors);
+            fallbackToTin(payment, customerId, card.getCurrency(), errors);
         }
     }
 
-    public void fromCheckAccount(PaymentEntity payment, Integer customerId,
-                                  String fromAccountNumber, List<ExceptionResponse> errors) {
+    public void fromCheckTin(PaymentEntity payment, Integer customerId,
+                                  String fromTinNumber, List<ExceptionResponse> errors) {
         Locale locale = messageUtil.resolveLocale(payment.getCustomer());
 
 
-        CurrentAccountEntity account = currentAccountRepository
-                .findByAccountNumberAndIsVisibleTrue(fromAccountNumber).orElse(null);
-        if (account == null) {
-            errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.fromCheckAccount.accountNotFound",null,locale), LocalDateTime.now()));
+        TinEntity tin = tinRepository
+                .findByTinNumberAndIsVisibleTrue(fromTinNumber).orElse(null);
+        if (tin == null) {
+            errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.fromCheckTin.tinNotFound",null,locale), LocalDateTime.now()));
             return;
         }
-        if (!account.getCustomer().getId().equals(customerId)) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckAccount.accountNotBelong",null,locale), LocalDateTime.now()));
+        if (!tin.getCustomer().getId().equals(customerId)) {
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckTin.tinNotBelong",null,locale), LocalDateTime.now()));
             return;
         }
-        if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckAccount.accountSuspended",null,locale), LocalDateTime.now()));
+        if (tin.getStatus() == TinStatus.SUSPICIOUS) {
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckTin.tinSuspended",null,locale), LocalDateTime.now()));
             return;
         }
         if (payment.getCustomer().getStatus() == CustomerStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckCard.fromCheckAccount.customerSuspended",null,locale), LocalDateTime.now()));
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckCard.fromCheckTin.customerSuspended",null,locale), LocalDateTime.now()));
             return;
         }
-        if (account.getStatus() == CurrentAccountStatus.EXPIRED) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckAccount.accountExpired",null,locale), LocalDateTime.now()));
+        if (tin.getStatus() == TinStatus.EXPIRED) {
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckTin.tinExpired",null,locale), LocalDateTime.now()));
             return;
         }
-        if (account.getStatus() == CurrentAccountStatus.CLOSED) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckAccount.accountClosed",null,locale), LocalDateTime.now()));
+        if (tin.getStatus() == TinStatus.CLOSED) {
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.fromCheckTin.tinClosed",null,locale), LocalDateTime.now()));
             return;
         }
 
-        BigDecimal minBalanceInAccountCurrency = currencyConverter.convertMinBalance(
-                bankConfig.getAccount().getMinBalance(),
-                bankConfig.getAccount().getMinBalanceCurrency(),
-                account.getCurrency());
+        BigDecimal minBalanceInTinCurrency = currencyConverter.convertMinBalance(
+                bankConfig.getTin().getMinBalance(),
+                bankConfig.getTin().getMinBalanceCurrency(),
+                tin.getCurrency());
 
-        boolean accountHasSufficientBalance = account.getBalance().compareTo(payment.getAmount()) >= 0;
-        boolean accountAboveMinBalance = account.getBalance().compareTo(minBalanceInAccountCurrency) >= 0;
+        boolean tinHasSufficientBalance = tin.getBalance().compareTo(payment.getAmount()) >= 0;
+        boolean tinAboveMinBalance = tin.getBalance().compareTo(minBalanceInTinCurrency) >= 0;
 
-        if (accountHasSufficientBalance && accountAboveMinBalance) {
-            payment.setFromAccount(account);
-            payment.setCurrency(account.getCurrency());
+        if (tinHasSufficientBalance && tinAboveMinBalance) {
+            payment.setFromTin(tin);
+            payment.setCurrency(tin.getCurrency());
         } else {
             fallbackToCard(payment, customerId, errors);
         }
     }
 
-    private void fallbackToAccount(PaymentEntity payment, Integer customerId,
+    private void fallbackToTin(PaymentEntity payment, Integer customerId,
                                    Currency cardCurrency, List<ExceptionResponse> errors) {
         Locale locale = messageUtil.resolveLocale(payment.getCustomer());
 
 
-        CurrentAccountEntity account = currentAccountRepository
-                .findSufficientAccount(customerId, payment.getAmount()).orElse(null);
-        if (account == null) {
-            errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentSourceResolver.fallbackToAccount.insufficientBalance",null,locale), LocalDateTime.now()));
+        TinEntity tin = tinRepository
+                .findSufficientTin(customerId, payment.getAmount()).orElse(null);
+        if (tin == null) {
+            errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentSourceResolver.fallbackToTin.insufficientBalance",null,locale), LocalDateTime.now()));
             return;
         }
 
-        BigDecimal minBalanceInAccountCurrency = currencyConverter.convertMinBalance(
-                bankConfig.getAccount().getMinBalance(),
-                bankConfig.getAccount().getMinBalanceCurrency(),
-                account.getCurrency());
+        BigDecimal minBalanceInTinCurrency = currencyConverter.convertMinBalance(
+                bankConfig.getTin().getMinBalance(),
+                bankConfig.getTin().getMinBalanceCurrency(),
+                tin.getCurrency());
 
-        BigDecimal amountInAccountCurrency = currencyConverter.convert(
-                payment.getAmount(), cardCurrency, account.getCurrency());
+        BigDecimal amountInTinCurrency = currencyConverter.convert(
+                payment.getAmount(), cardCurrency, tin.getCurrency());
 
-        if (account.getBalance().compareTo(amountInAccountCurrency) < 0 ||
-                account.getBalance().compareTo(minBalanceInAccountCurrency) < 0) {
-            errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentSourceResolver.fallbackToAccount.insufficientBalance",null,locale), LocalDateTime.now()));
+        if (tin.getBalance().compareTo(amountInTinCurrency) < 0 ||
+                tin.getBalance().compareTo(minBalanceInTinCurrency) < 0) {
+            errors.add(new ExceptionResponse(400, messageSource.getMessage("paymentSourceResolver.fallbackToTin.insufficientBalance",null,locale), LocalDateTime.now()));
             return;
         }
 
-        payment.setFromAccount(account);
-        payment.setFromType(PaymentSourceType.CURRENT_ACCOUNT);
-        payment.setCurrency(account.getCurrency());
+        payment.setFromTin(tin);
+        payment.setFromType(PaymentSourceType.TIN);
+        payment.setCurrency(tin.getCurrency());
     }
 
     private void fallbackToCard(PaymentEntity payment, Integer customerId,
@@ -218,48 +218,48 @@ public class PaymentSourceResolver {
         payment.setToType(PaymentSourceType.EXTERNAL);
     }
 
-    public void toCheckAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
-        if (isInternalAccount(toAccountNumber)) {
-            resolveInternalAccount(payment, toAccountNumber, errors);
+    public void toCheckTin(PaymentEntity payment, String toTinNumber, List<ExceptionResponse> errors) {
+        if (isInternalTin(toTinNumber)) {
+            resolveInternalTin(payment, toTinNumber, errors);
         } else {
-            resolveExternalAccount(payment, toAccountNumber, errors);
+            resolveExternalTin(payment, toTinNumber, errors);
         }
     }
 
-    private boolean isInternalAccount(String accountNumber) {
-        return accountNumber != null && accountNumber.startsWith("2211");
+    private boolean isInternalTin(String tinNumber) {
+        return tinNumber != null && tinNumber.startsWith("2211");
     }
 
-    private void resolveInternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
+    private void resolveInternalTin(PaymentEntity payment, String toTinNumber, List<ExceptionResponse> errors) {
         Locale locale = messageUtil.resolveLocale(payment.getCustomer());
 
 
-        CurrentAccountEntity account = currentAccountRepository
-                .findByAccountNumberAndIsVisibleTrue(toAccountNumber).orElse(null);
-        if (account == null) {
-            errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.resolveInternalAccount.accountNotFound",null,locale), LocalDateTime.now()));
+        TinEntity tin = tinRepository
+                .findByTinNumberAndIsVisibleTrue(toTinNumber).orElse(null);
+        if (tin == null) {
+            errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.resolveInternalTin.tinNotFound",null,locale), LocalDateTime.now()));
             return;
         }
-        if (account.getStatus() == CurrentAccountStatus.EXPIRED) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.resolveInternalAccount.accountExpired",null,locale), LocalDateTime.now()));
+        if (tin.getStatus() == TinStatus.EXPIRED) {
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.resolveInternalTin.tinExpired",null,locale), LocalDateTime.now()));
             return;
         }
-        if (account.getStatus() == CurrentAccountStatus.CLOSED) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.resolveInternalAccount.accountClosed",null,locale), LocalDateTime.now()));
+        if (tin.getStatus() == TinStatus.CLOSED) {
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.resolveInternalTin.tinClosed",null,locale), LocalDateTime.now()));
             return;
         }
-        if (account.getStatus() == CurrentAccountStatus.SUSPICIOUS) {
-            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.resolveInternalAccount.accountSuspended",null,locale), LocalDateTime.now()));
+        if (tin.getStatus() == TinStatus.SUSPICIOUS) {
+            errors.add(new ExceptionResponse(403, messageSource.getMessage("paymentSourceResolver.resolveInternalTin.tinSuspended",null,locale), LocalDateTime.now()));
             return;
         }
-        payment.setToAccount(account);
+        payment.setToTin(tin);
     }
 
-    private void resolveExternalAccount(PaymentEntity payment, String toAccountNumber, List<ExceptionResponse> errors) {
+    private void resolveExternalTin(PaymentEntity payment, String toTinNumber, List<ExceptionResponse> errors) {
         Locale locale = messageUtil.resolveLocale(payment.getCustomer());
-        Optional<ExternalPartyEntity> external = externalPartyRepository.findByAccountNumber(toAccountNumber);
+        Optional<ExternalPartyEntity> external = externalPartyRepository.findByTinNumber(toTinNumber);
         if (external.isEmpty()) {
-            errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.resolveExternalAccount.accountNotFound",null,locale), LocalDateTime.now()));
+            errors.add(new ExceptionResponse(404, messageSource.getMessage("paymentSourceResolver.resolveExternalTin.tinNotFound",null,locale), LocalDateTime.now()));
             return;
         }
         payment.setToExternalParty(external.get());

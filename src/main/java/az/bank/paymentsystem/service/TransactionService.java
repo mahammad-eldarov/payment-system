@@ -4,14 +4,14 @@ import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import az.bank.paymentsystem.dto.response.TransactionResponse;
 import az.bank.paymentsystem.entity.TransactionEntity;
-import az.bank.paymentsystem.exception.AccountNotFoundException;
+import az.bank.paymentsystem.exception.TinNotFoundException;
 import az.bank.paymentsystem.exception.CardNotFoundException;
 import az.bank.paymentsystem.exception.EmptyListException;
 import az.bank.paymentsystem.exception.PageRequestException;
 import az.bank.paymentsystem.exception.PaymentNotFoundException;
 import az.bank.paymentsystem.mapper.TransactionMapper;
 import az.bank.paymentsystem.repository.CardRepository;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.repository.TinRepository;
 import az.bank.paymentsystem.repository.PaymentRepository;
 import az.bank.paymentsystem.repository.TransactionRepository;
 import org.springframework.context.MessageSource;
@@ -28,7 +28,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CardRepository cardRepository;
-    private final CurrentAccountRepository currentAccountRepository;
+    private final TinRepository tinRepository;
     private final TransactionMapper transactionMapper;
     private final PaymentRepository paymentRepository;
     private final MessageSource messageSource;
@@ -46,16 +46,16 @@ public class TransactionService {
         return transactions.map(transactionMapper::toResponse);
     }
 
-    public Page<TransactionResponse> getTransactionsByAccountId(Integer accountId, int page) {
+    public Page<TransactionResponse> getTransactionsByTinId(Integer tinId, int page) {
         Locale locale = LocaleContextHolder.getLocale();
 
-        currentAccountRepository.findByIdAndIsVisibleTrue(accountId)
-                .orElseThrow(() -> new AccountNotFoundException(messageSource.getMessage("transactionService.getTransactionsByAccountId.currentAccountNotFound", null, locale)));
+        tinRepository.findByIdAndIsVisibleTrue(tinId)
+                .orElseThrow(() -> new TinNotFoundException(messageSource.getMessage("transactionService.getTransactionsByTinId.currentTinNotFound", null, locale)));
         Pageable pageable = buildPageable(page);
         Page<TransactionEntity> transactions = transactionRepository
-                .findByFromAccountIdOrToAccountId(accountId, accountId, pageable);
+                .findByFromTinIdOrToTinId(tinId, tinId, pageable);
 
-        if (transactions.isEmpty()) throw new EmptyListException(messageSource.getMessage("transactionService.getTransactionsByAccountId.accountNoTransaction", null, locale));
+        if (transactions.isEmpty()) throw new EmptyListException(messageSource.getMessage("transactionService.getTransactionsByTinId.tinNoTransaction", null, locale));
         return transactions.map(transactionMapper::toResponse);
     }
 

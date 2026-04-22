@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/audit")
 @RequiredArgsConstructor
-@Tag(name = "Audit Log Controller", description = "Status change history for cards, accounts and customers")
+@Tag(name = "Audit Log Controller", description = "Status change history for cards, TINs and customers")
 public class StatusAuditLogV1Controller {
 
     private final StatusAuditLogService statusAuditLogService;
@@ -29,12 +29,12 @@ public class StatusAuditLogV1Controller {
         return ResponseEntity.ok(statusAuditLogService.getCardHistory(cardId,page).getContent());
     }
 
-    @GetMapping("/internal/account/{accountId}")
-    @Operation(summary = "Get account status history", description = "Returns status change history for a specific current account")
-    public ResponseEntity<List<StatusAuditLogResponse>> getAccountHistory(@PathVariable Integer accountId,
+    @GetMapping("/internal/tin/{tinId}")
+    @Operation(summary = "Get TIN status history", description = "Returns status change history for a specific TIN")
+    public ResponseEntity<List<StatusAuditLogResponse>> getTinHistory(@PathVariable Integer tinId,
                                                                           @RequestParam(required = false, defaultValue ="1")
                                                                           int page) {
-        return ResponseEntity.ok(statusAuditLogService.getAccountHistory(accountId, page).getContent());
+        return ResponseEntity.ok(statusAuditLogService.getTinHistory(tinId, page).getContent());
     }
 
     @GetMapping("/internal/customer/{customerId}")

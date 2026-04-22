@@ -13,9 +13,9 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import az.bank.paymentsystem.dto.request.AccountToAccountRequest;
-import az.bank.paymentsystem.dto.request.AccountToCardRequest;
-import az.bank.paymentsystem.dto.request.CardToAccountRequest;
+import az.bank.paymentsystem.dto.request.TinToTinRequest;
+import az.bank.paymentsystem.dto.request.TinToCardRequest;
+import az.bank.paymentsystem.dto.request.CardToTinRequest;
 import az.bank.paymentsystem.dto.request.CardToCardRequest;
 import az.bank.paymentsystem.dto.response.PaymentResponse;
 import az.bank.paymentsystem.entity.PaymentEntity;
@@ -79,12 +79,12 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentResponse cardToAccount(Integer customerId, CardToAccountRequest request) {
-        checkCooldown(customerId, request.getAmount(), request.getFromPan(), request.getToAccountNumber());
+    public PaymentResponse cardToTin(Integer customerId, CardToTinRequest request) {
+        checkCooldown(customerId, request.getAmount(), request.getFromPan(), request.getToTinNumber());
 
         String idempotencyKey = generateIdempotencyKey(
                 customerId, request.getAmount(),
-                request.getFromPan(), request.getToAccountNumber());
+                request.getFromPan(), request.getToTinNumber());
 
         Optional<PaymentResponse> idempotentResponse = checkIdempotency(idempotencyKey);
         if (idempotentResponse.isPresent()) return idempotentResponse.get();
@@ -93,10 +93,10 @@ public class PaymentService {
         paymentValidator.validateAmount(request.getAmount(), errors);
 
         PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CARD, PaymentSourceType.CURRENT_ACCOUNT, idempotencyKey);
+                PaymentSourceType.CARD, PaymentSourceType.TIN, idempotencyKey);
 
         paymentSourceResolver.fromCheckCard(payment, customerId, request.getFromPan(), errors);
-        paymentSourceResolver.toCheckAccount(payment, request.getToAccountNumber(), errors);
+        paymentSourceResolver.toCheckTin(payment, request.getToTinNumber(), errors);
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);
@@ -104,12 +104,12 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentResponse accountToCard(Integer customerId, AccountToCardRequest request) {
-        checkCooldown(customerId, request.getAmount(), request.getFromAccountNumber(), request.getToPan());
+    public PaymentResponse tinToCard(Integer customerId, TinToCardRequest request) {
+        checkCooldown(customerId, request.getAmount(), request.getFromTinNumber(), request.getToPan());
 
         String idempotencyKey = generateIdempotencyKey(
                 customerId, request.getAmount(),
-                request.getFromAccountNumber(), request.getToPan());
+                request.getFromTinNumber(), request.getToPan());
         Optional<PaymentResponse> idempotentResponse = checkIdempotency(idempotencyKey);
         if (idempotentResponse.isPresent()) return idempotentResponse.get();
 
@@ -117,9 +117,9 @@ public class PaymentService {
         paymentValidator.validateAmount(request.getAmount(), errors);
 
         PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.CARD, idempotencyKey);
+                PaymentSourceType.TIN, PaymentSourceType.CARD, idempotencyKey);
 
-        paymentSourceResolver.fromCheckAccount(payment, customerId, request.getFromAccountNumber(), errors);
+        paymentSourceResolver.fromCheckTin(payment, customerId, request.getFromTinNumber(), errors);
         paymentSourceResolver.toCheckCard(payment, request.getToPan(), errors);
         paymentValidator.checkSelfTransfer(payment, errors);
 
@@ -128,12 +128,12 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentResponse accountToAccount(Integer customerId, AccountToAccountRequest request) {
-        checkCooldown(customerId, request.getAmount(), request.getFromAccountNumber(), request.getToAccountNumber());
+    public PaymentResponse tinToTin(Integer customerId, TinToTinRequest request) {
+        checkCooldown(customerId, request.getAmount(), request.getFromTinNumber(), request.getToTinNumber());
 
         String idempotencyKey = generateIdempotencyKey(
                 customerId, request.getAmount(),
-                request.getFromAccountNumber(), request.getToAccountNumber());
+                request.getFromTinNumber(), request.getToTinNumber());
         Optional<PaymentResponse> idempotentResponse = checkIdempotency(idempotencyKey);
         if (idempotentResponse.isPresent()) return idempotentResponse.get();
 
@@ -141,10 +141,10 @@ public class PaymentService {
         paymentValidator.validateAmount(request.getAmount(), errors);
 
         PaymentEntity payment = paymentCreator.buildPayment(customerId, request.getAmount(),
-                PaymentSourceType.CURRENT_ACCOUNT, PaymentSourceType.CURRENT_ACCOUNT, idempotencyKey);
+                PaymentSourceType.TIN, PaymentSourceType.TIN, idempotencyKey);
 
-        paymentSourceResolver.fromCheckAccount(payment, customerId, request.getFromAccountNumber(), errors);
-        paymentSourceResolver.toCheckAccount(payment, request.getToAccountNumber(), errors);
+        paymentSourceResolver.fromCheckTin(payment, customerId, request.getFromTinNumber(), errors);
+        paymentSourceResolver.toCheckTin(payment, request.getToTinNumber(), errors);
         paymentValidator.checkSelfTransfer(payment, errors);
 
         if (!errors.isEmpty()) throw new MultiValidationException(errors);

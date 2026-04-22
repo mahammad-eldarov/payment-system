@@ -43,11 +43,11 @@ databaseChangeLog:
                     references: customer(id)
 
               - column:
-                  name: from_account_id
+                  name: from_tin_id
                   type: integer
                   constraints:
-                    foreignKeyName: payment_from_account_id_fk
-                    references: current_account(id)
+                    foreignKeyName: payment_from_tin_id_fk
+                    references: tin(id)
 
               - column:
                   name: from_card_id
@@ -61,11 +61,11 @@ databaseChangeLog:
                   type: integer
 
               - column:
-                  name: to_account_id
+                  name: to_tin_id
                   type: integer
                   constraints:
-                    foreignKeyName: payment_to_account_id_fk
-                    references: current_account(id)
+                    foreignKeyName: payment_to_tin_id_fk
+                    references: tin(id)
 
               - column:
                   name: to_card_id
@@ -141,7 +141,7 @@ databaseChangeLog:
             sql: >
               ALTER TABLE payment
               ADD CONSTRAINT payment_from_type_check
-              CHECK (from_type = ANY (ARRAY['CARD', 'CURRENT_ACCOUNT', 'EXTERNAL_CARD', 'EXTERNAL_ACCOUNT']));
+              CHECK (from_type = ANY (ARRAY['CARD', 'TIN', 'EXTERNAL_CARD', 'EXTERNAL_TIN']));
 
         - sql:
             comment: "payment status check constraint"
@@ -155,4 +155,4 @@ databaseChangeLog:
             sql: >
               ALTER TABLE payment
               ADD CONSTRAINT payment_to_type_check
-              CHECK (to_type = ANY (ARRAY['CARD', 'CURRENT_ACCOUNT', 'EXTERNAL']));
+              CHECK (to_type = ANY (ARRAY['CARD', 'TIN', 'EXTERNAL']));

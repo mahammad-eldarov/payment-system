@@ -1,6 +1,6 @@
 # Payment System
 
-A banking payment system built with Spring Boot for managing customers, cards, current accounts, and payment transactions.
+A banking payment system built with Spring Boot for managing customers, cards, TIN, and payment transactions.
 
 ## Tech Stack
 
@@ -30,21 +30,21 @@ A banking payment system built with Spring Boot for managing customers, cards, c
 - Balance management with minimum balance enforcement
 - Automatic expiration detection via scheduler
 
-### Current Account Management
-- Order and manage current accounts
-- Account statuses: `ACTIVE`, `BLOCKED`, `SUSPENDED`, `CLOSED`
-- 18-digit account number generation
+### TIN Management
+- Order and manage TIN
+- TIN statuses: `ACTIVE`, `BLOCKED`, `SUSPENDED`, `CLOSED`
+- 18-digit TIN number generation
 - Balance management with minimum balance enforcement
 
 ### Payment Processing
-- Card-to-Card, Card-to-Account, Account-to-Card, Account-to-Account transfers
+- Card-to-Card, Card-to-TIN, TIN-to-Card, TIN-to-TIN transfers
 - Idempotency support to prevent duplicate payments
 - Payment cooldown / rate limiting
 - Payment statuses: `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`
 - Batch payment processing via scheduler
 
 ### Transaction Management
-- Full transaction history for cards and accounts
+- Full transaction history for cards and TINs
 - Paginated transaction retrieval
 - Transaction statuses: `PENDING`, `COMPLETED`, `FAILED`
 
@@ -56,7 +56,7 @@ A banking payment system built with Spring Boot for managing customers, cards, c
 
 ### Scheduling (Daily)
 - `00:00` — Card expiration check
-- `00:01` — Current account expiration check
+- `00:01` — TIN expiration check
 - `00:05` — Pending payment processing
 
 ### External Integration
@@ -91,17 +91,17 @@ src/
 
 ## API Endpoints
 
-| Resource            | Base Path                    |
-|---------------------|------------------------------|
-| Customers           | `/api/v1/customers`          |
-| Cards               | `/api/v1/cards`              |
-| Current Accounts    | `/api/v1/accounts`           |
-| Payments            | `/api/v1/payments`           |
-| Card Orders         | `/api/v1/card-orders`        |
-| Account Orders      | `/api/v1/account-orders`     |
-| Transactions        | `/api/v1/transactions`       |
-| Notifications       | `/api/v1/notifications`      |
-| Audit Logs          | `/api/v1/audit-logs`         |
+| Resource      | Base Path               |
+|---------------|-------------------------|
+| Customers     | `/api/v1/customers`     |
+| Cards         | `/api/v1/cards`         |
+| TIN           | `/api/v1/tin`           |
+| Payments      | `/api/v1/payments`      |
+| Card Orders   | `/api/v1/card-orders`   |
+| TIN Orders    | `/api/v1/tin-orders`    |
+| Transactions  | `/api/v1/transactions`  |
+| Notifications | `/api/v1/notifications` |
+| Audit Logs    | `/api/v1/audit-logs`    |
 
 Full API documentation is available at `/swagger-ui.html` after running the application.
 
@@ -141,7 +141,7 @@ spring:
 
 Database schema is managed by **Liquibase** and applied automatically on startup.
 
-Key tables: `customer`, `card`, `current_account`, `card_order`, `current_account_order`, `payment`, `transaction`, `fraud_blacklist`, `notification`, `status_audit_log`, `shedlock`
+Key tables: `customer`, `card`, `tin`, `card_order`, `tin_order`, `payment`, `transaction`, `fraud_blacklist`, `notification`, `status_audit_log`, `shedlock`
 
 ## License
 

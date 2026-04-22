@@ -1,25 +1,25 @@
-package az.bank.paymentsystem.util.currentAccount;
+package az.bank.paymentsystem.util.tin;
 
 import jakarta.annotation.PostConstruct;
 import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;
-import az.bank.paymentsystem.repository.CurrentAccountRepository;
+import az.bank.paymentsystem.repository.TinRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AccountNumberGenerator {
+public class TinNumberGenerator {
 
-    @Value("${bank.account.number.prefix}")
+    @Value("${bank.tin.number.prefix}")
     private String prefix;
 
-    @Value("${bank.account.number.total-length}")
+    @Value("${bank.tin.number.total-length}")
     private int totalLength;
 
     private int randomPartLength;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final CurrentAccountRepository currentAccountRepository;
+    private final TinRepository tinRepository;
 
     @PostConstruct
     public void init() {
@@ -27,14 +27,14 @@ public class AccountNumberGenerator {
     }
 
     public String generate() {
-        String accountNumber;
+        String tinNumber;
         do {
-            accountNumber = buildAccountNumber();
-        } while (currentAccountRepository.existsByAccountNumber(accountNumber));
-        return accountNumber;
+            tinNumber = buildTinNumber();
+        } while (tinRepository.existsByTinNumber(tinNumber));
+        return tinNumber;
     }
 
-    private String buildAccountNumber() {
+    private String buildTinNumber() {
         StringBuilder sb = new StringBuilder(prefix);
         for (int i = 0; i < randomPartLength; i++) {
             sb.append(secureRandom.nextInt(10));

@@ -20,8 +20,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "current_account_order")
-public class CurrentAccountOrderEntity extends BaseEntity {
+@Table(name = "tin_order")
+public class TinOrderEntity extends BaseEntity {
 
     @Column(name = "status", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
@@ -30,8 +30,8 @@ public class CurrentAccountOrderEntity extends BaseEntity {
     @Column(name = "rejection_reason", length = Integer.MAX_VALUE)
     private String rejectionReason;
 
-    @Column(name = "account_holder_name", length = Integer.MAX_VALUE)
-    private String accountHolderName;
+    @Column(name = "tin_holder_name", length = Integer.MAX_VALUE)
+    private String tinHolderName;
 
     @Column(name = "currency", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)

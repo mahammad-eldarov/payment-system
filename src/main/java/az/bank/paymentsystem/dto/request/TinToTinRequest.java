@@ -7,19 +7,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountToCardRequest {
+public class TinToTinRequest {
 
     @NotNull(message = "{notNull.bigDecimal}")
     private BigDecimal amount;
 
     @NotBlank(message = "{notBlank.fromAccountNumber}")
-    private String fromAccountNumber;
+    private String fromTinNumber;
 
-    @NotBlank(message = "{notBlank.toPan}")
-    private String toPan;
+    @NotBlank(message = "{notBlank.toAccountNumber}")
+    private String toTinNumber;
+
 
 }

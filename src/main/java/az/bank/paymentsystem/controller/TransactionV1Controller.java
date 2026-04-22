@@ -30,13 +30,13 @@ public class TransactionV1Controller {
         return ResponseEntity.ok(transactionService.getTransactionsByCardId(cardId, page).getContent());
     }
 
-    @GetMapping("/external/account/{accountId}")
-    @Operation(summary = "Get last 100 transactions by account ID.",
-            description = "Returns transactions where account is sender or receiver.")
-    public ResponseEntity<List<TransactionResponse>> getByAccountId(
-            @PathVariable Integer accountId,
+    @GetMapping("/external/tin/{tinId}")
+    @Operation(summary = "Get last 100 transactions by TIN ID.",
+            description = "Returns transactions where TIN is sender or receiver.")
+    public ResponseEntity<List<TransactionResponse>> getByTinId(
+            @PathVariable Integer tinId,
             @RequestParam(required = false, defaultValue = "1") int page) {
-        return ResponseEntity.ok(transactionService.getTransactionsByAccountId(accountId, page).getContent());
+        return ResponseEntity.ok(transactionService.getTransactionsByTinId(tinId, page).getContent());
     }
 
     @GetMapping("external/payment/{paymentId}")

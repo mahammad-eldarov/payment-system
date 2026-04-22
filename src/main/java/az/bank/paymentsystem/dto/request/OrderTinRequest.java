@@ -10,13 +10,13 @@ import az.bank.paymentsystem.enums.Currency;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderCurrentAccountRequest {
+public class OrderTinRequest {
 
     @NotNull(message = "{notNull.currency}")
     private Currency currency;
 
     @NotNull(message = "{notNull.currentAccountHolderName}")
-    private String currentAccountHolderName;
+    private String tinHolderName;
 
 
 }

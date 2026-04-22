@@ -36,11 +36,11 @@ databaseChangeLog:
                     references: customer(id)
 
               - column:
-                  name: from_account_id
+                  name: from_tin_id
                   type: integer
                   constraints:
-                    foreignKeyName: transaction_from_account_id_fk
-                    references: current_account(id)
+                    foreignKeyName: transaction_from_tin_id_fk
+                    references: tin(id)
 
               - column:
                   name: from_card_id
@@ -57,11 +57,11 @@ databaseChangeLog:
                     references: payment(id)
 
               - column:
-                  name: to_account_id
+                  name: to_tin_id
                   type: integer
                   constraints:
-                    foreignKeyName: transaction_to_account_id_fk
-                    references: current_account(id)
+                    foreignKeyName: transaction_to_tin_id_fk
+                    references: tin(id)
 
               - column:
                   name: to_card_id

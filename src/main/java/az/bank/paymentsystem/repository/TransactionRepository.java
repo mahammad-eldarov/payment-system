@@ -11,7 +11,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     @EntityGraph(attributePaths = {
             "customer",
             "fromCard", "toCard",
-            "fromAccount", "toAccount",
+            "fromTin", "toTin",
             "payment"
     })
     Page<TransactionEntity> findByFromCardIdOrToCardId(
@@ -23,19 +23,19 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     @EntityGraph(attributePaths = {
             "customer",
             "fromCard", "toCard",
-            "fromAccount", "toAccount",
+            "fromTin", "toTin",
             "payment"
     })
-    Page<TransactionEntity> findByFromAccountIdOrToAccountId(
-            Integer fromAccountId,
-            Integer toAccountId,
+    Page<TransactionEntity> findByFromTinIdOrToTinId(
+            Integer fromTinId,
+            Integer toTinId,
             Pageable pageable
     );
 
     @EntityGraph(attributePaths = {
             "customer",
             "fromCard", "toCard",
-            "fromAccount", "toAccount",
+            "fromTin", "toTin",
             "payment"
     })
     Page<TransactionEntity> findAllByPaymentId(Integer paymentId, Pageable pageable);

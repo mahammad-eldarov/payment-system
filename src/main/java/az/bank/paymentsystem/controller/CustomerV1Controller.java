@@ -76,9 +76,9 @@ public class CustomerV1Controller {
 
     @GetMapping("/external/{customerId}/details")
     @Operation(summary = "Get full customer details by ID",
-            description = "Retrieves detailed information about a customer including their cards and accounts using their unique identifier.")
-    public ResponseEntity<CustomerResponse> getCustomersCardsAndAccounts(@PathVariable Integer customerId) {
-        CustomerResponse response = customerService.getCustomersCardsAndAccounts(customerId);
+            description = "Retrieves detailed information about a customer including their cards and TINs using their unique identifier.")
+    public ResponseEntity<CustomerResponse> getCustomersCardsAndTins(@PathVariable Integer customerId) {
+        CustomerResponse response = customerService.getCustomersCardsAndTins(customerId);
         return ResponseEntity.ok(response);
     }
 
@@ -119,13 +119,13 @@ public class CustomerV1Controller {
         return ResponseEntity.ok(customerService.getCardTransactions(customerId, pan, page).getContent());
     }
 
-    @GetMapping("/external/{customerId}/accounts/{accountNumber}/transactions")
-    @Operation(summary = "Get account transactions.", description = "Returns paginated transactions for a specific account.")
-    public ResponseEntity<List<TransactionResponse>> getAccountTransactions(
+    @GetMapping("/external/{customerId}/tins/{tinNumber}/transactions")
+    @Operation(summary = "Get tin transactions.", description = "Returns paginated transactions for a specific TIN.")
+    public ResponseEntity<List<TransactionResponse>> getTinTransactions(
             @PathVariable Integer customerId,
-            @PathVariable String accountNumber,
+            @PathVariable String tinNumber,
             @RequestParam(required = false, defaultValue = "1") int page) {
-        return ResponseEntity.ok(customerService.getAccountTransactions(customerId, accountNumber, page).getContent());
+        return ResponseEntity.ok(customerService.getTinTransactions(customerId, tinNumber, page).getContent());
     }
 
 

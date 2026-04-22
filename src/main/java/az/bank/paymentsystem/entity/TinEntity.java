@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import az.bank.paymentsystem.enums.Currency;
-import az.bank.paymentsystem.enums.CurrentAccountStatus;
+import az.bank.paymentsystem.enums.TinStatus;
 import org.hibernate.annotations.ColumnDefault;
 
 @Getter
@@ -26,17 +26,17 @@ import org.hibernate.annotations.ColumnDefault;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "current_account")
-public class CurrentAccountEntity extends BaseEntity {
+@Table(name = "tin")
+public class TinEntity extends BaseEntity {
 
     @Size(max = 18)
     @NotNull
-    @Column(name = "account_number", nullable = false, length = 18)
-    private String accountNumber;
+    @Column(name = "tin_number", nullable = false, length = 18)
+    private String tinNumber;
 
     @NotNull
-    @Column(name = "current_account_holder_name", nullable = false, length = Integer.MAX_VALUE)
-    private String currentAccountHolderName;
+    @Column(name = "tin_holder_name", nullable = false, length = Integer.MAX_VALUE)
+    private String tinHolderName;
 
     @NotNull
     @ColumnDefault("0")
@@ -52,7 +52,7 @@ public class CurrentAccountEntity extends BaseEntity {
     @ColumnDefault("'ACTIVE'")
     @Column(name = "status", nullable = false, length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
-    private CurrentAccountStatus status;
+    private TinStatus status;
 
     @NotNull
     @Column(name = "activation_date", nullable = false)

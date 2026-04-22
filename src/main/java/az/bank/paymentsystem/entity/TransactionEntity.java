@@ -57,16 +57,16 @@ public class TransactionEntity extends  BaseEntity {
     private CardEntity fromCard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_account_id")
-    private CurrentAccountEntity fromAccount;
+    @JoinColumn(name = "from_tin_id")
+    private TinEntity fromTin;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_card_id")
     private CardEntity toCard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_account_id")
-    private CurrentAccountEntity toAccount;
+    @JoinColumn(name = "to_tin_id")
+    private TinEntity toTin;
 
     @Column(name = "description", nullable = false, length = 500)
     private String description;

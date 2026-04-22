@@ -32,8 +32,8 @@ public class PaymentCreator {
         Locale fallbackLocale = LocaleContextHolder.getLocale();
 
         PaymentSourceType blockedType = switch (fromType) {
-            case CARD -> PaymentSourceType.CURRENT_ACCOUNT;
-            case CURRENT_ACCOUNT -> PaymentSourceType.CARD;
+            case CARD -> PaymentSourceType.TIN;
+            case TIN -> PaymentSourceType.CARD;
             case EXTERNAL -> throw new IllegalStateException(
                     messageSource.getMessage("paymentCreator.buildPayment.illegalFromType", null, fallbackLocale));
         };

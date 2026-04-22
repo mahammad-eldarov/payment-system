@@ -9,13 +9,13 @@ databaseChangeLog:
       file: changes/008-create-external-party-table.yaml
       relativeToChangelogFile: true
   - include:
-      file: changes/003-create-current-account-table.yaml
+      file: changes/003-create-tin-table.yaml
       relativeToChangelogFile: true
   - include:
       file: changes/004-create-card-order-table.yaml
       relativeToChangelogFile: true
   - include:
-      file: changes/005-create-current-account-order-table.yaml
+      file: changes/005-create-tin-order-table.yaml
       relativeToChangelogFile: true
   - include:
       file: changes/006-create-payment-table.yaml

@@ -3,9 +3,9 @@ package az.bank.paymentsystem.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import az.bank.paymentsystem.dto.request.AccountToAccountRequest;
-import az.bank.paymentsystem.dto.request.AccountToCardRequest;
-import az.bank.paymentsystem.dto.request.CardToAccountRequest;
+import az.bank.paymentsystem.dto.request.TinToTinRequest;
+import az.bank.paymentsystem.dto.request.TinToCardRequest;
+import az.bank.paymentsystem.dto.request.CardToTinRequest;
 import az.bank.paymentsystem.dto.request.CardToCardRequest;
 import az.bank.paymentsystem.dto.response.PaymentResponse;
 import az.bank.paymentsystem.service.PaymentService;
@@ -35,31 +35,31 @@ public class PaymentV1Controller {
                 .body(paymentService.cardToCard(customerId, request));
     }
 
-    @PostMapping("/external/{customerId}/card-to-account")
-    @Operation(summary = "Card → Account payment.", description = "Transfer from a card PAN to a current account number.")
-    public ResponseEntity<PaymentResponse> cardToAccount(
+    @PostMapping("/external/{customerId}/card-to-tin")
+    @Operation(summary = "Card → TIN payment.", description = "Transfer from a card PAN to a TIN number.")
+    public ResponseEntity<PaymentResponse> cardToTin(
             @PathVariable Integer customerId,
-            @RequestBody CardToAccountRequest request) {
+            @RequestBody CardToTinRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.cardToAccount(customerId, request));
+                .body(paymentService.cardToTin(customerId, request));
     }
 
-    @PostMapping("/external/{customerId}/account-to-card")
-    @Operation(summary = "Account → Card payment.", description = "Transfer from a current account number to a card PAN.")
-    public ResponseEntity<PaymentResponse> accountToCard(
+    @PostMapping("/external/{customerId}/tin-to-card")
+    @Operation(summary = "TIN → Card payment.", description = "Transfer from a TIN number to a card PAN.")
+    public ResponseEntity<PaymentResponse> tinToCard(
             @PathVariable Integer customerId,
-            @RequestBody AccountToCardRequest request) {
+            @RequestBody TinToCardRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.accountToCard(customerId, request));
+                .body(paymentService.tinToCard(customerId, request));
     }
 
-    @PostMapping("/external/{customerId}/account-to-account")
-    @Operation(summary = "Account → Account payment.", description = "Transfer from a current account number to another account number.")
-    public ResponseEntity<PaymentResponse> accountToAccount(
+    @PostMapping("/external/{customerId}/tin-to-tin")
+    @Operation(summary = "TIN → TIN payment.", description = "Transfer from a TIN number to another TIN number.")
+    public ResponseEntity<PaymentResponse> tinToTin(
             @PathVariable Integer customerId,
-            @RequestBody AccountToAccountRequest request) {
+            @RequestBody TinToTinRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.accountToAccount(customerId, request));
+                .body(paymentService.tinToTin(customerId, request));
     }
 
     @GetMapping("/external/{customerId}/{paymentId}")

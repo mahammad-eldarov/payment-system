@@ -30,7 +30,7 @@ public class CustomerCreator {
         fraudBlacklistChecker.checkBlacklist(
                 request.getPin(), request.getPhoneNumber(), request.getEmail());
         fraudDetectionChecker.checkDeletedSuspiciousCustomer(request.getPin());
-        fraudDetectionChecker.checkAccountCreationFrequency(request.getPin());
+        fraudDetectionChecker.checkTinCreationFrequency(request.getPin());
 
         if (customerRepository.existsByPinAndIsVisibleTrue(request.getPin())) {
             throw new CustomerPinAlreadyExistsException(messageSource.getMessage("customerCreator.createCustomer.pinAvailable", null, locale));
